@@ -1,0 +1,54 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning sticky-top">
+    <div class="container">
+        <a class="navbar-brand fw-bold text-warning d-flex align-items-center gap-2" href="{{ path('app_home') }}">
+            <img src="{{ asset('images/logo.png') }}" alt="GeoMonkey" width="36" height="36" class="rounded-circle">
+            <span>GéoMonkey</span>
+        </a>
+
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+                aria-controls="mainNavbar" aria-expanded="false" aria-label="Basculer la navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="mainNavbar">
+            <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Accueil</a>
+                </li>
+                <li class="nav-item">
+                    {#<a class="nav-link" href="{{ path('app_about') }}">Présentation</a>#}
+                    <a class="nav-link" href="#">Présentation</a>
+                </li>
+                <li class="nav-item">
+                    {#<a class="nav-link" href="{{ path('app_project') }}">Nos projets</a>#}
+                    <a class="nav-link" href="#">Nos projets</a>
+                </li>
+                <li class="nav-item">
+                    {#<a class="nav-link" href="{{ path('app_news') }}">Actualités</a>#}
+                    <a class="nav-link" href="#">Actualités</a>
+                </li>
+                <li class="nav-item">
+                    {#<a class="nav-link" href="{{ path('app_gallery') }}">Galerie</a>#}
+                    <a class="nav-link" href="#">Galerie</a>
+                </li>
+                <li class="nav-item">
+                   {# <a class="nav-link" href="{{ path('app_events') }}">Événements</a>#}
+                    <a class="nav-link" href="#">Événements</a>
+                </li>
+                <li class="nav-item ms-lg-3">
+                    {#<a class="btn btn-warning fw-semibold" href="#newsletter">Newsletter</a>#}
+                    <a class="btn btn-warning fw-semibold" href="#">Newsletter</a>
+                </li>
+                {# lien futur : adhésion #}
+                {# <li class="nav-item ms-lg-2">
+                    <a class="btn btn-outline-warning" href="{{ path('app_membership') }}">Adhérer</a>
+                </li> #}
+                <li class="nav-item ms-lg-2">
+                    <a class="btn btn-outline-warning" href="{{ path('app_admin_dashboard') }}">
+                        <i class="bi bi-box-arrow-in-right"></i> Connexion
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

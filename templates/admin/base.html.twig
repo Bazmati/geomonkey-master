@@ -1,0 +1,17 @@
+{% extends 'front/base.html.twig' %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="row">
+            {# Sidebar (menu latéral) #}
+            <div class="col-md-3 col-lg-2 bg-dark vh-100 p-0">
+                {% include 'admin/partials/_sidebar.html.twig' %}
+            </div>
+
+            {# Contenu principal #}
+            <div class="col-md-9 col-lg-10">
+                {% block admin_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

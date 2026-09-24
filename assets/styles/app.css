@@ -1,0 +1,37 @@
+:root {
+  --gm-green: #00A040;
+  --gm-yellow: #E0C020;
+  --gm-bg: #1C1C1A;
+  --gm-surface: #242422;
+  --gm-text: #F5F0D0;
+
+  --bs-primary: var(--gm-green);
+  --bs-warning: var(--gm-yellow);
+  --bs-body-bg: var(--gm-bg);
+  --bs-body-color: var(--gm-text);
+  --bs-secondary: var(--gm-surface);
+}
+
+body {
+  background: var(--gm-bg);
+  color: var(--gm-text);
+}
+
+.navbar,
+.card,
+footer {
+  background: var(--gm-surface);
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--gm-green);
+  --bs-btn-border-color: var(--gm-green);
+  --bs-btn-hover-bg: #008a37;
+  --bs-btn-hover-border-color: #008a37;
+}
+
+.btn-warning {
+  --bs-btn-bg: var(--gm-yellow);
+  --bs-btn-border-color: var(--gm-yellow);
+  --bs-btn-color: #1c1c1a;
+}

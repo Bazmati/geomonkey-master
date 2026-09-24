@@ -1,0 +1,50 @@
+<nav class="navbar navbar-dark bg-dark flex-column p-3 h-100">
+    <a class="navbar-brand mb-4" href="{{ path('app_admin_dashboard') }}">
+        <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" width="40" class="d-inline-block align-top">
+        <span class="ms-2 fw-bold text-warning">Admin Panel</span>
+    </a>
+    <ul class="nav nav-pills flex-column">
+        <li class="nav-item">
+            <a class="nav-link active bg-warning text-dark" href="{{ path('app_admin_dashboard') }}">
+                <i class="bi bi-house"></i> Tableau de bord
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#">
+                <i class="bi bi-calendar"></i> Événements
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#">
+                <i class="bi bi-folder"></i> Projets
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#">
+                <i class="bi bi-people"></i> Utilisateurs
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#">
+                <i class="bi bi-envelope"></i> Messages
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-warning" href="#">
+                <i class="bi bi-gear"></i> Paramètres
+            </a>
+        </li>
+    </ul>
+    <div class="mt-auto">
+        <a class="btn btn-primary w-100" href="{{ path('app_home') }}">
+            <i class="bi bi-arrow-left"></i> Retour au site public
+        </a>
+    </div>
+</nav>
+
+<style>
+    .nav-link:hover {
+        background-color: rgba(255, 193, 7, 0.2);
+    }
+</style>
+

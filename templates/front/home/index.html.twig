@@ -1,0 +1,160 @@
+{% extends '/front/base.html.twig' %}
+
+{% block title %}GéoMonkey - Accueil{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <header class="hero-section py-5">
+        <div class="container py-5">
+            <div class="row align-items-center g-5">
+                <div class="col-lg-7">
+                    <span class="badge text-bg-warning text-dark mb-3">Association culturelle & conviviale</span>
+                    <h1 class="display-4 fw-bold text-warning mb-3">
+                        Bienvenue chez GéoMonkey
+                    </h1>
+                    <p class="lead mb-4">
+                        GéoMonkey organise des événements culturels, artisanaux et conviviaux.
+                        Notre site centralise l’actualité, la présentation de l’association et les futures inscriptions.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3">
+                        {#<a href="{{ path('app_events') }}" class="btn btn-warning btn-lg fw-semibold">Voir les événements</a>
+                        <a href="{{ path('app_about') }}" class="btn btn-outline-light btn-lg">Découvrir l’association</a>#}
+                    </div>
+                </div>
+
+                <div class="col-lg-5 text-center">
+                    <img src="{{ asset('images/logo.png') }}" alt="Logo GeoMonkey" class="img-fluid hero-logo">
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <section class="py-5">
+            <div class="container">
+                <div class="row mb-4">
+                    <div class="col-lg-8">
+                        <h2 class="text-warning fw-bold">Présentation institutionnelle</h2>
+                        <p class="text-muted">
+                            Retrouvez ici les informations essentielles sur l’association et son identité.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
+                            <div class="card-body">
+                                <h3 class="h5 text-warning">Présentation + valeurs</h3>
+                                <p class="mb-0">Comprendre le projet, sa mission et ses valeurs fondatrices.</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-success">
+                                {#<a href="{{ path('app_about') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
+                            <div class="card-body">
+                                <h3 class="h5 text-warning">Historique</h3>
+                                <p class="mb-0">Les grandes étapes qui ont construit GéoMonkey.</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-success">
+                                {#<a href="{{ path('app_history') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
+                            <div class="card-body">
+                                <h3 class="h5 text-warning">Équipe fondatrice</h3>
+                                <p class="mb-0">Les personnes à l’origine de l’association.</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-success">
+                                {#<a href="{{ path('app_team') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 col-xl-3">
+                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
+                            <div class="card-body">
+                                <h3 class="h5 text-warning">Galerie photos</h3>
+                                <p class="mb-0">Un aperçu visuel de nos événements et moments forts.</p>
+                            </div>
+                            <div class="card-footer bg-transparent border-success">
+                                {#<a href="{{ path('app_gallery') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-5 bg-surface">
+            <div class="container">
+                <div class="row align-items-start g-4">
+                    <div class="col-lg-7">
+                        <h2 class="text-warning fw-bold mb-4">Derniers événements</h2>
+
+                        <div class="row g-4">
+                            <div class="col-md-6">
+                                <div class="card h-100 bg-dark text-light border-warning">
+                                    <div class="card-body">
+                                        <span class="badge text-bg-success mb-2">À venir</span>
+                                        <h3 class="h5">Concert de printemps</h3>
+                                        <p class="mb-1">Date : à définir</p>
+                                        <p class="mb-0">Lieu : à définir</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="card h-100 bg-dark text-light border-warning">
+                                    <div class="card-body">
+                                        <span class="badge text-bg-secondary mb-2">Passé</span>
+                                        <h3 class="h5">Rencontre associative</h3>
+                                        <p class="mb-1">Date : à définir</p>
+                                        <p class="mb-0">Lieu : à définir</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        {# lien futur : page événement détaillée #}
+                        {# <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-outline-warning mt-3">Voir le détail</a> #}
+                    </div>
+
+                    <div class="col-lg-5" id="newsletter">
+                        <div class="card bg-dark text-light border-success shadow-sm">
+                            <div class="card-body p-4">
+                                <h2 class="text-warning fw-bold">Newsletter</h2>
+                                <p>Inscris-toi pour recevoir les actualités de GéoMonkey.</p>
+
+                                <form method="post">
+                                    <div class="mb-3">
+                                        <label for="newsletter_email" class="form-label">Adresse email</label>
+                                        <input type="email" class="form-control" id="newsletter_email" name="email" placeholder="ton@email.fr">
+                                    </div>
+                                    <button type="submit" class="btn btn-success w-100 fw-semibold">
+                                        S’inscrire
+                                    </button>
+                                </form>
+
+                                {# lien futur : gestion consentement RGPD / double opt-in #}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {# lien futur : section adhésion #}
+        {# <section class="py-5">
+            ...
+        </section> #}
+    </main>
+{% endblock %}
