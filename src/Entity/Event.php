@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Interface\ImageableInterface;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
-class Event
+class Event implements ImageableInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -122,5 +124,33 @@ class Event
         $this->image = $image;
 
         return $this;
+    }
+
+    // Image file for upload (not persisted in database)
+    private ?File $imageFile = null;
+
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    public function setImageFile(?File $file): void
+    {
+        $this->imageFile = $file;
+    }
+
+    public function getImagePath(): string
+    {
+        return 'events';
+    }
+
+    public function getDefaultImage(): string
+    {
+        return '';
+    }
+
+    public function hasImage(): bool
+    {
+        return $this->image !== null && $this->image !== '';
     }
 }

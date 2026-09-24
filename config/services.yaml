@@ -7,6 +7,8 @@
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
+    # Public directory for image storage
+    public_dir: '%kernel.project_dir%/public'
 
 services:
     # default configuration for services in *this* file
@@ -18,6 +20,21 @@ services:
     # this creates a service per class whose id is the fully-qualified class name
     App\:
         resource: '../src/'
+
+    # ImageManager service - explicitly configure the public directory argument
+    App\Service\ImageManager:
+        arguments:
+            $publicDir: '%public_dir%'
+
+    # ImageUploadListener - register as Doctrine event listener
+    App\EventListener\ImageUploadListener:
+        tags:
+            - { name: doctrine.event_listener, event: preRemove }
+            - { name: doctrine.event_listener, event: preUpdate }
+
+    # ImageExtension - register as Twig extension
+    App\Twig\ImageExtension:
+        tags: ['twig.extension']
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

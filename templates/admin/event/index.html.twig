@@ -2,7 +2,7 @@
 
 {% block admin_content %}
     <div class="p-4">
-        <h1 class="text-dark mb-4">Gestion des événements</h1>
+        <h1 class="text-success mb-4">Gestion des événements</h1>
 
         <div class="d-flex justify-content-end mb-3">
             <a href="{{ path('admin_events_new') }}" class="btn btn-success">
@@ -13,9 +13,9 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if events is empty %}
-                    <div class="text-center text-muted py-4">
+                    <div class="text-center py-4" style="color: #c0c0c0;">
                         <i class="bi bi-calendar-x fs-1"></i>
-                        <p class="mt-2 text-dark">Aucun événement trouvé</p>
+                        <p class="mt-2 text-light">Aucun événement trouvé</p>
                     </div>
                 {% else %}
                     <div class="table-responsive">
@@ -35,7 +35,7 @@
                             </thead>
                             <tbody>
                                 {% for event in events %}
-                                    <tr class="text-dark">
+                                    <tr class="text-light">
                                         <td>{{ event.id }}</td>
                                         <td>{{ event.title }}</td>
                                         <td>{{ event.desciption }}</td>
