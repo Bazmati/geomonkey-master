@@ -34,13 +34,16 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image upload
             $imageFile = $form->get('imageFile')->getData();
+
+            $entityManager->persist($event);
+            $entityManager->flush();
+
+            // Process image upload AFTER persist so entity has an ID
             if ($imageFile) {
                 $imageManager->upload($event, $imageFile);
             }
 
-            $entityManager->persist($event);
             $entityManager->flush();
 
             $this->addFlash('success', 'L\'événement a été créé avec succès.');

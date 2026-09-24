@@ -50,31 +50,27 @@
         <div class="mb-3">
             {{ form_label(form.imageFile) }}
             {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-            <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 5Mo)</div>
+            <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 2Mo)</div>
             {% if form.imageFile.vars.errors|length > 0 %}
                 <div class="text-danger">
                     {{ form_errors(form.imageFile) }}
                 </div>
             {% endif %}
-        </div>
-
-        {# Delete image checkbox (only if image exists) #}
-        {% if event.hasImage() %}
-            <div class="mb-3 form-check">
-                {{ form_widget(form.deleteImage, {'attr': {'class': 'form-check-input'}}) }}
-                {{ form_label(form.deleteImage, null, {'label_attr': {'class': 'form-check-label'}}) }}
-            </div>
-        {% endif %}
-
-        {# Image preview - show on right side if exists #}
-        {% if event.hasImage() %}
-            <div class="mb-3">
-                <label class="form-label">Image actuelle</label>
-                <div class="border rounded p-2 image-preview-container" style="height: 200px; background-color: #2d2d2d;">
-                    {{ image_tag(event, 'medium', event.title, 'w-100 h-100 rounded') }}
+            
+            {# Image preview - show under input if exists #}
+            {% if event.hasImage() %}
+                <div class="mt-2">
+                    <label class="form-label">Image actuelle</label>
+                    <div class="border rounded p-2 image-preview-container" style="height: 200px; background-color: #2d2d2d;">
+                        {{ image_tag(event, 'medium', event.title, 'w-100 h-100 rounded') }}
+                    </div>
+                    <div class="mt-2 form-check">
+                        {{ form_widget(form.deleteImage, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.deleteImage, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                    </div>
                 </div>
-            </div>
-        {% endif %}
+            {% endif %}
+        </div>
     </div>
 
     {# Submit button - full width #}

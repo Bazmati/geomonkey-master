@@ -3,8 +3,9 @@
 namespace App\Service;
 
 use App\Interface\ImageableInterface;
-use Intervention\Image\ImageManagerStatic as InterventionImage;
-use Symfony\Component\HttpFoundation\File\File;
+use Intervention\Image\ImageManager as InterventionImageManager;
+use Intervention\Image\Drivers\Gd\Driver as GdDriver;
+use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 /**
@@ -26,7 +27,6 @@ class ImageManager
     {
         $this->publicDir = rtrim($publicDir, '/');
         
-        // Configuration des tailles (max width) et qualités
         $this->sizes = [
             'small' => 300,
             'medium' => 800,
@@ -46,18 +46,12 @@ class ImageManager
      */
     public function upload(ImageableInterface $entity, UploadedFile $file): void
     {
-        // Delete old images if they exist
-        $this->deleteForEntity($entity);
-
-        // Generate UUID for the image
         $uuid = bin2hex(random_bytes(16));
 
-        // Process each size
         foreach (self::AVAILABLE_SIZES as $size) {
             $this->processImage($entity, $file, $uuid, $size);
         }
 
-        // Store the UUID in the entity
         $entity->setImage($uuid);
     }
 
@@ -73,26 +67,66 @@ class ImageManager
         $maxWidth = $this->sizes[$size];
         $quality = $this->qualities[$size];
 
-        // Create intervention image
-        $image = InterventionImage::make($file->getPathname());
+        $manager = $this->createImageManager();
+        
+        if ($manager === null) {
+            $this->copyFileWithoutProcessing($entity, $file, $uuid, $size);
+            return;
+        }
 
-        // Resize while maintaining aspect ratio
+        $image = $manager->read($file->getPathname());
         $image->resize($maxWidth, null, function ($constraint) {
             $constraint->aspectRatio();
-            $constraint->upsize(); // Don't upsize if image is smaller
+            $constraint->upsize();
         });
 
-        // Get the save path
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);
-        
-        // Ensure directory exists
         $dir = dirname($savePath);
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
 
-        // Save as WebP
-        $image->save($savePath, $quality, 'webp');
+        $image->save($savePath);
+    }
+
+    /**
+     * Create an ImageManager instance based on available extensions.
+     */
+    private function createImageManager(): ?InterventionImageManager
+    {
+        if (extension_loaded('gd')) {
+            return new InterventionImageManager(new GdDriver());
+        }
+        if (extension_loaded('imagick')) {
+            return new InterventionImageManager(new ImagickDriver());
+        }
+        return null;
+    }
+
+    /**
+     * Copy file without image processing (fallback when GD/Imagick not available).
+     */
+    private function copyFileWithoutProcessing(
+        ImageableInterface $entity,
+        UploadedFile $file,
+        string $uuid,
+        string $size
+    ): void {
+        // Get original extension
+        $originalExtension = $file->getClientOriginalExtension();
+        if (empty($originalExtension)) {
+            $originalExtension = pathinfo($file->getPathname(), PATHINFO_EXTENSION);
+        }
+        
+        $savePath = $this->getAbsolutePath($entity, $size, $uuid);
+        // Replace .webp with original extension
+        $savePath = preg_replace('/\.webp$/', '.' . $originalExtension, $savePath);
+        
+        $dir = dirname($savePath);
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        copy($file->getPathname(), $savePath);
     }
 
     /**
@@ -105,7 +139,13 @@ class ImageManager
         }
 
         $uuid = $entity->getImage();
-        $basePath = $this->publicDir . '/uploads/' . $entity->getImagePath() . '/' . $entity->getId();
+        $entityId = $entity->getId();
+        
+        if ($entityId === null) {
+            return;
+        }
+        
+        $basePath = $this->publicDir . '/uploads/' . $entity->getImagePath() . '/' . $entityId;
 
         foreach (self::AVAILABLE_SIZES as $size) {
             $filePath = $basePath . '/' . $size . '/' . $uuid . '.webp';
@@ -114,7 +154,6 @@ class ImageManager
             }
         }
 
-        // Remove empty directories
         $this->cleanupEmptyDirectories($basePath);
     }
 
@@ -126,7 +165,6 @@ class ImageManager
         if (!is_dir($path)) {
             return;
         }
-
         $files = array_diff(scandir($path), ['.', '..']);
         foreach ($files as $file) {
             $fullPath = $path . '/' . $file;
@@ -134,8 +172,6 @@ class ImageManager
                 $this->cleanupEmptyDirectories($fullPath);
             }
         }
-
-        // Remove directory if empty
         if (count(array_diff(scandir($path), ['.', '..'])) === 0) {
             rmdir($path);
         }
@@ -143,21 +179,38 @@ class ImageManager
 
     /**
      * Get the URL for an entity's image in a specific size.
-     * Returns the URL or null if no image exists.
      */
     public function getUrl(ImageableInterface $entity, string $size = 'medium'): ?string
     {
         if (!$entity->getImage()) {
             return null;
         }
-
-        return '/' . $this->getRelativePath($entity, $size, $entity->getImage());
+        
+        $uuid = $entity->getImage();
+        $entityId = $entity->getId();
+        $basePath = 'uploads/' . $entity->getImagePath() . '/' . $entityId . '/' . $size . '/' . $uuid;
+        
+        // Try .webp first (if GD/Imagick is installed)
+        $webpPath = $this->publicDir . '/' . $basePath . '.webp';
+        if (file_exists($webpPath)) {
+            return '/' . $basePath . '.webp';
+        }
+        
+        // Fallback to common extensions if GD/Imagick not installed
+        $extensions = ['.jpg', '.jpeg', '.png', '.gif', '.webp'];
+        foreach ($extensions as $ext) {
+            $fullPath = $this->publicDir . '/' . $basePath . $ext;
+            if (file_exists($fullPath)) {
+                return '/' . $basePath . $ext;
+            }
+        }
+        
+        // Default fallback
+        return '/' . $basePath . '.webp';
     }
 
     /**
      * Get the HTML tag for an entity's image.
-     * If no image exists, returns Bootstrap's image-slash icon.
-     * If a default image is defined, uses that instead.
      */
     public function getHtmlTag(
         ImageableInterface $entity,
@@ -167,21 +220,16 @@ class ImageManager
         array $attrs = []
     ): string {
         $url = $this->getUrl($entity, $size);
-
         if ($url) {
             $attrsStr = '';
             $attrs['class'] = $class;
             $attrs['src'] = $url;
             $attrs['alt'] = $alt ?: ($entity->getImagePath() ?? 'image');
-
             foreach ($attrs as $key => $value) {
                 $attrsStr .= sprintf(' %s="%s"', $key, htmlspecialchars($value, ENT_QUOTES));
             }
-
             return sprintf('<img%s>', $attrsStr);
         }
-
-        // No image: check for default image
         $defaultImage = $entity->getDefaultImage();
         if (!empty($defaultImage)) {
             return sprintf(
@@ -191,8 +239,6 @@ class ImageManager
                 htmlspecialchars($class, ENT_QUOTES)
             );
         }
-
-        // Fallback to Bootstrap icon
         return '<i class="bi bi-image-slash text-muted"></i>';
     }
 
@@ -231,17 +277,11 @@ class ImageManager
         );
     }
 
-    /**
-     * Get available sizes.
-     */
     public function getAvailableSizes(): array
     {
         return self::AVAILABLE_SIZES;
     }
 
-    /**
-     * Check if a size is valid.
-     */
     public function isValidSize(string $size): bool
     {
         return in_array($size, self::AVAILABLE_SIZES, true);
