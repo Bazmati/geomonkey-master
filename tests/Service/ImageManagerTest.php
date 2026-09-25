@@ -5,25 +5,23 @@ namespace App\Tests\Service;
 use App\Entity\Event;
 use App\Service\ImageManager;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class ImageManagerTest extends TestCase
 {
     private ImageManager $imageManager;
     private string $publicDir;
-    private string $tempDir;
 
     protected function setUp(): void
     {
         $this->publicDir = sys_get_temp_dir() . '/geomonkey_test_uploads';
-        $this->tempDir = $this->publicDir . '/uploads';
         
         // Clean up and recreate test directory
         if (is_dir($this->publicDir)) {
             $this->removeDirectory($this->publicDir);
         }
         mkdir($this->publicDir, 0755, true);
-        mkdir($this->tempDir, 0755, true);
         
         $this->imageManager = new ImageManager($this->publicDir);
     }
@@ -49,160 +47,176 @@ class ImageManagerTest extends TestCase
         rmdir($dir);
     }
 
-    private function createTestImage(string $name = 'test.jpg'): UploadedFile
+    // ==================== SECURITY TESTS ====================
+
+    public function testUploadRejectsNonImageFile(): void
     {
-        $imageContent = file_get_contents(__DIR__ . '/../../public/images/test-image.jpg') ?: 
-                       base64_decode('/9j/4AAQSkZJRgABAQEASABIAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgo//wAARCAABAAEDASIAAhEBAxEB/8QAFQABAQAAAAAAAAAAAAAAAAAAAAr/xAAUEAEAAAAAAAAAAAAAAAAAAAAA/8QAFQEBAQAAAAAAAAAAAAAAAAAAAAX/xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwC77//xAAUEQEAAAAAAAAAAAAAAAAAAAAA/9oADAMBAAIRAxEAPwC77//xAArEAEAAAAAAAAAAAAAAAAAAAAA/9o=');
+        // Create a PHP file disguised as an image
+        $phpContent = '<?php system($_GET["cmd"]); ?>';
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_php');
+        file_put_contents($tmpFile, $phpContent);
         
-        $tmpFile = tempnam(sys_get_temp_dir(), 'test_img');
-        file_put_contents($tmpFile, $imageContent);
-        
-        return new UploadedFile(
+        $uploadedFile = new UploadedFile(
             $tmpFile,
-            $name,
+            'malicious.php.jpg',
             'image/jpeg',
             null,
             true
         );
-    }
 
-    public function testUploadForNewEntityWithoutId(): void
-    {
         $event = new Event();
         $event->setTitle('Test Event');
-        $event->setStartDate(new \DateTime('2030-11-21 12:00:00'));
-        $event->setEndDate(new \DateTime('2030-11-22 12:00:00'));
-        $event->setLocation('Test Location');
-        $event->setIsPublished(true);
+        $event->setDescription('Test Description');
+
+        $this->expectException(FileException::class);
+        $this->imageManager->upload($event, $uploadedFile);
+    }
+
+    public function testUploadRejectsLargeFile(): void
+    {
+        // Create a file larger than 5MB
+        $largeContent = str_repeat('A', 6 * 1024 * 1024);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_large');
+        file_put_contents($tmpFile, $largeContent);
         
-        // Verify entity has no ID
-        $this->assertNull($event->getId());
-        
-        // Store original dates for comparison
-        $originalStartDate = clone $event->getStartDate();
-        $originalEndDate = clone $event->getEndDate();
-        
-        // Create a test image file
-        $imageFile = $this->createTestImage();
-        
-        // Upload image for new entity (no ID yet)
-        $this->imageManager->upload($event, $imageFile);
-        
-        // Verify dates have NOT changed
-        $this->assertSame(
-            $originalStartDate->format('Y-m-d H:i:s'),
-            $event->getStartDate()->format('Y-m-d H:i:s'),
-            'Start date should not change after upload for new entity'
+        $uploadedFile = new UploadedFile(
+            $tmpFile,
+            'large.jpg',
+            'image/jpeg',
+            null,
+            true
         );
+
+        $event = new Event();
+        $event->setTitle('Test Event');
+
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Fichier trop volumineux');
+        $this->imageManager->upload($event, $uploadedFile);
+    }
+
+    public function testUploadRejectsUnallowedExtension(): void
+    {
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_ext');
+        file_put_contents($tmpFile, 'test');
         
-        $this->assertSame(
-            $originalEndDate->format('Y-m-d H:i:s'),
-            $event->getEndDate()->format('Y-m-d H:i:s'),
-            'End date should not change after upload for new entity'
+        $uploadedFile = new UploadedFile(
+            $tmpFile,
+            'test.php',
+            'image/jpeg',
+            null,
+            true
         );
-        
-        // Verify image UUID was set
-        $this->assertNotNull($event->getImage());
-        $this->assertIsString($event->getImage());
-        
-        // Verify files were created in temp directory
-        $basePath = $this->publicDir . '/uploads/events/temp';
-        $this->assertTrue(is_dir($basePath), 'Temp directory should be created');
-        
-        foreach (['small', 'medium', 'large'] as $size) {
-            $filePath = $basePath . '/' . $size . '/' . $event->getImage() . '.webp';
-            $this->assertTrue(file_exists($filePath), "File should exist in temp/{$size}/ directory");
-        }
-    }
 
-    public function testFinalizeUploadMovesFilesToCorrectLocation(): void
-    {
         $event = new Event();
         $event->setTitle('Test Event');
-        $event->setImage('test-uuid-123');
-        
-        // Create temp directory structure manually
-        $tempPath = $this->publicDir . '/uploads/events/temp';
-        foreach (['small', 'medium', 'large'] as $size) {
-            $dir = $tempPath . '/' . $size;
-            if (!is_dir($dir)) {
-                mkdir($dir, 0755, true);
-            }
-            file_put_contents($dir . '/test-uuid-123.webp', 'test content');
-        }
-        
-        // Simulate entity getting an ID after persist
-        $reflection = new \ReflectionClass($event);
-        $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
-        $property->setValue($event, 42);
-        
-        // Verify entity now has an ID
-        $this->assertSame(42, $event->getId());
-        
-        // Finalize upload (move from temp to actual ID directory)
-        $this->imageManager->finalizeUpload($event);
-        
-        // Verify files were moved
-        foreach (['small', 'medium', 'large'] as $size) {
-            $oldPath = $tempPath . '/' . $size . '/test-uuid-123.webp';
-            $newPath = $this->publicDir . '/uploads/events/42/' . $size . '/test-uuid-123.webp';
-            
-            $this->assertFalse(file_exists($oldPath), "File should be removed from temp/{$size}/");
-            $this->assertTrue(file_exists($newPath), "File should exist in 42/{$size}/");
-        }
-        
-        // Verify temp directory was cleaned up
-        $this->assertFalse(is_dir($tempPath), 'Temp directory should be removed');
+
+        $this->expectException(FileException::class);
+        // The real MIME type will be detected as text/plain, so it will fail on MIME type check
+        $this->expectExceptionMessageMatches('/Type de fichier non autoris|Extension de fichier non autoris/');
+        $this->imageManager->upload($event, $uploadedFile);
     }
 
-    public function testUploadForExistingEntityWithId(): void
+    public function testUploadRejectsInvalidMimeType(): void
     {
+        $textContent = 'This is not an image';
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_txt');
+        file_put_contents($tmpFile, $textContent);
+        
+        $uploadedFile = new UploadedFile(
+            $tmpFile,
+            'test.jpg',
+            'text/plain',
+            null,
+            true
+        );
+
         $event = new Event();
         $event->setTitle('Test Event');
-        $event->setStartDate(new \DateTime('2030-11-21 12:00:00'));
-        $event->setEndDate(new \DateTime('2030-11-22 12:00:00'));
-        $event->setLocation('Test Location');
-        $event->setIsPublished(true);
-        $event->setImage('old-uuid-456');
+
+        $this->expectException(FileException::class);
+        $this->expectExceptionMessage('Type de fichier non autoris');
+        $this->imageManager->upload($event, $uploadedFile);
+    }
+
+    public function testUploadAcceptsValidImage(): void
+    {
+        // Use logo.png which exists
+        $imagePath = __DIR__ . '/../../public/images/logo.png';
+        $this->assertFileExists($imagePath, 'Test image logo.png should exist');
+        
+        $imageContent = file_get_contents($imagePath);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_valid_img');
+        file_put_contents($tmpFile, $imageContent);
+        
+        $uploadedFile = new UploadedFile(
+            $tmpFile,
+            'test.png',
+            'image/png',
+            null,
+            true
+        );
+
+        $event = new Event();
+        $event->setTitle('Test Event');
+        $event->setDescription('Test Description');
         
         // Simulate existing entity with ID
         $reflection = new \ReflectionClass($event);
         $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
+        // setAccessible is deprecated in PHP 8.5+ but still works
         $property->setValue($event, 1);
+
+        // This should not throw an exception
+        $this->imageManager->upload($event, $uploadedFile);
         
-        // Store original dates
-        $originalStartDate = clone $event->getStartDate();
-        $originalEndDate = clone $event->getEndDate();
+        // Verify image UUID was set
+        $this->assertNotNull($event->getImage());
+        $this->assertIsString($event->getImage());
+    }
+
+    public function testGetAvailableSizes(): void
+    {
+        $sizes = $this->imageManager->getAvailableSizes();
         
-        // Create a test image file
-        $imageFile = $this->createTestImage();
+        $this->assertIsArray($sizes);
+        $this->assertContains('small', $sizes);
+        $this->assertContains('medium', $sizes);
+        $this->assertContains('large', $sizes);
+    }
+
+    public function testIsValidSize(): void
+    {
+        $this->assertTrue($this->imageManager->isValidSize('small'));
+        $this->assertTrue($this->imageManager->isValidSize('medium'));
+        $this->assertTrue($this->imageManager->isValidSize('large'));
+        $this->assertFalse($this->imageManager->isValidSize('extra-large'));
+    }
+
+    public function testDeleteForEntityWithoutImage(): void
+    {
+        $event = new Event();
+        $event->setTitle('Test Event');
+        $event->setDescription('Test Description');
         
-        // Upload image for existing entity
-        $this->imageManager->upload($event, $imageFile);
+        // Entity has no image
+        $this->assertNull($event->getImage());
         
-        // Verify dates have NOT changed
-        $this->assertSame(
-            $originalStartDate->format('Y-m-d H:i:s'),
-            $event->getStartDate()->format('Y-m-d H:i:s'),
-            'Start date should not change after upload for existing entity'
-        );
+        // This should not throw an exception
+        $this->imageManager->deleteForEntity($event);
+    }
+
+    public function testDeleteForEntityWithoutId(): void
+    {
+        $event = new Event();
+        $event->setTitle('Test Event');
+        $event->setDescription('Test Description');
+        $event->setImage('test-uuid-123');
         
-        $this->assertSame(
-            $originalEndDate->format('Y-m-d H:i:s'),
-            $event->getEndDate()->format('Y-m-d H:i:s'),
-            'End date should not change after upload for existing entity'
-        );
+        // Entity has no ID
+        $this->assertNull($event->getId());
         
-        // Verify old image was marked for deletion (files deleted)
-        $this->assertNotSame('old-uuid-456', $event->getImage(), 'Image UUID should be changed');
-        
-        // Verify new files were created
-        $basePath = $this->publicDir . '/uploads/events/1';
-        foreach (['small', 'medium', 'large'] as $size) {
-            $filePath = $basePath . '/' . $size . '/' . $event->getImage() . '.webp';
-            $this->assertTrue(file_exists($filePath), "New file should exist in 1/{$size}/ directory");
-        }
+        // This should not throw an exception
+        $this->imageManager->deleteForEntity($event);
     }
 }

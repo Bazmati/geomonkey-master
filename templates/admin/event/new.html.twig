@@ -2,17 +2,25 @@
 
 {% block admin_content %}
     <div class="p-4">
-        <h1 class="text-success mb-4">Créer un nouvel événement</h1>
-
         <div class="card shadow-sm">
-            <div class="card-body">
-                {{ include('admin/event/_form.html.twig') }}
+            {# === EN-TÊTE AVEC BOUTON RETOUR À DROITE === #}
+            <div class="card-header bg-light d-flex justify-content-end">
+                <a href="{{ path('admin_events_index') }}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
 
-                <div class="mt-3">
-                    <a href="{{ path('admin_events_index') }}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i> Retour à la liste
-                    </a>
-                </div>
+            {# === CORPS DE LA CARD === #}
+            <div class="card-body">
+                <h1 class="text-success mb-4">Créer un nouvel événement</h1>
+                {{ include('admin/event/_form.html.twig', {'button_label': 'Enregistrer'}) }}
+            </div>
+
+            {# === PIED DE CARD AVEC BOUTON VALIDER À DROITE === #}
+            <div class="card-footer bg-light d-flex justify-content-end">
+                <button type="submit" form="event-form" class="btn btn-primary">
+                    <i class="bi bi-check-circle"></i> Enregistrer
+                </button>
             </div>
         </div>
     </div>

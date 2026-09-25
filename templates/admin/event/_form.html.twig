@@ -1,4 +1,4 @@
-{{ form_start(form, {'attr': {'class': 'row g-3', 'enctype': 'multipart/form-data'}}) }}
+{{ form_start(form, {'attr': {'class': 'row g-3', 'enctype': 'multipart/form-data', 'id': 'event-form'}}) }}
     {# Left column: title, startDate, endDate, location, isPublished #}
     <div class="col-md-6">
         {# Title #}
@@ -41,16 +41,16 @@
     <div class="col-md-6">
         {# Description - give it more space #}
         <div class="mb-4">
-            {{ form_label(form.desciption) }}
-            {{ form_widget(form.desciption, {'attr': {'class': 'form-control', 'rows': 8, 'style': 'min-height: 200px'}}) }}
-            {{ form_errors(form.desciption) }}
+            {{ form_label(form.description) }}
+            {{ form_widget(form.description, {'attr': {'class': 'form-control', 'rows': 8, 'style': 'min-height: 200px'}}) }}
+            {{ form_errors(form.description) }}
         </div>
 
         {# Image upload section #}
         <div class="mb-3">
             {{ form_label(form.imageFile) }}
             {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
-            <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 2Mo)</div>
+            <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 5Mo)</div>
             {% if form.imageFile.vars.errors|length > 0 %}
                 <div class="text-danger">
                     {{ form_errors(form.imageFile) }}
@@ -71,12 +71,5 @@
                 </div>
             {% endif %}
         </div>
-    </div>
-
-    {# Submit button - full width #}
-    <div class="col-12">
-        <button class="btn btn-success" type="submit">
-            <i class="bi bi-check-circle"></i> {{ button_label|default('Enregistrer') }}
-        </button>
     </div>
 {{ form_end(form) }}

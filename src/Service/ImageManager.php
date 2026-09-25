@@ -7,6 +7,7 @@ use Intervention\Image\ImageManager as InterventionImageManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
  * Service for managing image uploads, resizing, and deletion.
@@ -22,6 +23,17 @@ class ImageManager
      * Available image sizes and their max width.
      */
     private const AVAILABLE_SIZES = ['small', 'medium', 'large'];
+
+    private const ALLOWED_MIME_TYPES = [
+        'image/jpeg', 'image/pjpeg',
+        'image/png',
+        'image/gif',
+        'image/webp'
+    ];
+
+    private const ALLOWED_EXTENSIONS = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
+
+    private const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 
     public function __construct(string $publicDir)
     {
@@ -46,6 +58,8 @@ class ImageManager
      */
     public function upload(ImageableInterface $entity, UploadedFile $file): void
     {
+        $this->validateUploadedFile($file);
+        
         $uuid = bin2hex(random_bytes(16));
 
         foreach (self::AVAILABLE_SIZES as $size) {
@@ -53,6 +67,56 @@ class ImageManager
         }
 
         $entity->setImage($uuid);
+    }
+
+    /**
+     * Validate uploaded file for security.
+     */
+    private function validateUploadedFile(UploadedFile $file): void
+    {
+        // 1. Check if file is valid
+        if (!$file->isValid()) {
+            throw new FileException('Fichier invalide: ' . $file->getErrorMessage());
+        }
+
+        // 2. Check file size
+        if ($file->getSize() > self::MAX_FILE_SIZE) {
+            throw new FileException('Fichier trop volumineux (max 5MB)');
+        }
+
+        // 3. Check MIME type from client
+        $mimeType = $file->getMimeType();
+        if (!in_array($mimeType, self::ALLOWED_MIME_TYPES, true)) {
+            throw new FileException('Type de fichier non autorisé: ' . $mimeType);
+        }
+
+        // 4. Check file extension
+        $extension = strtolower($file->getClientOriginalExtension());
+        if (!in_array($extension, self::ALLOWED_EXTENSIONS, true)) {
+            throw new FileException('Extension de fichier non autorisée: ' . $extension);
+        }
+
+        // 5. Verify real MIME type using finfo
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        $realMime = finfo_file($finfo, $file->getPathname());
+        // Note: finfo_close() is deprecated in PHP 8.5+ as objects are freed automatically
+
+        if (!in_array($realMime, self::ALLOWED_MIME_TYPES, true)) {
+            throw new FileException('Le fichier n\'est pas une image valide');
+        }
+
+        // 6. Check image dimensions (only if possible)
+        $imageInfo = @getimagesize($file->getPathname());
+        if ($imageInfo !== false) {
+            $width = $imageInfo[0];
+            $height = $imageInfo[1];
+
+            if ($width > 5000 || $height > 5000) {
+                throw new FileException('Image trop grande (max 5000x5000px)');
+            }
+        }
+        // If getimagesize fails but finfo says it's a valid image, we accept it
+        // This can happen with some base64 encoded test images
     }
 
     /**
@@ -112,10 +176,18 @@ class ImageManager
         string $uuid,
         string $size
     ): void {
+        // Validate file even in fallback mode
+        $this->validateUploadedFile($file);
+        
         // Get original extension
-        $originalExtension = $file->getClientOriginalExtension();
+        $originalExtension = strtolower($file->getClientOriginalExtension());
         if (empty($originalExtension)) {
-            $originalExtension = pathinfo($file->getPathname(), PATHINFO_EXTENSION);
+            $originalExtension = strtolower(pathinfo($file->getPathname(), PATHINFO_EXTENSION));
+        }
+        
+        // Ensure extension is allowed
+        if (!in_array($originalExtension, self::ALLOWED_EXTENSIONS, true)) {
+            $originalExtension = 'webp';
         }
         
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);

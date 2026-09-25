@@ -52,8 +52,8 @@ class ImageUploadListener
             }
             // If image is being changed to a new value
             elseif ($oldValue !== null && $newValue !== null && $oldValue !== $newValue) {
-                // The old images will be deleted when the new image is uploaded
-                // via ImageManager::upload() which is called in the controller
+                // Delete old images immediately when image field changes
+                $this->imageManager->deleteForEntity($entity);
             }
         }
     }
