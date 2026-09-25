@@ -4,7 +4,6 @@ namespace App\EventListener;
 
 use App\Interface\ImageableInterface;
 use App\Service\ImageManager;
-use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\PreRemoveEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 
@@ -20,7 +19,7 @@ class ImageUploadListener
      * Called before an entity is removed.
      * Deletes all associated images.
      */
-    public function preRemove(LifecycleEventArgs $args): void
+    public function preRemove(PreRemoveEventArgs $args): void
     {
         $entity = $args->getObject();
         
