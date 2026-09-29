@@ -1,0 +1,107 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Connexion - GéoMonkey{% endblock %}
+
+{% block body %}
+<div class="min-vh-100 d-flex flex-column bg-dark">
+    {# Lien de retour en haut #}
+    <div class="p-3">
+        <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
+            <i class="bi bi-arrow-left"></i> Retour à l'accueil
+        </a>
+    </div>
+
+    {# Contenu principal #}
+    <div class="flex-grow-1 d-flex align-items-center justify-content-center p-4">
+        <div class="col-lg-4 col-md-6 col-sm-8">
+            {# Card de connexion #}
+            <div class="card border-warning shadow-lg" style="border-radius: 15px; overflow: hidden;">
+                {# En-tête avec logo #}
+                <div class="card-header bg-warning text-dark text-center py-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="rounded-circle border border-3 border-dark" style="width: 80px; height: 80px; object-fit: cover;">
+                    <h2 class="h4 mt-3 mb-0 fw-bold">GéoMonkey</h2>
+                    <p class="mb-0 small">Espace membre</p>
+                </div>
+
+                {# Corps de la card #}
+                <div class="card-body bg-dark text-white">
+                    {% if app.user %}
+                        <div class="alert alert-info mb-4">
+                            Vous êtes déjà connecté en tant que {{ app.user.userIdentifier }}, 
+                            <a href="{{ logout_path() }}" class="alert-link">Se déconnecter</a>
+                        </div>
+                    {% endif %}
+
+                    
+Copier
+
+                    {% if error %}
+                        <div class="alert alert-danger mb-4">
+                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                        </div>
+                    {% endif %}
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {# Champ Email #}
+                        <div class="mb-4">
+                            <label for="inputEmail" class="form-label fw-semibold">Email</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-dark border-0">
+                                    <i class="bi bi-envelope"></i>
+                                </span>
+                                <input type="email" id="inputEmail" name="_username"
+                                    class="form-control form-control-lg bg-light text-dark"
+                                    autocomplete="email" placeholder="votre@email.com"
+                                    value="{{ last_username }}" required autofocus>
+                            </div>
+                        </div>
+
+                        {# Champ Mot de passe #}
+                        <div class="mb-4">
+                            <label for="inputPassword" class="form-label fw-semibold">Mot de passe</label>
+                            <div class="input-group">
+                                <span class="input-group-text bg-light text-dark border-0">
+                                    <i class="bi bi-lock"></i>
+                                </span>
+                                <input type="password" id="inputPassword" name="_password"
+                                    class="form-control form-control-lg bg-light text-dark"
+                                    autocomplete="current-password" placeholder="••••••••" required>
+                            </div>
+                        </div>
+
+                        {# Protection CSRF (indispensable si enable_csrf_protection: true dans security.yaml) #}
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+                        {# Option Se souvenir de moi — à activer seulement si "remember_me" est configuré dans security.yaml #}
+                        
+                        <div class="mb-4 form-check">
+                            <input type="checkbox" id="rememberMe" name="_remember_me" class="form-check-input">
+                            <label for="rememberMe" class="form-check-label">Se souvenir de moi</label>
+                        </div>
+                       
+
+                        {# Bouton de connexion #}
+                        <button class="btn btn-warning btn-lg w-100 fw-bold py-3" type="submit" style="border-radius: 8px;">
+                            <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
+                        </button>
+                    </form>
+
+
+
+                    {# Lien mot de passe oublié - placeholder #}
+                    <div class="mt-4 text-center">
+                        <small class="text-muted">
+                            <a href="#" class="text-warning text-decoration-none">Mot de passe oublié ?</a>
+                        </small>
+                    </div>
+                </div>
+
+                {# Pied de la card #}
+                <div class="card-footer bg-warning text-dark text-center py-2 small">
+                    <p class="mb-0">Pas encore membre ? <a href="#" class="fw-bold text-dark">Rejoignez-nous</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

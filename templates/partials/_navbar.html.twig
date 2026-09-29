@@ -16,38 +16,62 @@
                     <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    {#<a class="nav-link" href="{{ path('app_about') }}">Présentation</a>#}
                     <a class="nav-link" href="#">Présentation</a>
                 </li>
                 <li class="nav-item">
-                    {#<a class="nav-link" href="{{ path('app_project') }}">Nos projets</a>#}
                     <a class="nav-link" href="#">Nos projets</a>
                 </li>
                 <li class="nav-item">
-                    {#<a class="nav-link" href="{{ path('app_news') }}">Actualités</a>#}
                     <a class="nav-link" href="#">Actualités</a>
                 </li>
                 <li class="nav-item">
-                    {#<a class="nav-link" href="{{ path('app_gallery') }}">Galerie</a>#}
                     <a class="nav-link" href="#">Galerie</a>
                 </li>
                 <li class="nav-item">
-                   {# <a class="nav-link" href="{{ path('app_events') }}">Événements</a>#}
                     <a class="nav-link" href="#">Événements</a>
                 </li>
                 <li class="nav-item ms-lg-3">
-                    {#<a class="btn btn-warning fw-semibold" href="#newsletter">Newsletter</a>#}
-                    <a class="btn btn-warning fw-semibold" href="#">Newsletter</a>
+                    <a class="btn btn-warning fw-semibold" href="#newsletter">Newsletter</a>
                 </li>
-                {# lien futur : adhésion #}
-                {# <li class="nav-item ms-lg-2">
-                    <a class="btn btn-outline-warning" href="{{ path('app_membership') }}">Adhérer</a>
-                </li> #}
-                <li class="nav-item ms-lg-2">
-                    <a class="btn btn-outline-warning" href="{{ path('app_admin_dashboard') }}">
-                        <i class="bi bi-box-arrow-in-right"></i> Connexion
-                    </a>
-                </li>
+
+                {# ===== Zone utilisateur ===== #}
+                {% if app.user %}
+                    <li class="nav-item dropdown ms-lg-2">
+                        <a class="nav-link dropdown-toggle d-flex align-items-center gap-1" href="#"
+                           id="userDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-person-circle"></i>
+                            {{ app.user.firstName ?? app.user.email }}
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                            {% if 'ROLE_ADMIN' in app.user.roles %}
+                                <li>
+                                    <a class="dropdown-item" href="{{ path('app_admin_dashboard') }}">
+                                        <i class="bi bi-speedometer2 me-2"></i>Backoffice
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider"></li>
+                            {% endif %}
+                            {# futur : page profil
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    <i class="bi bi-person me-2"></i>Mon profil
+                                </a>
+                            </li>
+                            #}
+                            <li>
+                                <a class="dropdown-item" href="{{ path('app_logout') }}">
+                                    <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                {% else %}
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-warning" href="{{ path('app_login') }}">
+                            <i class="bi bi-box-arrow-in-right"></i> Connexion
+                        </a>
+                    </li>
+                {% endif %}
             </ul>
         </div>
     </div>
