@@ -27,6 +27,12 @@
 .vscode/
 ###< ide ###
 
+###>node ###
+/node_modules/
+/npm-debug.log
+/yarn-error.log
+###< node ###       
+
 ###> os ###
 .DS_Store
 ###< os ###
