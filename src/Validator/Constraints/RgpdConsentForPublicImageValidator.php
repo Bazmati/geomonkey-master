@@ -22,10 +22,9 @@ class RgpdConsentForPublicImageValidator extends ConstraintValidator
         }
 
         $visibility = $value->getVisibility();
-        $hasConsent = $value->hasRgpdConsent();
 
-        // Si l'image est publique mais n'a pas de consentement RGPD
-        if ($visibility === ImageVisibility::Public && !$hasConsent) {
+        // Si l'image est publique mais n'a pas de consentement RGPD VALIDE (coché + daté)
+        if ($visibility === ImageVisibility::Public && !$value->hasValidConsent()) {
             $this->context->buildViolation($constraint->message)
                 ->atPath($constraint->propertyPath)
                 ->addViolation();

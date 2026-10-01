@@ -66,14 +66,24 @@ class GalleryImageVoter extends Voter
 
         $function = $user->getOfficeFunction();
 
-        // Si on a un subject (GalleryImage), appliquer la logique de visibilité
+        // Si on a un subject (GalleryImage), appliquer la logique spécifique à l'attribut
         if ($subject instanceof GalleryImage) {
-            // Logique de visibilité basée sur le rôle de l'utilisateur
-            return match ($subject->getVisibility()) {
-                ImageVisibility::Public => true, // Tout le monde peut voir
-                ImageVisibility::Members => $function !== OfficeFunction::None, // Tout membre connecté
-                ImageVisibility::Participants => $this->canViewAsParticipant($user, $subject),
-                ImageVisibility::Bureau => $this->isBureau($function), // Seulement le bureau
+            return match ($attribute) {
+                self::VIEW => match ($subject->getVisibility()) {
+                    ImageVisibility::Public => true, // Tout le monde peut voir
+                    ImageVisibility::Members => $function !== OfficeFunction::None, // Tout membre connecté
+                    ImageVisibility::Participants => $this->canViewAsParticipant($user, $subject),
+                    ImageVisibility::Bureau => $this->isBureau($function), // Seulement le bureau
+                    default => false,
+                },
+                self::PUBLISH => $this->canPublish($user, $subject),
+                // Pour CREATE, EDIT, DELETE : on délègue à la matrice générique
+                self::CREATE, self::EDIT, self::DELETE => match ($attribute) {
+                    self::CREATE => $this->isBureau($function),
+                    self::EDIT => $this->canEdit($function),
+                    self::DELETE => $this->canDelete($function),
+                    default => false,
+                },
                 default => false,
             };
         }
@@ -84,7 +94,7 @@ class GalleryImageVoter extends Voter
             self::CREATE => $this->isBureau($function),
             self::EDIT => $this->canEdit($function),
             self::DELETE => $this->canDelete($function),
-            self::PUBLISH => $this->canPublish($function),
+            self::PUBLISH => false, // PUBLISH nécessite toujours un GalleryImage
             default => false,
         };
     }
@@ -139,12 +149,24 @@ class GalleryImageVoter extends Voter
     }
 
     /**
-     * Vérifie si l'utilisateur peut publier une image
-     * - Pour les images Public : Président uniquement
-     * - Pour les autres visibilités : Bureau
+     * Vérifie si l'utilisateur peut publier une image.
+     * 
+     * - Images Public (visible du grand public) : président uniquement
+     * - Images à visibilité restreinte (Members, Participants, Bureau) : tout le bureau peut publier
+     * 
+     * Note : Le contrôleur doit aussi vérifier hasValidConsent() pour les images Public
+     * (double barrière : voter + garde applicative).
      */
-    private function canPublish(OfficeFunction $function): bool
+    private function canPublish(User $user, GalleryImage $image): bool
     {
-        return $function === OfficeFunction::President;
+        $isPresident = $user->getOfficeFunction() === OfficeFunction::President;
+
+        // Image Public (visible du grand public) : président uniquement
+        if ($image->getVisibility() === ImageVisibility::Public) {
+            return $isPresident;
+        }
+
+        // Images à visibilité restreinte : tout le bureau peut publier
+        return $this->isBureau($user->getOfficeFunction());
     }
 }

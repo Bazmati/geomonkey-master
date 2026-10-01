@@ -156,26 +156,20 @@ class GalleryImageController extends AbstractController
     }
 
     #[Route('/{id}/publish', name: 'publish', methods: ['POST'])]
-    #[IsGranted('GALLERY_IMAGE_PUBLISH')]
+    #[IsGranted('GALLERY_IMAGE_PUBLISH', 'galleryImage')]
     public function publish(Request $request, GalleryImage $galleryImage): Response
     {
         if ($this->isCsrfTokenValid('publish' . $galleryImage->getId(), $request->getPayload()->getString('_token'))) {
-            // Vérifier le consentement RGPD pour les images publiques
-            if ($galleryImage->getVisibility() === ImageVisibility::Public && !$galleryImage->hasRgpdConsent()) {
-                $this->addFlash('error', 'Les images publiques nécessitent un consentement RGPD pour être publiées.');
+            // Double vérification : le voter a déjà vérifié les permissions,
+            // mais on vérifie aussi la conformité RGPD au niveau applicatif
+            if ($galleryImage->getVisibility() === ImageVisibility::Public && !$galleryImage->hasValidConsent()) {
+                $this->addFlash('error', 'Publication impossible : une image publique exige un consentement RGPD daté.');
                 return $this->redirectToRoute('app_admin_gallery_image_index');
             }
 
-            // Seuls le président peut publier une image Public
-            $user = $this->security->getUser();
-            if ($galleryImage->getVisibility() === ImageVisibility::Public && 
-                $user instanceof User && 
-                $user->getOfficeFunction() !== OfficeFunction::President) {
-                $this->addFlash('error', 'Seul le président peut publier une image publique.');
-                return $this->redirectToRoute('app_admin_gallery_image_index');
-            }
-
+            // Toggle publish state
             $galleryImage->setIsPublished(!$galleryImage->isPublished());
+            $galleryImage->setUpdatedAt(new \DateTime());
             $this->em->flush();
 
             $action = $galleryImage->isPublished() ? 'publiée' : 'dépubliée';
@@ -190,23 +184,18 @@ class GalleryImageController extends AbstractController
     public function withdrawConsent(Request $request, GalleryImage $galleryImage): Response
     {
         if ($this->isCsrfTokenValid('withdraw_consent' . $galleryImage->getId(), $request->getPayload()->getString('_token'))) {
-            // Retirer le consentement
-            $galleryImage->setRgpdConsent(false);
-            $galleryImage->setConsentedAt(null);
-            $galleryImage->setConsentDetail(null);
-
-            // Si l'image est publique, la rétrograder à Members (conformité RGPD)
-            if ($galleryImage->getVisibility() === ImageVisibility::Public) {
-                $galleryImage->setVisibility(ImageVisibility::Members);
-                // Si l'image était publiée, la dépublier
-                if ($galleryImage->isPublished()) {
-                    $galleryImage->setIsPublished(false);
-                    $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" et dépubliée pour conformité RGPD.');
-                } else {
-                    $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" pour conformité RGPD.');
-                }
+            $wasPublished = $galleryImage->isPublished();
+            
+            // Utiliser la méthode dédiée qui gère la rétrogradation auto
+            $galleryImage->withdrawConsent();
+            
+            // Si l'image était publique, elle a été rétrogradée à Members par withdrawConsent()
+            // Si elle était publiée, on la dépublie aussi
+            if ($wasPublished) {
+                $galleryImage->setIsPublished(false);
+                $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" et dépubliée pour conformité RGPD.');
             } else {
-                $this->addFlash('success', 'Le consentement a été retiré.');
+                $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" pour conformité RGPD.');
             }
 
             $galleryImage->setUpdatedAt(new \DateTime());

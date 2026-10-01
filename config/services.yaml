@@ -43,6 +43,10 @@ services:
     App\Twig\ImageExtension:
         tags: ['twig.extension']
 
+    # AppExtension - register as Twig extension (for additional filters)
+    App\Twig\AppExtension:
+        tags: ['twig.extension']
+
     # UserFactory - factory for creating test users
     App\Factory\UserFactory: ~
 

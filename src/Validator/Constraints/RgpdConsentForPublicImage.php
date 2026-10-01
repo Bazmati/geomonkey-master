@@ -14,8 +14,8 @@ use Symfony\Component\Validator\Constraint;
 ]
 class RgpdConsentForPublicImage extends Constraint
 {
-    public string $message = 'Les images publiques nécessitent un consentement RGPD.';
-    public string $propertyPath = 'rgpdConsent';
+    public string $message = 'Les images publiques nécessitent un consentement RGPD valide et daté.';
+    public string $propertyPath = 'consentedAt';
 
     public function validatedBy(): string
     {

@@ -301,46 +301,121 @@ class GalleryImageVoterTest extends TestCase
     }
 
     // ========================================================================
-    // Tests pour PUBLISH
+    // Tests pour PUBLISH (nécessite toujours un GalleryImage subject)
     // ========================================================================
 
-    public function testPublishAllowedForPresident(): void
+    public function testPublishPublicImageAllowedForPresident(): void
     {
         $user = new User();
         $user->setOfficeFunction(OfficeFunction::President);
         $token = $this->createToken($user);
 
-        $result = $this->voter->vote($token, null, [GalleryImageVoter::PUBLISH]);
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Public);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function testPublishDeniedForSecretary(): void
+    public function testPublishPublicImageDeniedForSecretary(): void
     {
         $user = new User();
         $user->setOfficeFunction(OfficeFunction::Secretary);
         $token = $this->createToken($user);
 
-        $result = $this->voter->vote($token, null, [GalleryImageVoter::PUBLISH]);
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Public);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 
-    public function testPublishDeniedForTreasurer(): void
+    public function testPublishMembersImageAllowedForSecretary(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Members);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
+    }
+
+    public function testPublishMembersImageAllowedForTreasurer(): void
     {
         $user = new User();
         $user->setOfficeFunction(OfficeFunction::Treasurer);
         $token = $this->createToken($user);
 
-        $result = $this->voter->vote($token, null, [GalleryImageVoter::PUBLISH]);
-        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Members);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
     }
 
-    public function testPublishDeniedForActiveMember(): void
+    public function testPublishBureauImageAllowedForBureau(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Bureau);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
+    }
+
+    public function testPublishParticipantsImageAllowedForBureau(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::Treasurer);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Participants);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
+    }
+
+    public function testPublishPublicImageDeniedForActiveMember(): void
     {
         $user = new User();
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $token = $this->createToken($user);
 
-        $result = $this->voter->vote($token, null, [GalleryImageVoter::PUBLISH]);
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Public);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    public function testPublishMembersImageDeniedForActiveMember(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Members);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    public function testPublishPublicImageDeniedForAnonymous(): void
+    {
+        $token = new TestBrowserToken([]); // Anonyme
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Public);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 }

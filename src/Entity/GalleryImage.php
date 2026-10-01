@@ -124,7 +124,53 @@ class GalleryImage implements ImageableInterface
     public function removeBlogPost(BlogPost $blogPost): static { if ($this->blogPosts->removeElement($blogPost)) { $blogPost->removeGalleryImage($this); } return $this; }
 
     // Business logic
-    public function canBePublic(): bool { return $this->rgpdConsent; }
+    /**
+     * Vérifie si le consentement RGPD est valide (coché + daté)
+     * Une image ne peut être publique que si elle a un consentement valide.
+     */
+    public function hasValidConsent(): bool
+    {
+        return $this->rgpdConsent && $this->consentedAt !== null;
+    }
+
+    /**
+     * Accorde le consentement RGPD et le date automatiquement.
+     * Utiliser cette méthode plutôt que setRgpdConsent(true) pour garantir
+     * la cohérence entre rgpdConsent et consentedAt.
+     */
+    public function giveConsent(): void
+    {
+        $this->rgpdConsent = true;
+        $this->consentedAt = new \DateTimeImmutable();
+    }
+
+    /**
+     * Retire le consentement RGPD et rétrograde automatiquement l'image.
+     * Si l'image était publique, elle passe en visibilité Members (conformité RGPD).
+     * Utiliser cette méthode plutôt que setRgpdConsent(false) pour garantir
+     * la cohérence entre rgpdConsent, consentedAt et visibility.
+     */
+    public function withdrawConsent(): void
+    {
+        $this->rgpdConsent = false;
+        $this->consentedAt = null;
+        $this->consentDetail = null;
+
+        // Rétrogradation auto : une image sans consentement ne peut pas rester publique
+        if ($this->visibility === ImageVisibility::Public) {
+            $this->visibility = ImageVisibility::Members;
+        }
+    }
+
+    /**
+     * Peut-on rendre cette image publique ? (ancienne méthode canBePublic, conservée pour compatibilité)
+     * @deprecated Utiliser hasValidConsent() à la place
+     */
+    public function canBePublic(): bool
+    {
+        return $this->hasValidConsent();
+    }
+
     public function isUsed(): bool { return $this->events->count() > 0 || $this->blogPosts->count() > 0; }
     public function getUsageCount(): int { return $this->events->count() + $this->blogPosts->count(); }
 }
