@@ -1,0 +1,7 @@
+<form method="post" action="{{ path('app_admin_gallery_image_delete', {'id': id}) }}" 
+      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette image ? Cette action est irréversible.');" class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ id) }}">
+    <button class="btn btn-sm btn-danger" type="submit" title="Supprimer">
+        <i class="bi bi-trash-fill"></i>
+    </button>
+</form>

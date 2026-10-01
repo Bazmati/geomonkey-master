@@ -63,7 +63,7 @@ class ImageManagerExifTest extends TestCase
 
     /**
      * Teste que le code de strip EXIF est bien présent dans processImage.
-     * C'est un test "smoke" pour vérifier que les appels stripExif/stripICC/stripMeta existent.
+     * En Intervention Image v4, strip() supprime toutes les métadonnées (EXIF, ICC, etc.)
      */
     public function testProcessImageContainsExifStripping(): void
     {
@@ -72,10 +72,8 @@ class ImageManagerExifTest extends TestCase
         $sourceFile = $reflection->getFileName();
         $source = file_get_contents($sourceFile);
         
-        // Vérifier que les appels de strip sont présents
-        $this->assertStringContainsString('stripExif', $source, 'stripExif doit être appelé');
-        $this->assertStringContainsString('stripICC', $source, 'stripICC doit être appelé');
-        $this->assertStringContainsString('stripMeta', $source, 'stripMeta doit être appelé');
+        // En Intervention Image v4, strip() supprime toutes les métadonnées
+        $this->assertStringContainsString('strip()', $source, 'strip() doit être appelé pour supprimer les métadonnées');
     }
 
     /**

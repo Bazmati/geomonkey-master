@@ -18,7 +18,7 @@ class ImageExtension extends AbstractExtension
     public function getFunctions(): array
     {
         return [
-            new TwigFunction('image_url', [$this, 'getImageUrl'], ['is_safe' => ['html']]),
+            // Removed image_url function to avoid conflict with AppExtension's image_url filter
             new TwigFunction('image_tag', [$this, 'getImageTag'], ['is_safe' => ['html']]),
         ];
     }

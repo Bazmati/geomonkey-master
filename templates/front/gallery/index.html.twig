@@ -1,0 +1,63 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Galerie - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+
+    <div class="container py-4">
+        <h1 class="mb-4">Galerie</h1>
+
+        {% if images is empty %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Aucune image à afficher pour le moment.
+            </div>
+        {% else %}
+            <div class="row g-3">
+                {% for image in images %}
+                    <div class="col-6 col-md-4 col-lg-3">
+                        <figure class="gallery-item card h-100">
+                            <div class="card-body p-2">
+                                {% include 'front/gallery_image/_picture.html.twig' with {
+                                    image: image,
+                                    size: 'medium',
+                                    alt: image.alt
+                                } %}
+                            </div>
+                            
+                            {% if image.title or image.description %}
+                                <div class="card-footer bg-transparent p-2">
+                                    {% if image.title %}
+                                        <h3 class="h6 m-0">{{ image.title }}</h3>
+                                    {% endif %}
+                                    {% if image.description %}
+                                        <figcaption class="small text-muted mb-0">{{ image.description }}</figcaption>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            {# Boutons d'action : uniquement pour ceux qui ont le droit #}
+                            {% if is_granted('GALLERY_IMAGE_EDIT', image) or 
+                                  is_granted('GALLERY_IMAGE_DELETE', image) %}
+                                <div class="card-footer bg-light p-2">
+                                    {% if is_granted('GALLERY_IMAGE_EDIT', image) %}
+                                        <a href="{{ path('app_admin_gallery_image_edit', {id: image.id}) }}" 
+                                           class="btn btn-sm btn-outline-warning me-1"
+                                           title="Éditer cette image">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    {% endif %}
+
+                                    {% if is_granted('GALLERY_IMAGE_DELETE', image) %}
+                                        {% include 'admin/gallery_image/_delete_form.html.twig' with {id: image.id} %}
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </figure>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

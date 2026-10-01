@@ -5,6 +5,7 @@ namespace App\Twig;
 use App\Service\ImageManager;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFilter;
+use Twig\TwigFunction;
 
 /**
  * Extension Twig pour GeoMonkey.
@@ -18,10 +19,17 @@ class AppExtension extends AbstractExtension
     ) {
     }
 
+    public function getFunctions(): array
+    {
+        return [
+            new TwigFunction('image_url', [$this, 'getImageUrl']),
+        ];
+    }
+
     public function getFilters(): array
     {
         return [
-            new TwigFilter('image_url', [$this, 'getImageUrl']),
+            new TwigFilter('truncate', [$this, 'truncateText']),
         ];
     }
 
@@ -39,5 +47,22 @@ class AppExtension extends AbstractExtension
         }
 
         return $this->imageManager->getUrl($entity, $size);
+    }
+
+    /**
+     * Tronque un texte à une longueur maximale.
+     * 
+     * @param string $text Le texte à tronquer
+     * @param int $length La longueur maximale (par défaut 50)
+     * @param string $suffix Le suffixe à ajouter (par défaut '...')
+     * @return string Le texte tronqué
+     */
+    public function truncateText(string $text, int $length = 50, string $suffix = '...'): string
+    {
+        if (strlen($text) <= $length) {
+            return $text;
+        }
+
+        return substr($text, 0, $length) . $suffix;
     }
 }

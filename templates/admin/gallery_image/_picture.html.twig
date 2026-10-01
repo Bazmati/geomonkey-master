@@ -1,0 +1,31 @@
+{# templates/admin/gallery_image/_picture.html.twig #}
+{#
+ * Partial réutilisable pour afficher une image de galerie dans l'admin.
+ *
+ * Usage :
+ *   {% include 'admin/gallery_image/_picture.html.twig' with {
+ *       image: galleryImage,
+ *       size: 'medium',
+ *       alt: galleryImage.alt
+ *   } %}
+ #}
+{% set size = size|default('medium') %}
+{% set alt = alt|default(image.alt) %}
+
+{% set url_medium = image_url(image, 'medium') %}
+
+{% if url_medium %}
+    <img
+        src="{{ url_medium }}"
+        alt="{{ alt }}"
+        {% if class is defined and class %}class="{{ class }}"{% else %}class="img-fluid rounded"{% endif %}
+        style="max-height: 200px;"
+        loading="lazy"
+    >
+{% else %}
+    <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted" 
+         style="height: 150px; width: 100%;">
+        <i class="bi bi-image fs-1" aria-hidden="true"></i>
+        <span class="visually-hidden">Aucune image</span>
+    </div>
+{% endif %}

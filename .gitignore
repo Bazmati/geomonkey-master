@@ -39,3 +39,6 @@
 
 ###> logs/debug locaux ###
 *.log
+
+###>images###
+/public/images/ 

@@ -18,8 +18,8 @@ class RgpdConsentForPublicImageValidator extends ConstraintValidator
         }
 
         // Vérifier que l'objet a les méthodes nécessaires
-        if (!method_exists($value, 'getVisibility') || !method_exists($value, 'hasRgpdConsent')) {
-            throw new UnexpectedValueException($value, 'GalleryImage');
+        if (!$value instanceof GalleryImage || !method_exists($value, 'getVisibility') || !method_exists($value, 'hasValidConsent')) {
+            throw new UnexpectedValueException($value, GalleryImage::class);
         }
 
         $visibility = $value->getVisibility();

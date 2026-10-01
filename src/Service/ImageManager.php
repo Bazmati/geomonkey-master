@@ -157,32 +157,18 @@ class ImageManager
 
         /** 
          * @var \Intervention\Image\Image $image
-         * @phpstan-ignore-next-line
          */
-        $image = $manager->decodePath($file->getPathname());
+        $image = $manager->read($file->getPathname());
         
-        // 🔒 Strip EXIF metadata for privacy (GPS, camera info, etc.)
-        if (method_exists($image, 'stripExif')) {
-            $image->stripExif();
-        }
-        if (method_exists($image, 'stripICC')) {
-            $image->stripICC(); // Remove color profiles
-        }
-        if (method_exists($image, 'stripMeta')) {
-            $image->stripMeta(); // Generic metadata strip
-        }
+        // 🔒 Strip all metadata for privacy (GPS, EXIF, ICC, etc.)
+        $image->strip();
         
-        /**
-         * @phpstan-ignore-next-line - Intervention Image resize with callback
-         */
-        $image->resize($maxWidth, null, function ($constraint) {
-            if (method_exists($constraint, 'aspectRatio')) {
-                $constraint->aspectRatio();
-            }
-            if (method_exists($constraint, 'upsize')) {
-                $constraint->upsize();
-            }
-        });
+        // Resize to max width, maintaining aspect ratio, don't upsize
+        $image->resize(
+            width: $maxWidth,
+            height: null,
+            mode: 'contain'
+        )->downsize();
 
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);
         $dir = dirname($savePath);
@@ -300,18 +286,20 @@ class ImageManager
         
         $uuid = $entity->getImage();
         $entityId = $entity->getId();
+        $imagePath = $entity->getImagePath();
         
         // Handle null entityId (before first flush)
         if ($entityId === null) {
             return null;
         }
         
-        $cacheKey = $entityId . ':' . $entity->getImagePath() . ':' . $uuid . ':' . $size;
+        $cacheKey = $entityId . ':' . $imagePath . ':' . $uuid . ':' . $size;
         if (isset($this->urlCache[$cacheKey])) {
             return $this->urlCache[$cacheKey];
         }
         
-        $basePath = 'uploads/' . $entity->getImagePath() . '/' . $entityId . '/' . $size . '/' . $uuid;
+        // Essayez le chemin standard (avec entityId)
+        $basePath = 'uploads/' . $imagePath . '/' . $entityId . '/' . $size . '/' . $uuid;
         
         // Try .webp first (if GD/Imagick is installed)
         $webpPath = $this->publicDir . '/' . $basePath . '.webp';
@@ -328,8 +316,18 @@ class ImageManager
             }
         }
         
-        // Default fallback
-        return $this->urlCache[$cacheKey] = '/' . $basePath . '.webp';
+        // Essayer le chemin SANS entityId (compatibilité avec anciens uploads)
+        // C'est le cas où les images ont été uploadées avant que l'entité n'ait un ID
+        $legacyBasePath = 'uploads/' . $imagePath . '/' . $size . '/' . $uuid;
+        foreach ($extensions as $ext) {
+            $legacyPath = $this->publicDir . '/' . $legacyBasePath . $ext;
+            if (file_exists($legacyPath)) {
+                return $this->urlCache[$cacheKey] = '/' . $legacyBasePath . $ext;
+            }
+        }
+        
+        // Si rien ne fonctionne, retourner null
+        return null;
     }
 
 
@@ -341,11 +339,29 @@ class ImageManager
         string $size,
         string $uuid
     ): string {
+        $entityId = $entity->getId();
+        
+        // Si l'entité n'a pas encore d'ID (avant flush), utiliser un chemin temporaire
+        // qui sera corrigé après le flush. Mais pour l'instant, on utilise l'UUID seul.
+        // Cependant, une fois persistée, l'entité aura un ID et on pourra accéder aux images.
+        // Pour les images existantes créées avant ce fix, on essaie aussi sans ID.
+        if ($entityId === null) {
+            // Avant le flush, on ne peut pas encore créer le chemin final
+            // Retourner un chemin temporaire qui sera mis à jour après
+            return sprintf(
+                '%s/uploads/%s/temp/%s/%s.webp',
+                $this->publicDir,
+                $entity->getImagePath(),
+                $size,
+                $uuid
+            );
+        }
+        
         return sprintf(
             '%s/uploads/%s/%s/%s/%s.webp',
             $this->publicDir,
             $entity->getImagePath(),
-            $entity->getId(),
+            $entityId,
             $size,
             $uuid
         );
