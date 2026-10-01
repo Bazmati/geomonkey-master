@@ -2,6 +2,7 @@
 
 namespace App\Validator\Constraints;
 
+use App\Entity\GalleryImage;
 use App\Enum\ImageVisibility;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
@@ -10,7 +11,7 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class RgpdConsentForPublicImageValidator extends ConstraintValidator
 {
-    public function validate($value, Constraint $constraint): void
+    public function validate(mixed $value, Constraint $constraint): void
     {
         if (!$constraint instanceof RgpdConsentForPublicImage) {
             throw new UnexpectedTypeException($constraint, RgpdConsentForPublicImage::class);

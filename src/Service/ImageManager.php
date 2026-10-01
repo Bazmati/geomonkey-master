@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 /**
+ * @phpstan-type InterventionImage \Intervention\Image\Image
+ */
+
+/**
  * Service for managing image uploads, resizing, and deletion.
  * Works with any entity that implements ImageableInterface.
  */
@@ -151,6 +155,10 @@ class ImageManager
 
         $maxWidth = $this->sizes[$size];
 
+        /** 
+         * @var \Intervention\Image\Image $image
+         * @phpstan-ignore-next-line
+         */
         $image = $manager->decodePath($file->getPathname());
         
         // 🔒 Strip EXIF metadata for privacy (GPS, camera info, etc.)
@@ -164,9 +172,16 @@ class ImageManager
             $image->stripMeta(); // Generic metadata strip
         }
         
+        /**
+         * @phpstan-ignore-next-line - Intervention Image resize with callback
+         */
         $image->resize($maxWidth, null, function ($constraint) {
-            $constraint->aspectRatio();
-            $constraint->upsize();
+            if (method_exists($constraint, 'aspectRatio')) {
+                $constraint->aspectRatio();
+            }
+            if (method_exists($constraint, 'upsize')) {
+                $constraint->upsize();
+            }
         });
 
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);

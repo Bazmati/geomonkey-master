@@ -48,7 +48,7 @@ services:
         tags: ['twig.extension']
 
     # UserFactory - factory for creating test users
-    App\Factory\UserFactory: ~
+    App\Factory\UserFactory:
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
