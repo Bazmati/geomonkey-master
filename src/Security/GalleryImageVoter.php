@@ -54,9 +54,9 @@ class GalleryImageVoter extends Voter
         if ($subject instanceof GalleryImage) {
             $visibility = $subject->getVisibility();
             
-            // Cas spécial : si l'image est publique, même un anonyme peut voir
+            // Cas spécial : si l'image est publique ET publiée, même un anonyme peut voir
             if ($attribute === self::VIEW && $visibility === ImageVisibility::Public) {
-                return true;
+                return $subject->isPublished();
             }
         }
 
@@ -70,10 +70,10 @@ class GalleryImageVoter extends Voter
         if ($subject instanceof GalleryImage) {
             return match ($attribute) {
                 self::VIEW => match ($subject->getVisibility()) {
-                    ImageVisibility::Public => true, // Tout le monde peut voir
-                    ImageVisibility::Members => $function !== OfficeFunction::None, // Tout membre connecté
-                    ImageVisibility::Participants => $this->canViewAsParticipant($user, $subject),
-                    ImageVisibility::Bureau => $this->isBureau($function), // Seulement le bureau
+                    ImageVisibility::Public => $subject->isPublished(), // Tout le monde peut voir (si publiée)
+                    ImageVisibility::Members => $subject->isPublished() && $function !== OfficeFunction::None, // Tout membre connecté
+                    ImageVisibility::Participants => $subject->isPublished() && $this->canViewAsParticipant($user, $subject),
+                    ImageVisibility::Bureau => $subject->isPublished() && $this->isBureau($function), // Seulement le bureau
                     default => false,
                 },
                 self::PUBLISH => $this->canPublish($user, $subject),

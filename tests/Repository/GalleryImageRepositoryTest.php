@@ -351,4 +351,99 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->assertSame($secondImage->getId(), $visibleImages[1]->getId());
         $this->assertSame($firstImage->getId(), $visibleImages[2]->getId());
     }
+
+    // ========================================================================
+    // Tests pour la correction des bugs identifiés
+    // ========================================================================
+
+    /**
+     * FIX BUG #1 : OfficeFunction::None doit être traité comme un anonyme
+     * Un utilisateur avec None ne doit voir que les images Public
+     */
+    public function testFindVisibleForUserWithOfficeFunctionNone(): void
+    {
+        // Créer un utilisateur sans fonction (None)
+        $user = new User();
+        $user->setEmail('visiteur@asso.fr');
+        $user->setOfficeFunction(OfficeFunction::None);
+        $this->em->persist($user);
+
+        // Créer des images de différentes visibilités
+        $publicImage = new GalleryImage();
+        $publicImage->setVisibility(ImageVisibility::Public);
+        $publicImage->setIsPublished(true);
+        $publicImage->setTitle('Image publique');
+        $publicImage->setAlt('Description publique');
+        $this->em->persist($publicImage);
+
+        $membersImage = new GalleryImage();
+        $membersImage->setVisibility(ImageVisibility::Members);
+        $membersImage->setIsPublished(true);
+        $membersImage->setTitle('Image membres');
+        $membersImage->setAlt('Description membres');
+        $this->em->persist($membersImage);
+
+        $bureauImage = new GalleryImage();
+        $bureauImage->setVisibility(ImageVisibility::Bureau);
+        $bureauImage->setIsPublished(true);
+        $bureauImage->setTitle('Image bureau');
+        $bureauImage->setAlt('Description bureau');
+        $this->em->persist($bureauImage);
+
+        $this->em->flush();
+
+        // Un utilisateur None ne doit voir QUE les images Public (comme un anonyme)
+        $visibleImages = $this->repository->findVisibleForUser($user);
+
+        $this->assertCount(1, $visibleImages);
+        $this->assertSame($publicImage->getId(), $visibleImages[0]->getId());
+        
+        $visibleIds = array_map(fn($img) => $img->getId(), $visibleImages);
+        $this->assertNotContains($membersImage->getId(), $visibleIds);
+        $this->assertNotContains($bureauImage->getId(), $visibleIds);
+    }
+
+    /**
+     * FIX BUG #2 : NOT IN avec tableau vide
+     * Quand il n'y a AUCUNE image Public/Members, le participant doit quand même
+     * voir ses images Participants (pas de NOT IN () qui casse la requête)
+     */
+    public function testFindVisibleForUserWithOnlyParticipantsImages(): void
+    {
+        // Créer un utilisateur participant
+        $user = new User();
+        $user->setEmail('participant@asso.fr');
+        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $this->em->persist($user);
+
+        // Créer un événement
+        $event = new Event();
+        $event->setTitle('Événement test');
+        $event->setDescription('Description de l\'événement');
+        $event->setStartDate(new \DateTime('2024-01-01'));
+        $event->setEndDate(new \DateTime('2024-01-02'));
+        $event->setLocation('Paris');
+        $this->em->persist($event);
+
+        // Ajouter l'utilisateur comme participant
+        $event->addParticipant($user, ParticipantRole::Participant);
+
+        // Créer UNIQUEMENT des images Participants (pas de Public/Members)
+        $participantsImage = new GalleryImage();
+        $participantsImage->setVisibility(ImageVisibility::Participants);
+        $participantsImage->setIsPublished(true);
+        $participantsImage->setTitle('Image participants');
+        $participantsImage->setAlt('Description participants');
+        $participantsImage->addEvent($event);
+        $this->em->persist($participantsImage);
+
+        $this->em->flush();
+
+        // Le participant DOIT voir son image Participants
+        // (avant le fix, NOT IN () retournait rien)
+        $visibleImages = $this->repository->findVisibleForUser($user);
+
+        $this->assertCount(1, $visibleImages, 'Un participant doit voir ses images Participants même sans images Public/Members');
+        $this->assertSame($participantsImage->getId(), $visibleImages[0]->getId());
+    }
 }

@@ -38,6 +38,7 @@ class GalleryImageVoterTest extends TestCase
     {
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Public);
+        $galleryImage->setIsPublished(true);
 
         $token = new TestBrowserToken([]); // Anonyme
 
@@ -53,6 +54,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Public);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
@@ -62,6 +64,7 @@ class GalleryImageVoterTest extends TestCase
     {
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Members);
+        $galleryImage->setIsPublished(true);
 
         $token = new TestBrowserToken([]); // Anonyme
 
@@ -77,6 +80,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Members);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
@@ -90,6 +94,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Members);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
@@ -103,6 +108,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Bureau);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
@@ -116,6 +122,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Bureau);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
@@ -129,6 +136,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Bureau);
+        $galleryImage->setIsPublished(true);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_GRANTED, $result);
@@ -147,6 +155,7 @@ class GalleryImageVoterTest extends TestCase
         $event = new Event();
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Participants);
+        $galleryImage->setIsPublished(true);
         $galleryImage->addEvent($event);
 
         // Configurer le repository pour retourner true
@@ -167,6 +176,7 @@ class GalleryImageVoterTest extends TestCase
         $event = new Event();
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Participants);
+        $galleryImage->setIsPublished(true);
         $galleryImage->addEvent($event);
 
         // Configurer le repository pour retourner false
@@ -189,6 +199,7 @@ class GalleryImageVoterTest extends TestCase
 
         $galleryImage = new GalleryImage();
         $galleryImage->setVisibility(ImageVisibility::Participants);
+        $galleryImage->setIsPublished(true);
         // Pas d'événements liés
 
         // Le repository ne doit pas être appelé car events est vide
@@ -416,6 +427,50 @@ class GalleryImageVoterTest extends TestCase
         $galleryImage->setVisibility(ImageVisibility::Public);
 
         $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::PUBLISH]);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    // ========================================================================
+    // Tests pour isPublished (alignement repo/voter)
+    // ========================================================================
+
+    public function testPublicImageViewDeniedIfNotPublished(): void
+    {
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Public);
+        $galleryImage->setIsPublished(false); // Non publiée
+
+        $token = new TestBrowserToken([]); // Anonyme
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    public function testMembersImageViewDeniedIfNotPublished(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Members);
+        $galleryImage->setIsPublished(false);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
+        $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
+    }
+
+    public function testBureauImageViewDeniedIfNotPublished(): void
+    {
+        $user = new User();
+        $user->setOfficeFunction(OfficeFunction::President);
+        $token = $this->createToken($user);
+
+        $galleryImage = new GalleryImage();
+        $galleryImage->setVisibility(ImageVisibility::Bureau);
+        $galleryImage->setIsPublished(false);
+
+        $result = $this->voter->vote($token, $galleryImage, [GalleryImageVoter::VIEW]);
         $this->assertSame(VoterInterface::ACCESS_DENIED, $result);
     }
 }

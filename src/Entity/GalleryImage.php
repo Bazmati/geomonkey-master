@@ -149,12 +149,14 @@ class GalleryImage implements ImageableInterface
      * Si l'image était publique, elle passe en visibilité Members (conformité RGPD).
      * Utiliser cette méthode plutôt que setRgpdConsent(false) pour garantir
      * la cohérence entre rgpdConsent, consentedAt et visibility.
+     * 
+     * NOTE RGPD : consentDetail est CONSERVÉ pour traçabilité (preuve du consentement initial)
      */
     public function withdrawConsent(): void
     {
         $this->rgpdConsent = false;
         $this->consentedAt = null;
-        $this->consentDetail = null;
+        // $this->consentDetail = null; // NE PAS EFFACER - RGPD exige traçabilité
 
         // Rétrogradation auto : une image sans consentement ne peut pas rester publique
         if ($this->visibility === ImageVisibility::Public) {

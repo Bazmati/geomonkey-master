@@ -134,17 +134,26 @@ class GalleryImageRgpdTest extends TestCase
         $this->assertFalse($image->canBePublic());
     }
 
-    public function testConsentDetailIsClearedOnWithdraw(): void
+    /**
+     * RGPD : consentDetail doit être CONSERVÉ pour traçabilité après retrait
+     * On garde la preuve du consentement initial même après retrait
+     */
+    public function testConsentDetailIsPreservedOnWithdrawForRgpdTraceability(): void
     {
         $image = new GalleryImage();
         $image->giveConsent();
-        $image->setConsentDetail('Consentement par email le 15/03/2024');
+        $image->setConsentDetail('Consentement par email le 15/03/2024 - Marie D.');
         
-        $this->assertSame('Consentement par email le 15/03/2024', $image->getConsentDetail());
+        $this->assertSame('Consentement par email le 15/03/2024 - Marie D.', $image->getConsentDetail());
         
         $image->withdrawConsent();
         
-        $this->assertNull($image->getConsentDetail());
+        // consentDetail doit être CONSERVÉ pour conformité RGPD (preuve du consentement initial)
+        $this->assertSame('Consentement par email le 15/03/2024 - Marie D.', $image->getConsentDetail());
+        // Mais les flags de consentement sont bien désactivés
+        $this->assertFalse($image->hasRgpdConsent());
+        $this->assertNull($image->getConsentedAt());
+        $this->assertFalse($image->hasValidConsent());
     }
 
     public function testMultipleConsentCycles(): void

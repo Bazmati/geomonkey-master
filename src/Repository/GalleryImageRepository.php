@@ -64,7 +64,7 @@ class GalleryImageRepository extends ServiceEntityRepository
     }
 
     /**
-     * Trouve les images ornelines (non utilisées)
+     * Trouve les images orphelines (non utilisées)
      */
     public function findOrphanImages(): array
     {
@@ -135,7 +135,16 @@ class GalleryImageRepository extends ServiceEntityRepository
             return $qb->getQuery()->getResult();
         }
 
-        // Pour les membres non-bureau : Public + Members + Participants
+        // Un compte sans fonction : comme un anonyme, Public uniquement
+        if ($function === OfficeFunction::None) {
+            return $qb
+                ->andWhere('gi.visibility = :public')
+                ->setParameter('public', ImageVisibility::Public->value)
+                ->getQuery()
+                ->getResult();
+        }
+
+        // Pour les membres non-bureau (ActiveMember) : Public + Members + Participants
         // 1. Récupérer les images Public et Members
         $baseImages = $qb
             ->andWhere('gi.visibility IN (:visibilities)')
@@ -147,18 +156,22 @@ class GalleryImageRepository extends ServiceEntityRepository
             ->getResult();
 
         // 2. Récupérer les images Participants des événements auxquels l'utilisateur participe
-        $participantImages = $this->createQueryBuilder('gi2')
+        $qb2 = $this->createQueryBuilder('gi2')
             ->join('gi2.events', 'e')
             ->join(EventParticipant::class, 'ep', 'WITH', 'ep.event = e')
             ->where('ep.user = :user')
             ->andWhere('gi2.visibility = :participants')
             ->andWhere('gi2.isPublished = true')
-            ->andWhere('gi2.id NOT IN (:baseImageIds)') // Éviter les doublons
             ->setParameter('user', $user)
-            ->setParameter('participants', ImageVisibility::Participants->value)
-            ->setParameter('baseImageIds', array_map(fn($img) => $img->getId(), $baseImages))
-            ->getQuery()
-            ->getResult();
+            ->setParameter('participants', ImageVisibility::Participants->value);
+
+        // Court-circuiter NOT IN si $baseImages est vide (évite NOT IN () en SQL)
+        if ($baseImages !== []) {
+            $qb2->andWhere('gi2.id NOT IN (:baseImageIds)')
+                ->setParameter('baseImageIds', array_map(fn($img) => $img->getId(), $baseImages));
+        }
+
+        $participantImages = $qb2->getQuery()->getResult();
 
         // Fusionner et dédupliquer
         $allImages = array_merge($baseImages, $participantImages);
