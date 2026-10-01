@@ -10,6 +10,11 @@ use Symfony\Component\HttpFoundation\File\File;
 interface ImageableInterface
 {
     /**
+     * Get the entity ID.
+     */
+    public function getId(): ?int;
+
+    /**
      * Get the stored image identifier (UUID or path).
      */
     public function getImage(): ?string;

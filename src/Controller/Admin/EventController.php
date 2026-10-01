@@ -11,11 +11,13 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/event')]
 final class EventController extends AbstractController
 {
     #[Route(name: 'admin_events_index', methods: ['GET'])]
+    #[IsGranted('ENTITY_VIEW')]
     public function index(EventRepository $eventRepository): Response
     {
         return $this->render('admin/event/index.html.twig', [
@@ -24,6 +26,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('/new', name: 'admin_events_new', methods: ['GET', 'POST'])]
+    #[IsGranted('ENTITY_CREATE')]
     public function new(
         Request $request,
         EntityManagerInterface $entityManager,
@@ -58,6 +61,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'admin_events_edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ENTITY_EDIT', 'event')]
     public function edit(
         Request $request,
         Event $event,
@@ -95,6 +99,7 @@ final class EventController extends AbstractController
     }
 
     #[Route('/{id}', name: 'admin_events_delete', methods: ['POST'])]
+    #[IsGranted('ENTITY_DELETE', 'event')]
     public function delete(
         Request $request,
         Event $event,

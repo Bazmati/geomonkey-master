@@ -49,6 +49,24 @@ class ImageExtension extends AbstractExtension
         string $class = 'img-cover',
         array $attrs = []
     ): string {
-        return $this->imageManager->getHtmlTag($entity, $size, $alt, $class, $attrs);
+        $url = $this->imageManager->getUrl($entity, $size);
+        
+        if ($url === null) {
+            return '<i class="bi bi-image-slash"></i>';
+        }
+        
+        $attrString = '';
+        if (!empty($class)) {
+            $attrs['class'] = $class;
+        }
+        if (!empty($alt)) {
+            $attrs['alt'] = $alt;
+        }
+        
+        foreach ($attrs as $key => $value) {
+            $attrString .= ' ' . htmlspecialchars($key, ENT_QUOTES) . '="' . htmlspecialchars($value, ENT_QUOTES) . '"';
+        }
+        
+        return sprintf('<img src="%s"%s>', htmlspecialchars($url, ENT_QUOTES), $attrString);
     }
 }

@@ -14,7 +14,6 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/admin/user', name: 'app_admin_user_')]
-#[IsGranted('ROLE_ADMIN')]
 class UserController extends AbstractController
 {
     public function __construct(
@@ -23,6 +22,7 @@ class UserController extends AbstractController
     ) {}
 
     #[Route('/', name: 'index', methods: ['GET'])]
+    #[IsGranted('ENTITY_VIEW')]
     public function index(UserRepository $users): Response
     {
         return $this->render('admin/user/index.html.twig', [
@@ -31,6 +31,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/new', name: 'new', methods: ['GET', 'POST'])]
+    #[IsGranted('ENTITY_CREATE')]
     public function new(Request $request): Response
     {
         $user = new User();
@@ -57,6 +58,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/edit', name: 'edit', methods: ['GET', 'POST'])]
+    #[IsGranted('ENTITY_EDIT')]
     public function edit(Request $request, User $user): Response
     {
         $form = $this->createForm(UserType::class, $user, ['current_roles' => $user->getRoles()]);
@@ -89,6 +91,7 @@ class UserController extends AbstractController
     }
 
     #[Route('/{id}/delete', name: 'delete', methods: ['POST'])]
+    #[IsGranted('ENTITY_DELETE')]
     public function delete(Request $request, User $user): Response
     {
         if ($user === $this->getUser()) {

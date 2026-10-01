@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Tests\Controller;
+namespace App\Tests\Controller\Admin;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
-final class Admin/UserControllerTest extends WebTestCase
+final class UserControllerTest extends WebTestCase
 {
     public function testIndex(): void
     {

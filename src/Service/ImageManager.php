@@ -18,6 +18,7 @@ class ImageManager
     private string $publicDir;
     private array $sizes;
     private array $qualities;
+    private array $urlCache = [];
 
     /**
      * Available image sizes and their max width.
@@ -59,11 +60,26 @@ class ImageManager
     public function upload(ImageableInterface $entity, UploadedFile $file): void
     {
         $this->validateUploadedFile($file);
-        
-        $uuid = bin2hex(random_bytes(16));
 
-        foreach (self::AVAILABLE_SIZES as $size) {
-            $this->processImage($entity, $file, $uuid, $size);
+        $uuid = bin2hex(random_bytes(16));
+        $writtenPaths = [];
+
+        try {
+            $manager = $this->createImageManager();
+
+            foreach (self::AVAILABLE_SIZES as $size) {
+                $savePath = $this->getAbsolutePath($entity, $size, $uuid);
+                $this->processImage($entity, $file, $uuid, $size, $manager);
+                $writtenPaths[] = $savePath;
+            }
+        } catch (\Throwable $e) {
+            // Échec partiel : on supprime ce qui a déjà été écrit
+            foreach ($writtenPaths as $path) {
+                if (file_exists($path)) {
+                    @unlink($path);
+                }
+            }
+            throw $e; // on relance : l'appelant doit savoir que l'upload a échoué
         }
 
         $entity->setImage($uuid);
@@ -96,10 +112,9 @@ class ImageManager
             throw new FileException('Extension de fichier non autorisée: ' . $extension);
         }
 
-        // 5. Verify real MIME type using finfo
-        $finfo = finfo_open(FILEINFO_MIME_TYPE);
-        $realMime = finfo_file($finfo, $file->getPathname());
-        // Note: finfo_close() is deprecated in PHP 8.5+ as objects are freed automatically
+        // 5. Verify real MIME type using finfo (OO style)
+        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+        $realMime = $finfo->file($file->getPathname());
 
         if (!in_array($realMime, self::ALLOWED_MIME_TYPES, true)) {
             throw new FileException('Le fichier n\'est pas une image valide');
@@ -126,19 +141,17 @@ class ImageManager
         ImageableInterface $entity,
         UploadedFile $file,
         string $uuid,
-        string $size
+        string $size,
+        ?InterventionImageManager $manager
     ): void {
-        $maxWidth = $this->sizes[$size];
-        $quality = $this->qualities[$size];
-
-        $manager = $this->createImageManager();
-        
         if ($manager === null) {
             $this->copyFileWithoutProcessing($entity, $file, $uuid, $size);
             return;
         }
 
-        $image = $manager->read($file->getPathname());
+        $maxWidth = $this->sizes[$size];
+
+        $image = $manager->decodePath($file->getPathname());
         $image->resize($maxWidth, null, function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();
@@ -260,12 +273,23 @@ class ImageManager
         
         $uuid = $entity->getImage();
         $entityId = $entity->getId();
+        
+        // Handle null entityId (before first flush)
+        if ($entityId === null) {
+            return null;
+        }
+        
+        $cacheKey = $entityId . ':' . $entity->getImagePath() . ':' . $uuid . ':' . $size;
+        if (isset($this->urlCache[$cacheKey])) {
+            return $this->urlCache[$cacheKey];
+        }
+        
         $basePath = 'uploads/' . $entity->getImagePath() . '/' . $entityId . '/' . $size . '/' . $uuid;
         
         // Try .webp first (if GD/Imagick is installed)
         $webpPath = $this->publicDir . '/' . $basePath . '.webp';
         if (file_exists($webpPath)) {
-            return '/' . $basePath . '.webp';
+            return $this->urlCache[$cacheKey] = '/' . $basePath . '.webp';
         }
         
         // Fallback to common extensions if GD/Imagick not installed
@@ -273,46 +297,14 @@ class ImageManager
         foreach ($extensions as $ext) {
             $fullPath = $this->publicDir . '/' . $basePath . $ext;
             if (file_exists($fullPath)) {
-                return '/' . $basePath . $ext;
+                return $this->urlCache[$cacheKey] = '/' . $basePath . $ext;
             }
         }
         
         // Default fallback
-        return '/' . $basePath . '.webp';
+        return $this->urlCache[$cacheKey] = '/' . $basePath . '.webp';
     }
 
-    /**
-     * Get the HTML tag for an entity's image.
-     */
-    public function getHtmlTag(
-        ImageableInterface $entity,
-        string $size = 'medium',
-        string $alt = '',
-        string $class = 'img-cover',
-        array $attrs = []
-    ): string {
-        $url = $this->getUrl($entity, $size);
-        if ($url) {
-            $attrsStr = '';
-            $attrs['class'] = $class;
-            $attrs['src'] = $url;
-            $attrs['alt'] = $alt ?: ($entity->getImagePath() ?? 'image');
-            foreach ($attrs as $key => $value) {
-                $attrsStr .= sprintf(' %s="%s"', $key, htmlspecialchars($value, ENT_QUOTES));
-            }
-            return sprintf('<img%s>', $attrsStr);
-        }
-        $defaultImage = $entity->getDefaultImage();
-        if (!empty($defaultImage)) {
-            return sprintf(
-                '<img src="%s" alt="%s" class="%s">',
-                htmlspecialchars($defaultImage, ENT_QUOTES),
-                htmlspecialchars($alt ?: 'default', ENT_QUOTES),
-                htmlspecialchars($class, ENT_QUOTES)
-            );
-        }
-        return '<i class="bi bi-image-slash text-muted"></i>';
-    }
 
     /**
      * Get the absolute filesystem path for an image.
