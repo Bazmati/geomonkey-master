@@ -8,6 +8,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
 class Event implements ImageableInterface
@@ -155,6 +157,17 @@ class Event implements ImageableInterface
     // Image file for upload (not persisted in database)
     private ?File $imageFile = null;
 
+    /**
+     * Images de la galerie associées à cet événement
+     */
+    #[ORM\ManyToMany(targetEntity: GalleryImage::class, inversedBy: 'events')]
+    private Collection $galleryImages;
+
+    public function __construct()
+    {
+        $this->galleryImages = new ArrayCollection();
+    }
+
     public function getImageFile(): ?File
     {
         return $this->imageFile;
@@ -178,5 +191,25 @@ class Event implements ImageableInterface
     public function hasImage(): bool
     {
         return $this->image !== null && $this->image !== '';
+    }
+
+    // Gallery images relations
+    public function getGalleryImages(): Collection
+    {
+        return $this->galleryImages;
+    }
+
+    public function addGalleryImage(GalleryImage $image): static
+    {
+        if (!$this->galleryImages->contains($image)) {
+            $this->galleryImages->add($image);
+        }
+        return $this;
+    }
+
+    public function removeGalleryImage(GalleryImage $image): static
+    {
+        $this->galleryImages->removeElement($image);
+        return $this;
     }
 }
