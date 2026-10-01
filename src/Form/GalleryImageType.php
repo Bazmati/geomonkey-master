@@ -6,23 +6,18 @@ use App\Entity\GalleryImage;
 use App\Enum\ImageVisibility;
 use App\Validator\Constraints\RgpdConsentForPublicImage;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\CallbackTransformer;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
-use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Formulaire pour les images de la galerie.
- * 
- * Règles d'or :
- * - alt non nullable → validation automatique
- * - Visibilité Public nécessite consentement RGPD
  */
 class GalleryImageType extends AbstractType
 {
@@ -33,8 +28,8 @@ class GalleryImageType extends AbstractType
                 'label' => 'Titre',
                 'required' => true,
                 'constraints' => [
-                    new NotBlank(['message' => 'Le titre est obligatoire']),
-                    new Length(['max' => 255])
+                    new Assert\NotBlank(message: 'Le titre est obligatoire'),
+                    new Assert\Length(max: 255)
                 ],
                 'attr' => ['placeholder' => 'Titre de l\'image']
             ])
@@ -42,10 +37,8 @@ class GalleryImageType extends AbstractType
                 'label' => 'Description alternative (Accessibilité)',
                 'required' => true,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'La description alternative (alt) est obligatoire pour l\'accessibilité'
-                    ]),
-                    new Length(['max' => 500])
+                    new Assert\NotBlank(message: 'La description alternative (alt) est obligatoire pour l\'accessibilité'),
+                    new Assert\Length(max: 500)
                 ],
                 'help' => 'Description pour les lecteurs d\'écran. Obligatoire pour l\'accessibilité.',
                 'attr' => ['placeholder' => 'Décrivez ce que montre l\'image']
@@ -54,7 +47,7 @@ class GalleryImageType extends AbstractType
                 'label' => 'Description',
                 'required' => false,
                 'constraints' => [
-                    new Length(['max' => 2000])
+                    new Assert\Length(max: 2000)
                 ],
                 'attr' => [
                     'placeholder' => 'Description détaillée (optionnelle)',
@@ -63,27 +56,14 @@ class GalleryImageType extends AbstractType
             ])
             ->add('visibility', ChoiceType::class, [
                 'label' => 'Visibilité',
-                'choices' => function(GalleryImage $image) {
-                    // Si pas de consentement RGPD, on ne peut pas choisir Public
-                    $choices = ImageVisibility::all();
-                    if (!$image->hasRgpdConsent()) {
-                        $choices = array_filter($choices, function($visibility) {
-                            return $visibility !== ImageVisibility::Public;
-                        });
-                    }
-                    return $choices;
-                },
-                'choice_label' => function(ImageVisibility $visibility) {
-                    return $visibility->getLabel();
-                },
-                'choice_attr' => function(ImageVisibility $visibility) {
-                    return ['data-description' => $visibility->getDescription()];
-                },
+                'choices' => array_combine(
+                    array_map(fn($v) => $v->value, $options['visibility_choices']),
+                    array_map(fn($v) => $v->getLabel(), $options['visibility_choices'])
+                ),
                 'expanded' => false,
                 'multiple' => false,
-                'data' => ImageVisibility::Members, // Default
                 'constraints' => [
-                    new NotBlank(['message' => 'La visibilité est obligatoire'])
+                    new Assert\NotBlank(message: 'La visibilité est obligatoire')
                 ]
             ])
             ->add('rgpdConsent', CheckboxType::class, [
@@ -101,28 +81,33 @@ class GalleryImageType extends AbstractType
                     'rows' => 2
                 ]
             ])
-            ->add('consentedAt', DateType::class, [
-                'label' => 'Date du consentement',
-                'required' => false,
-                'widget' => 'single_text',
-                'format' => 'yyyy-MM-dd',
-                'html5' => true,
-                'help' => 'Date à laquelle le consentement a été obtenu (obligatoire pour conformité RGPD)',
-                'attr' => ['class' => 'flatpickr-date']
-            ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Image',
-                'required' => false, // Optionnel pour les modifications
-                'mapped' => false, // Géré manuellement dans le contrôleur
+                'mapped' => false,
+                'required' => $options['require_image'],
                 'help' => 'Formats autorisés: JPG, PNG, GIF, WebP (max 5MB)',
                 'attr' => ['accept' => 'image/jpeg,image/png,image/gif,image/webp']
             ])
             ->add('isPublished', CheckboxType::class, [
                 'label' => 'Publier',
                 'required' => false,
+                'data' => true,
                 'help' => 'Cochez pour rendre cette image visible selon sa visibilité.',
                 'attr' => ['class' => 'form-check-input']
             ]);
+
+        // Model Transformer pour gérer ImageVisibility (enum) ↔ string
+        $builder->get('visibility')->addModelTransformer(new CallbackTransformer(
+            function (?ImageVisibility $visibility): ?string {
+                return $visibility?->value;
+            },
+            function (?string $value): ?ImageVisibility {
+                if ($value === null) {
+                    return null;
+                }
+                return ImageVisibility::from($value);
+            }
+        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -132,6 +117,10 @@ class GalleryImageType extends AbstractType
             'constraints' => [
                 new RgpdConsentForPublicImage(),
             ],
+            'visibility_choices' => ImageVisibility::all(),
+            'require_image' => false,
         ]);
+
+        $resolver->setAllowedTypes('visibility_choices', ['array', 'Traversable']);
     }
 }
