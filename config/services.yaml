@@ -32,9 +32,19 @@ services:
             - { name: doctrine.event_listener, event: preRemove }
             - { name: doctrine.event_listener, event: preUpdate }
 
+    # SecurityExceptionListener - register as kernel event listener
+    App\EventListener\SecurityExceptionListener:
+        arguments:
+            $tokenStorage: '@security.token_storage'
+        tags:
+            - { name: kernel.event_listener, event: kernel.exception, method: onKernelException }
+
     # ImageExtension - register as Twig extension
     App\Twig\ImageExtension:
         tags: ['twig.extension']
+
+    # UserFactory - factory for creating test users
+    App\Factory\UserFactory: ~
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
