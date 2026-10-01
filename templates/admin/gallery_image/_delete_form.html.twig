@@ -1,7 +1,7 @@
-<form method="post" action="{{ path('app_admin_gallery_image_delete', {'id': id}) }}" 
-      onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette image ? Cette action est irréversible.');" class="d-inline">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ id) }}">
-    <button class="btn btn-sm btn-danger" type="submit" title="Supprimer">
-        <i class="bi bi-trash-fill"></i>
-    </button>
-</form>
+{% include 'front/partials/_delete_button.html.twig' with {
+    id: id,
+    path: path('app_admin_gallery_image_delete', {'id': id}),
+    entity_type: 'image',
+    confirm_message: 'Êtes-vous sûr de vouloir supprimer cette image ? Cette action est irréversible.',
+    csrf_token: csrf_token('delete' ~ id)
+} %}

@@ -1,6 +1,7 @@
-<form method="post" action="{{ path('admin_events_delete', {'id': event.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-    <button class="btn btn-danger" type="submit">
-        <i class="bi bi-trash"></i> Supprimer
-    </button>
-</form>
+{% include 'front/partials/_delete_button.html.twig' with {
+    id: event.id,
+    path: path('admin_events_delete', {'id': event.id}),
+    entity_type: 'événement',
+    confirm_message: 'Êtes-vous sûr de vouloir supprimer cet événement ?',
+    csrf_token: csrf_token('delete' ~ event.id)
+} %}

@@ -50,11 +50,13 @@
                 <td class="text-end">
                     <a href="{{ path('app_admin_user_edit', {id: user.id}) }}"
                        class="btn btn-sm btn-outline-warning"><i class="bi bi-pencil"></i></a>
-                    <form method="post" action="{{ path('app_admin_user_delete', {id: user.id}) }}"
-                          class="d-inline" onsubmit="return confirm('Supprimer cet utilisateur ?');">
-                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
-                        <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
-                    </form>
+                    {% include 'front/partials/_delete_button.html.twig' with {
+                        id: user.id,
+                        path: path('app_admin_user_delete', {id: user.id}),
+                        entity_type: 'utilisateur',
+                        confirm_message: 'Êtes-vous sûr de vouloir supprimer cet utilisateur ?',
+                        csrf_token: csrf_token('delete' ~ user.id)
+                    } %}
                 </td>
             </tr>
         {% else %}

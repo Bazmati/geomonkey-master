@@ -1,0 +1,43 @@
+{# templates/front/partials/_delete_form.html.twig #}
+{# Generic Bootstrap 5 Modal for Delete Confirmation #}
+{# Usage: include with { path: 'route_name', id: entity.id, entity_type: 'EntityName', csrf_token: csrf_token('delete' ~ id) } #}
+{% set entity_type = entity_type|default('element') %}
+{% set confirm_message = confirm_message|default('Êtes-vous sûr de vouloir supprimer cet ' ~ entity_type ~ ' ? Cette action est irréversible.') %}
+
+<!-- Delete Modal -->
+<div class="modal fade" id="deleteModal-{{ id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ id }}" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel-{{ id }}">
+                    <i class="bi bi-trash-fill me-2"></i>
+                    Supprimer {{ entity_type|capitalize }}
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>{{ confirm_message }}</p>
+            </div>
+            <div class="modal-footer">
+                <form method="post" action="{{ path }}" class="d-inline">
+                    <input type="hidden" name="_token" value="{{ csrf_token }}">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        <i class="bi bi-x-circle me-1"></i> Annuler
+                    </button>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash-fill me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Button to trigger modal -->
+<button type="button" 
+        class="btn btn-danger btn-sm"
+        data-bs-toggle="modal" 
+        data-bs-target="#deleteModal-{{ id }}"
+        title="Supprimer">
+    <i class="bi bi-trash-fill"></i>
+</button>

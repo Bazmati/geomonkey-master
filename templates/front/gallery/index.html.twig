@@ -50,7 +50,12 @@
                                     {% endif %}
 
                                     {% if is_granted('GALLERY_IMAGE_DELETE', image) %}
-                                        {% include 'admin/gallery_image/_delete_form.html.twig' with {id: image.id} %}
+                                        {% include 'front/partials/_delete_button.html.twig' with {
+                                            id: image.id,
+                                            path: path('app_admin_gallery_image_delete', {id: image.id}),
+                                            entity_type: 'image',
+                                            csrf_token: csrf_token('delete' ~ image.id)
+                                        } %}
                                     {% endif %}
                                 </div>
                             {% endif %}
