@@ -5,6 +5,7 @@ namespace App\Controller\Admin;
 use App\Entity\GalleryImage;
 use App\Entity\User;
 use App\Enum\ImageVisibility;
+use App\Enum\OfficeFunction;
 use App\Form\GalleryImageType;
 use App\Repository\GalleryImageRepository;
 use App\Service\ImageManager;
@@ -165,11 +166,51 @@ class GalleryImageController extends AbstractController
                 return $this->redirectToRoute('app_admin_gallery_image_index');
             }
 
+            // Seuls le président peut publier une image Public
+            $user = $this->security->getUser();
+            if ($galleryImage->getVisibility() === ImageVisibility::Public && 
+                $user instanceof User && 
+                $user->getOfficeFunction() !== OfficeFunction::President) {
+                $this->addFlash('error', 'Seul le président peut publier une image publique.');
+                return $this->redirectToRoute('app_admin_gallery_image_index');
+            }
+
             $galleryImage->setIsPublished(!$galleryImage->isPublished());
             $this->em->flush();
 
             $action = $galleryImage->isPublished() ? 'publiée' : 'dépubliée';
             $this->addFlash('success', sprintf('Image %s avec succès.', $action));
+        }
+
+        return $this->redirectToRoute('app_admin_gallery_image_index');
+    }
+
+    #[Route('/{id}/withdraw-consent', name: 'withdraw_consent', methods: ['POST'])]
+    #[IsGranted('GALLERY_IMAGE_EDIT')]
+    public function withdrawConsent(Request $request, GalleryImage $galleryImage): Response
+    {
+        if ($this->isCsrfTokenValid('withdraw_consent' . $galleryImage->getId(), $request->getPayload()->getString('_token'))) {
+            // Retirer le consentement
+            $galleryImage->setRgpdConsent(false);
+            $galleryImage->setConsentedAt(null);
+            $galleryImage->setConsentDetail(null);
+
+            // Si l'image est publique, la rétrograder à Members (conformité RGPD)
+            if ($galleryImage->getVisibility() === ImageVisibility::Public) {
+                $galleryImage->setVisibility(ImageVisibility::Members);
+                // Si l'image était publiée, la dépublier
+                if ($galleryImage->isPublished()) {
+                    $galleryImage->setIsPublished(false);
+                    $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" et dépubliée pour conformité RGPD.');
+                } else {
+                    $this->addFlash('warning', 'Le consentement a été retiré. L\'image a été rétrogradée en "Membres" pour conformité RGPD.');
+                }
+            } else {
+                $this->addFlash('success', 'Le consentement a été retiré.');
+            }
+
+            $galleryImage->setUpdatedAt(new \DateTime());
+            $this->em->flush();
         }
 
         return $this->redirectToRoute('app_admin_gallery_image_index');

@@ -8,6 +8,7 @@ use App\Validator\Constraints\RgpdConsentForPublicImage;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -62,7 +63,16 @@ class GalleryImageType extends AbstractType
             ])
             ->add('visibility', ChoiceType::class, [
                 'label' => 'Visibilité',
-                'choices' => ImageVisibility::all(),
+                'choices' => function(GalleryImage $image) {
+                    // Si pas de consentement RGPD, on ne peut pas choisir Public
+                    $choices = ImageVisibility::all();
+                    if (!$image->hasRgpdConsent()) {
+                        $choices = array_filter($choices, function($visibility) {
+                            return $visibility !== ImageVisibility::Public;
+                        });
+                    }
+                    return $choices;
+                },
                 'choice_label' => function(ImageVisibility $visibility) {
                     return $visibility->getLabel();
                 },
@@ -90,6 +100,15 @@ class GalleryImageType extends AbstractType
                     'placeholder' => 'Ex: "Marie D. - consentement par email du 15/03/2024 pour publication sur le site"',
                     'rows' => 2
                 ]
+            ])
+            ->add('consentedAt', DateType::class, [
+                'label' => 'Date du consentement',
+                'required' => false,
+                'widget' => 'single_text',
+                'format' => 'yyyy-MM-dd',
+                'html5' => true,
+                'help' => 'Date à laquelle le consentement a été obtenu (obligatoire pour conformité RGPD)',
+                'attr' => ['class' => 'flatpickr-date']
             ])
             ->add('imageFile', FileType::class, [
                 'label' => 'Image',

@@ -152,6 +152,18 @@ class ImageManager
         $maxWidth = $this->sizes[$size];
 
         $image = $manager->decodePath($file->getPathname());
+        
+        // 🔒 Strip EXIF metadata for privacy (GPS, camera info, etc.)
+        if (method_exists($image, 'stripExif')) {
+            $image->stripExif();
+        }
+        if (method_exists($image, 'stripICC')) {
+            $image->stripICC(); // Remove color profiles
+        }
+        if (method_exists($image, 'stripMeta')) {
+            $image->stripMeta(); // Generic metadata strip
+        }
+        
         $image->resize($maxWidth, null, function ($constraint) {
             $constraint->aspectRatio();
             $constraint->upsize();

@@ -6,6 +6,7 @@ use App\Entity\GalleryImage;
 use App\Entity\User;
 use App\Enum\ImageVisibility;
 use App\Enum\OfficeFunction;
+use App\Repository\EventParticipantRepository;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Vote;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
@@ -29,6 +30,11 @@ class GalleryImageVoter extends Voter
     public const DELETE = 'GALLERY_IMAGE_DELETE';
     public const PUBLISH = 'GALLERY_IMAGE_PUBLISH';
 
+    public function __construct(
+        private EventParticipantRepository $participantRepository
+    ) {
+    }
+
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array($attribute, [
@@ -44,13 +50,7 @@ class GalleryImageVoter extends Voter
     ): bool {
         $user = $token->getUser();
 
-        if (!$user instanceof User) {
-            return false; // Anonyme : seulement les images publiques
-        }
-
-        $function = $user->getOfficeFunction();
-
-        // Pour les images publiques, tout le monde peut voir
+        // Pour les images publiques, même un anonyme peut voir
         if ($subject instanceof GalleryImage) {
             $visibility = $subject->getVisibility();
             
@@ -58,12 +58,21 @@ class GalleryImageVoter extends Voter
             if ($attribute === self::VIEW && $visibility === ImageVisibility::Public) {
                 return true;
             }
+        }
 
+        if (!$user instanceof User) {
+            return false; // Anonyme : accès refusé sauf pour les images publiques (déjà géré ci-dessus)
+        }
+
+        $function = $user->getOfficeFunction();
+
+        // Si on a un subject (GalleryImage), appliquer la logique de visibilité
+        if ($subject instanceof GalleryImage) {
             // Logique de visibilité basée sur le rôle de l'utilisateur
-            return match ($visibility) {
+            return match ($subject->getVisibility()) {
                 ImageVisibility::Public => true, // Tout le monde peut voir
                 ImageVisibility::Members => $function !== OfficeFunction::None, // Tout membre connecté
-                ImageVisibility::Participants => $this->canViewAsParticipant($user, $subject), // À implémenter
+                ImageVisibility::Participants => $this->canViewAsParticipant($user, $subject),
                 ImageVisibility::Bureau => $this->isBureau($function), // Seulement le bureau
                 default => false,
             };
@@ -75,7 +84,7 @@ class GalleryImageVoter extends Voter
             self::CREATE => $this->isBureau($function),
             self::EDIT => $this->canEdit($function),
             self::DELETE => $this->canDelete($function),
-            self::PUBLISH => $this->isBureau($function),
+            self::PUBLISH => $this->canPublish($function),
             default => false,
         };
     }
@@ -113,25 +122,29 @@ class GalleryImageVoter extends Voter
 
     /**
      * Vérifie si l'utilisateur peut voir l'image en tant que participant
-     * NOTE: À implémenter quand la modélisation des participants sera prête
      * 
-     * Pour l'instant, retourne false car les participants ne sont pas encore modélisés
-     * Quand EventParticipant existera, on pourra vérifier:
-     * - Si l'image est liée à un événement
-     * - Si l'utilisateur a participé à cet événement
+     * Vérifie si l'utilisateur a participé à UN des événements liés à l'image.
+     * Utilise une requête optimisée pour vérifier plusieurs événements à la fois.
      */
     private function canViewAsParticipant(User $user, GalleryImage $image): bool
     {
-        // TODO: Implémenter quand EventParticipant sera modélisé
-        // Exemple de logique future :
-        // foreach ($image->getEvents() as $event) {
-        //     if ($eventParticipantRepository->userParticipatedInEvent($user, $event)) {
-        //         return true;
-        //     }
-        // }
+        $events = $image->getEvents()->toArray();
         
-        // Pour l'instant, on utilise le bureau comme fallback
-        // car c'est le seul moyen de voir les images Participants
-        return $this->isBureau($user->getOfficeFunction());
+        // Si l'image n'est liée à aucun événement, personne ne peut la voir via Participants
+        if ($events === []) {
+            return false;
+        }
+
+        return $this->participantRepository->userParticipatesIn($user, $events);
+    }
+
+    /**
+     * Vérifie si l'utilisateur peut publier une image
+     * - Pour les images Public : Président uniquement
+     * - Pour les autres visibilités : Bureau
+     */
+    private function canPublish(OfficeFunction $function): bool
+    {
+        return $function === OfficeFunction::President;
     }
 }

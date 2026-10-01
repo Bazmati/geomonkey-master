@@ -50,6 +50,9 @@ class GalleryImage implements ImageableInterface
     #[Assert\Length(max: 1000)]
     private ?string $consentDetail = null;
 
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $consentedAt = null;
+
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'uploaded_by_id', referencedColumnName: 'id')]
     private ?User $uploadedBy = null;
@@ -101,6 +104,8 @@ class GalleryImage implements ImageableInterface
     public function setRgpdConsent(bool $rgpdConsent): static { $this->rgpdConsent = $rgpdConsent; return $this; }
     public function getConsentDetail(): ?string { return $this->consentDetail; }
     public function setConsentDetail(?string $consentDetail): static { $this->consentDetail = $consentDetail; return $this; }
+    public function getConsentedAt(): ?\DateTimeImmutable { return $this->consentedAt; }
+    public function setConsentedAt(?\DateTimeImmutable $consentedAt): static { $this->consentedAt = $consentedAt; return $this; }
     public function getUploadedBy(): ?User { return $this->uploadedBy; }
     public function setUploadedBy(?User $uploadedBy): static { $this->uploadedBy = $uploadedBy; return $this; }
     public function getCreatedAt(): ?\DateTime { return $this->createdAt; }
