@@ -1,0 +1,142 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Politique de Confidentialité - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-warning text-dark">
+                        <h1 class="mb-0 text-center">
+                            <i class="bi bi-shield-check me-2"></i>
+                            Politique de Confidentialité
+                        </h1>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">
+                            GéoMonkey prend très au sérieux la protection de vos données personnelles. 
+                            Cette politique explique comment nous collectons, utilisons et protégeons vos informations.
+                        </p>
+
+                        <h2>1. Responsable du traitement</h2>
+                        <p>
+                            Le responsable du traitement des données est l'association GéoMonkey, représentée par son président.
+                            Vous pouvez nous contacter à l'adresse : <strong>contact@geomonkey.fr</strong>
+                        </p>
+
+                        <h2>2. Finalités du traitement</h2>
+                        <p>
+                            Nous traitons vos données personnelles uniquement pour les finalités suivantes :
+                        </p>
+                        <ul>
+                            <li><strong>Gestion des adhérents</strong> : Création et gestion de votre compte, suivi de votre adhésion ;</li>
+                            <li><strong>Vie associative</strong> : Organisation et communication des événements, envoi d'informations ;</li>
+                            <li><strong>Comptabilité</strong> : Gestion des cotisations et obligations légales de conservation ;</li>
+                            <li><strong>Support et communication</strong> : Réponse à vos questions et envoi de communications importantes.</li>
+                        </ul>
+
+                        <h2>3. Données collectées</h2>
+                        <p>
+                            Nous collectons les données suivantes :
+                        </p>
+                        <ul>
+                            <li><strong>Données d'identification</strong> : Nom, prénom, adresse email ;</li>
+                            <li><strong>Données de connexion</strong> : Mot de passe (stocké de manière sécurisée, jamais en clair) ;</li>
+                            <li><strong>Données d'adhésion</strong> : Statut (visiteur/membre actif), date d'adhésion, date de validation ;</li>
+                            <li><strong>Données de paiement</strong> : Aucun détail bancaire n'est stocké. Les paiements sont traités 
+                                par Stripe, qui stocke uniquement l'ID de transaction (stripePaymentId) pour la traçabilité.</li>
+                        </ul>
+
+                        <h2>4. Base légale du traitement</h2>
+                        <p>
+                            <strong>Pour les visiteurs (gratuit)</strong> : Votre consentement explicite (case à cocher lors de l'inscription).
+                        </p>
+                        <p>
+                            <strong>Pour les membres actifs (payant)</strong> : 
+                            <ul>
+                                <li>Consentement explicite pour l'adhésion et la gestion associative ;</li>
+                                <li>Exécution d'un contrat (fourniture des services d'adhésion) ;</li>
+                                <li>Obligation légale (conservation comptable pendant 2 ans après la fin de l'adhésion).</li>
+                            </ul>
+                        </p>
+
+                        <h2>5. Durée de conservation</h2>
+                        <p>
+                            Vos données sont conservées :
+                        </p>
+                        <ul>
+                            <li>Tant que votre adhésion est active ;</li>
+                            <li>Pendant 2 ans supplémentaires après la fin de votre adhésion (obligation comptable) ;</li>
+                            <li>Après quoi, vos données sont anonymisées ou supprimées, sauf si vous avez donné un consentement 
+                                spécifique pour une conservation plus longue.</li>
+                        </ul>
+
+                        <h2>6. Droits des personnes concernées</h2>
+                        <p>
+                            Conformément au RGPD, vous disposez des droits suivants :
+                        </p>
+                        <ul>
+                            <li><strong>Droit d'accès</strong> : Accéder à vos données personnelles ;</li>
+                            <li><strong>Droit de rectification</strong> : Corriger vos données si elles sont inexactes ;</li>
+                            <li><strong>Droit à l'effacement</strong> : Supprimer vos données (sous réserve des obligations légales de conservation) ;</li>
+                            <li><strong>Droit à la limitation</strong> : Limiter le traitement de vos données ;</li>
+                            <li><strong>Droit à la portabilité</strong> : Récupérer vos données dans un format structuré ;</li>
+                            <li><strong>Droit d'opposition</strong> : Vous opposer au traitement de vos données.</li>
+                        </ul>
+                        <p>
+                            Pour exercer l'un de ces droits, contactez-nous à <strong>contact@geomonkey.fr</strong>.
+                        </p>
+
+                        <h2>7. Sécurité des données</h2>
+                        <p>
+                            Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données :
+                        </p>
+                        <ul>
+                            <li>Chiffrement des mots de passe ;</li>
+                            <li>Hébergement sécurisé ;</li>
+                            <li>Accès réservé au bureau de l'association ;</li>
+                            <li>Paiements sécurisés via Stripe (conforme PCI-DSS).</li>
+                        </ul>
+
+                        <h2>8. Sous-traitants</h2>
+                        <p>
+                            Nous utilisons les sous-traitants suivants :
+                        </p>
+                        <ul>
+                            <li><strong>Stripe</strong> : Traitement des paiements. Stripe traite vos données bancaires selon 
+                                ses propres conditions de confidentialité. Nous ne stockons aucun détail bancaire, 
+                                seulement l'ID de transaction pour la traçabilité.</li>
+                            <li><strong>Hébergeur</strong> : Nos données sont hébergées sur des serveurs sécurisés.</li>
+                        </ul>
+
+                        <h2>9. Transfert de données hors UE</h2>
+                        <p>
+                            Vos données sont traitées et stockées au sein de l'Union Européenne. 
+                            Stripe peut transférer certaines données aux États-Unis conformément à son programme de conformité 
+                            au Privacy Shield.
+                        </p>
+
+                        <h2>10. Modifications de la politique</h2>
+                        <p>
+                            Cette politique de confidentialité peut être modifiée à tout moment. 
+                            Vous serez informé de toute modification par email.
+                        </p>
+
+                        <div class="mt-4 text-center">
+                            <p class="text-muted">
+                                En vigueur depuis le {{ 'now'|date('d/m/Y') }}<br>
+                                Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
+                            </p>
+                            <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left me-2"></i> Retour à l'accueil
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

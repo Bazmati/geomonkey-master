@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
+use App\Service\MailService;
 use App\Service\MembershipFeeService;
 use App\Service\StripeService;
 use Doctrine\ORM\EntityManagerInterface;
@@ -23,6 +24,7 @@ class MembershipController extends AbstractController
         private EntityManagerInterface $em,
         private MembershipFeeService $feeService,
         private StripeService $stripeService,
+        private MailService $mailService,
     ) {}
 
     #[Route('/requests', name: 'requests')]
@@ -63,9 +65,11 @@ class MembershipController extends AbstractController
             return $this->redirectToRoute('app_admin_membership_requests');
         }
 
-        // TODO: Envoyer le mail avec le lien de paiement
+        // M3: Envoyer le mail de validation avec le lien de paiement
+        $this->mailService->sendValidationEmail($user, $paymentUrl);
+
         $this->addFlash('success', sprintf(
-            'Demande de %s validée ! TODO: Un mail avec le lien de paiement doit être envoyé.',
+            'Demande de %s validée ! Un mail avec le lien de paiement a été envoyé.',
             $user->getEmail()
         ));
 

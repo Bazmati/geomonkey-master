@@ -58,5 +58,11 @@ services:
             $cancelUrl: '%env(STRIPE_CANCEL_URL)%'
             $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
+    # MailService - service d'envoi d'emails
+    App\Service\MailService:
+        arguments:
+            $contactEmail: '%env(CONTACT_EMAIL)%'
+            $whatsappGroupLink: '%env(WHATSAPP_GROUP_LINK)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

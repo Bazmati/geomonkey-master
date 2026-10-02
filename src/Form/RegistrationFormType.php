@@ -69,11 +69,16 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['class' => 'form-select'],
             ])
             ->add('agreeTerms', CheckboxType::class, [
-                'label' => 'J\'accepte les conditions générales et la politique de confidentialité',
+                'label' => 'J\'accepte les [Conditions Générales d\'Adhésion](/cgu) et la [Politique de Confidentialité](/confidentialite)',
                 'mapped' => false,
                 'constraints' => [
                     new Assert\IsTrue(message: 'Vous devez accepter les conditions pour vous inscrire'),
                 ],
+                'attr' => ['class' => 'form-check-input'],
+            ])
+            ->add('imageConsent', CheckboxType::class, [
+                'label' => 'J\'accepte que mes photos prises lors des événements soient publiées sur le site',
+                'required' => false,
                 'attr' => ['class' => 'form-check-input'],
             ]);
     }

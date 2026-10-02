@@ -64,6 +64,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $registrationValidatedAt = null;
 
+    // === CHAMPS RGPD ===
+    
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $termsAcceptedAt = null; // Horodatage du consentement aux CGU
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $imageConsent = false; // Consentement pour la publication des photos
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $imageConsentAt = null; // Horodatage du consentement image
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $whatsappInviteSent = false; // Invitation WhatsApp envoyée
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -304,6 +318,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             }
         }
         return false;
+    }
+
+    // === MÉTHODES RGPD ===
+
+    public function getTermsAcceptedAt(): ?\DateTimeImmutable
+    {
+        return $this->termsAcceptedAt;
+    }
+
+    public function setTermsAcceptedAt(?\DateTimeImmutable $termsAcceptedAt): self
+    {
+        $this->termsAcceptedAt = $termsAcceptedAt;
+        return $this;
+    }
+
+    public function getImageConsent(): bool
+    {
+        return $this->imageConsent;
+    }
+
+    public function setImageConsent(bool $imageConsent): self
+    {
+        $this->imageConsent = $imageConsent;
+        return $this;
+    }
+
+    public function getImageConsentAt(): ?\DateTimeImmutable
+    {
+        return $this->imageConsentAt;
+    }
+
+    public function setImageConsentAt(?\DateTimeImmutable $imageConsentAt): self
+    {
+        $this->imageConsentAt = $imageConsentAt;
+        return $this;
+    }
+
+    public function getWhatsappInviteSent(): bool
+    {
+        return $this->whatsappInviteSent;
+    }
+
+    public function setWhatsappInviteSent(bool $whatsappInviteSent): self
+    {
+        $this->whatsappInviteSent = $whatsappInviteSent;
+        return $this;
     }
 
     /**

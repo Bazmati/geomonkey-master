@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Service\MailService;
 use App\Service\MembershipFeeService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -17,6 +18,7 @@ class MembershipController extends AbstractController
 {
     public function __construct(
         private MembershipFeeService $feeService,
+        private MailService $mailService,
     ) {}
 
     #[Route('', name: 'app_membership_register', methods: ['GET', 'POST'])]
@@ -47,6 +49,16 @@ class MembershipController extends AbstractController
             // Définir les rôles par défaut
             $user->setRoles(['ROLE_USER']);
 
+            // Stocker les consentements RGPD
+            $user->setTermsAcceptedAt(new \DateTimeImmutable());
+            
+            // Stocker le consentement pour les photos (si coché)
+            $imageConsent = $form->get('imageConsent')->getData();
+            $user->setImageConsent($imageConsent);
+            if ($imageConsent) {
+                $user->setImageConsentAt(new \DateTimeImmutable());
+            }
+
             // Si l'utilisateur a demandé "membre_actif", validation bureau nécessaire
             // Sinon (null), compte actif immédiatement
             if (!$user->needsBureauValidation()) {
@@ -57,8 +69,13 @@ class MembershipController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            // Envoyer le mail de confirmation
-            $this->sendRegistrationMail($user);
+            // M1: Envoyer le mail de confirmation à l'utilisateur
+            $this->mailService->sendRegistrationConfirmation($user);
+
+            // M2: Si membre actif, envoyer alerte au bureau
+            if ($user->needsBureauValidation()) {
+                $this->mailService->sendMembershipRequestAlert($user);
+            }
 
             // Redirection selon le statut
             if ($user->needsBureauValidation()) {
@@ -104,13 +121,5 @@ class MembershipController extends AbstractController
         return $this->render('front/membership/cancel.html.twig');
     }
 
-    /**
-     * Envoie le mail de confirmation d'inscription
-     */
-    private function sendRegistrationMail(User $user): void
-    {
-        // TODO: Implémenter l'envoi du mail avec MailerInterface
-        // Pour l'instant, on simule avec un flash message
-        $this->addFlash('info', 'Un email de confirmation a été envoyé à ' . $user->getEmail());
-    }
+
 }
