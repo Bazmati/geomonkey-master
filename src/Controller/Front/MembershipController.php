@@ -24,7 +24,6 @@ class MembershipController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $em,
-        UserAuthenticatorInterface $authenticator,
     ): Response {
         try {
             $membershipFee = $this->feeService->getCurrentAmountInEuros();

@@ -152,9 +152,24 @@
             </div>
         </section>
 
-        {# lien futur : section adhésion #}
-        {# <section class="py-5">
-            ...
-        </section> #}
+        {# Section Adhésion #}
+        <section class="py-5 bg-dark">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-lg-8 mb-4 mb-lg-0">
+                        <h2 class="text-warning fw-bold">Deviens membre de GéoMonkey</h2>
+                        <p class="text-light">
+                            Rejoins notre association et participe à nos événements culturels et conviviaux. 
+                            L'adhésion est ouverte à tous !
+                        </p>
+                    </div>
+                    <div class="col-lg-4 text-lg-end">
+                        <a href="{{ path('app_membership_register') }}" class="btn btn-warning btn-lg fw-semibold">
+                            <i class="bi bi-person-plus me-2"></i>Faire une demande d'adhésion
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
     </main>
 {% endblock %}

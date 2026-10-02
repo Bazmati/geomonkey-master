@@ -20,13 +20,17 @@ use Doctrine\Migrations\AbstractMigration;
  * SOLUTION : Créer une membership par membre actif existant avec:
  * - is_active: true
  * - started_at: il y a 1 an (pour éviter l'expiration immédiate)
- * - expires_at: maintenant (afin que le cron ne les expire pas tout de suite)
+ * - expires_at: CURRENT_DATE + 1 an (une année de grâce pour les membres backfillés)
  * - amount: 0 (paiement historique non tracé par Stripe)
  * - stripe_payment_id: null
  * 
  * ET mettre à jour les users concernés:
  * - is_registration_confirmed: true
  * - registration_validated_at: maintenant
+ * 
+ * PENSE-BÊTE MÉTIER: Tous les membres backfillés expireront en même temps dans 1 an pile
+ * et recevront le mail de rappel le même jour. C'est plutôt bien car cela correspond
+ * typiquement à la période de l'AG annuelle où tout le monde renouvelle ensemble.
  */
 final class Version20261002000000 extends AbstractMigration
 {

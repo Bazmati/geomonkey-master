@@ -53,14 +53,17 @@ class MembershipFeeController extends AbstractController
             $data = $form->getData();
             $amountCents = (int) ($data['amount'] * 100); // Convertir en centimes
 
+            // Convertir DateTime en DateTimeImmutable si présent
+            $effectiveFrom = $data['effectiveFrom'] ? \DateTimeImmutable::createFromMutable($data['effectiveFrom']) : null;
+
             $this->feeService->updateFee(
                 $amountCents,
-                $data['effectiveFrom'],
+                $effectiveFrom,
                 $data['notes']
             );
 
             $this->addFlash('success', 'Tarif mis à jour avec succès !');
-            return $this->redirectToRoute('app_admin_membership_fee');
+            return $this->redirectToRoute('app_admin_membership_fee_index');
         }
 
         return $this->render('admin/membership/fee/edit.html.twig', [
