@@ -50,5 +50,13 @@ services:
     # UserFactory - factory for creating test users
     App\Factory\UserFactory:
 
+    # StripeService - configuration des clés depuis .env
+    App\Service\StripeService:
+        arguments:
+            $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
+            $successUrl: '%env(STRIPE_SUCCESS_URL)%'
+            $cancelUrl: '%env(STRIPE_CANCEL_URL)%'
+            $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

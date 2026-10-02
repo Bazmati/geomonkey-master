@@ -1,0 +1,41 @@
+{# templates/front/membership/wait_validation.html.twig #}
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Inscription en attente - GéoMonkey{% endblock %}
+
+{% block body %}
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 text-center">
+                <div class="card shadow-sm border-info">
+                    <div class="card-header bg-info text-dark">
+                        <h2 class="mb-0"><i class="bi bi-clock-history me-2"></i>Inscription en attente</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="py-4">
+                            <i class="bi bi-envelope-paper text-info display-4"></i>
+                            <h3 class="mt-3 text-info">Demande enregistrée</h3>
+                            <p class="lead text-muted">
+                                Ta demande pour devenir membre actif a bien été enregistrée.
+                            </p>
+                            <p class="text-muted">
+                                Le bureau de GéoMonkey va valider ton inscription dans les plus brefs délais.
+                                Ils pourront te contacter pour vérifier ton identité.
+                            </p>
+                            <p class="text-muted">
+                                Une fois validée, tu recevras un email avec un lien pour effectuer le paiement de ton adhésion.
+                            </p>
+                        </div>
+                        <div class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle me-2"></i>
+                            <strong>Important :</strong> Sans validation du bureau et paiement, tu n'auras pas accès aux contenus réservés aux membres.
+                        </div>
+                        <a href="{{ path('app_home') }}" class="btn btn-primary">
+                            <i class="bi bi-house me-2"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,65 @@
+{# templates/admin/membership/fee/edit.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Modifier le tarif d'adhésion - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    <div class="p-4">
+        <h1 class="mb-4">
+            <i class="bi bi-pencil-square me-2"></i>Modifier le tarif d'adhésion
+        </h1>
+
+        {% if currentFee %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">
+                        Tarif actuel: 
+                        <span class="badge bg-warning text-dark">{{ "%.2f"|format(currentFee.amount / 100) }} €</span>
+                    </h5>
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">Nouveau tarif</h5>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                    <div class="mb-3">
+                        {{ form_label(form.amount) }}
+                        <div class="input-group">
+                            <span class="input-group-text">€</span>
+                            {{ form_widget(form.amount, {'attr': {'class': 'form-control', 'placeholder': '15.00'}}) }}
+                        </div>
+                        <small class="text-muted">Montant en euros. Exemple: 15,00€ = 15.00</small>
+                        <div class="text-danger">{{ form_errors(form.amount) }}</div>
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.effectiveFrom) }}
+                        {{ form_widget(form.effectiveFrom, {'attr': {'class': 'form-control'}}) }}
+                        <small class="text-muted">Date à laquelle le nouveau tarif prendra effet</small>
+                        <div class="text-danger">{{ form_errors(form.effectiveFrom) }}</div>
+                    </div>
+
+                    <div class="mb-4">
+                        {{ form_label(form.notes) }}
+                        {{ form_widget(form.notes, {'attr': {'class': 'form-control', 'rows': 3}}) }}
+                        <small class="text-muted">Ex: "Tarif 2025 voté en AG du 15/10/2024"</small>
+                        <div class="text-danger">{{ form_errors(form.notes) }}</div>
+                    </div>
+
+                    <div class="d-flex gap-3">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle me-1"></i> Enregistrer le nouveau tarif
+                        </button>
+                        <a href="{{ path('app_admin_membership_fee') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour
+                        </a>
+                    </div>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,75 @@
+<?php
+
+namespace App\Controller\Admin;
+
+use App\Entity\User;
+use App\Repository\UserRepository;
+use App\Service\MembershipFeeService;
+use App\Service\StripeService;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\RedirectResponse;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
+
+#[IsGranted('ENTITY_EDIT')] // Bureau (président + secrétaire)
+#[Route('/admin/membership', name: 'app_admin_membership_')]
+class MembershipController extends AbstractController
+{
+    public function __construct(
+        private UserRepository $userRepo,
+        private EntityManagerInterface $em,
+        private MembershipFeeService $feeService,
+        private StripeService $stripeService,
+    ) {}
+
+    #[Route('/requests', name: 'requests')]
+    public function requests(): Response
+    {
+        $pendingUsers = $this->userRepo->findPendingMembershipRequests();
+
+        return $this->render('admin/membership/requests.html.twig', [
+            'pendingUsers' => $pendingUsers,
+        ]);
+    }
+
+    #[Route('/validate/{id}', name: 'validate', methods: ['POST'])]
+    #[IsGranted('ENTITY_EDIT')]
+    public function validate(User $user): RedirectResponse
+    {
+        if (!$user->needsBureauValidation()) {
+            $this->addFlash('error', 'Cette demande ne nécessite pas de validation.');
+            return $this->redirectToRoute('app_admin_membership_requests');
+        }
+
+        // Valider l'utilisateur
+        $user->setIsRegistrationConfirmed(true);
+        $user->setRegistrationValidatedAt(new \DateTimeImmutable());
+        $this->em->flush();
+
+        // Générer le lien de paiement
+        try {
+            $paymentUrl = $this->stripeService->createMembershipCheckoutSession($user);
+        } catch (\RuntimeException $e) {
+            $this->addFlash('error', $e->getMessage());
+            return $this->redirectToRoute('app_admin_membership_requests');
+        }
+
+        // TODO: Envoyer le mail avec le lien de paiement
+        $this->addFlash('success', sprintf(
+            'Demande de %s validée ! Un mail avec le lien de paiement a été envoyé.',
+            $user->getEmail()
+        ));
+
+        return $this->redirectToRoute('app_admin_membership_requests');
+    }
+
+    #[Route('/list', name: 'list')]
+    public function list(): Response
+    {
+        // TODO: Lister toutes les adhésions
+        return $this->render('admin/membership/list.html.twig');
+    }
+}

@@ -33,6 +33,21 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         $this->getEntityManager()->flush();
     }
 
+    /**
+     * Trouve les utilisateurs ayant demandé un statut "membre_actif" 
+     * et non encore validés par le bureau
+     */
+    public function findPendingMembershipRequests(): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.requestedFunction = :function')
+            ->andWhere('u.isRegistrationConfirmed = false')
+            ->setParameter('function', 'membre_actif')
+            ->orderBy('u.createdAt', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return User[] Returns an array of User objects
     //     */

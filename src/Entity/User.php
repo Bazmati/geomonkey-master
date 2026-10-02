@@ -8,6 +8,8 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Enum\OfficeFunction;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -49,9 +51,23 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?\DateTimeImmutable $createdAt = null;
 
+    // === NOUVEAUX CHAMPS POUR L'ADHÉSION ===
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Membership::class)]
+    private Collection $memberships;
+
+    #[ORM\Column(type: Types::STRING, length: 20, nullable: true)]
+    private ?string $requestedFunction = null; // 'membre_actif' ou null
+
+    #[ORM\Column(type: Types::BOOLEAN)]
+    private bool $isRegistrationConfirmed = false;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $registrationValidatedAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+        $this->memberships = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -198,5 +214,106 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             OfficeFunction::ActiveMember => 'Membre actif',
             OfficeFunction::None => '',
         };
+    }
+
+    // === MÉTHODES POUR L'ADHÉSION ===
+
+    public function getMemberships(): Collection
+    {
+        return $this->memberships;
+    }
+
+    public function addMembership(Membership $membership): self
+    {
+        if (!$this->memberships->contains($membership)) {
+            $this->memberships->add($membership);
+            $membership->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeMembership(Membership $membership): self
+    {
+        if ($this->memberships->removeElement($membership)) {
+            if ($membership->getUser() === $this) {
+                $membership->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getRequestedFunction(): ?string
+    {
+        return $this->requestedFunction;
+    }
+
+    public function setRequestedFunction(?string $requestedFunction): self
+    {
+        $this->requestedFunction = $requestedFunction;
+        return $this;
+    }
+
+    public function isRegistrationConfirmed(): bool
+    {
+        return $this->isRegistrationConfirmed;
+    }
+
+    public function setIsRegistrationConfirmed(bool $isRegistrationConfirmed): self
+    {
+        $this->isRegistrationConfirmed = $isRegistrationConfirmed;
+        return $this;
+    }
+
+    public function getRegistrationValidatedAt(): ?\DateTimeImmutable
+    {
+        return $this->registrationValidatedAt;
+    }
+
+    public function setRegistrationValidatedAt(?\DateTimeImmutable $registrationValidatedAt): self
+    {
+        $this->registrationValidatedAt = $registrationValidatedAt;
+        return $this;
+    }
+
+    // === MÉTHODES MÉTIER ===
+
+    /**
+     * Retourne true si l'utilisateur a demandé un statut nécessitant validation
+     */
+    public function needsBureauValidation(): bool
+    {
+        return $this->requestedFunction === 'membre_actif';
+    }
+
+    /**
+     * Retourne les statuts disponibles pour le formulaire public
+     */
+    public static function getAvailableRequestedFunctions(): array
+    {
+        return ['membre_actif']; // Seule option publique (null = visiteur)
+    }
+
+    /**
+     * Vérifie si l'utilisateur a une adhésion active (non expirée)
+     */
+    public function hasActiveMembership(): bool
+    {
+        foreach ($this->memberships as $membership) {
+            if ($membership->isActive() && !$membership->isExpired()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * RÈGLE CENTRALE : Pas d'adhésion active → rétrogradation automatique
+     * Appelée après expiration ou retrait de consentement
+     */
+    public function applyMembershipStatus(): void
+    {
+        if (!$this->hasActiveMembership() && $this->getOfficeFunction() !== OfficeFunction::None) {
+            $this->setOfficeFunction(OfficeFunction::None);
+        }
     }
 }
