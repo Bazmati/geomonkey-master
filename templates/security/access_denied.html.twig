@@ -1,10 +1,12 @@
 {# templates/security/access_denied.html.twig #}
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
 {% block title %}Accès réservé{% endblock %}
 
 {% block body %}
-<div class="container py-5">
+    {% include 'partials/_navbar.html.twig' %}
+    
+    <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow-sm">
