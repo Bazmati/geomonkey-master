@@ -3,13 +3,15 @@
 {% block title %}Connexion - GéoMonkey{% endblock %}
 
 {% block body %}
-<div class="min-vh-100 d-flex flex-column bg-dark">
-    {# Lien de retour en haut #}
-    <div class="p-3">
-        <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
-            <i class="bi bi-arrow-left"></i> Retour à l'accueil
-        </a>
-    </div>
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="min-vh-100 d-flex flex-column bg-dark">
+        {# Lien de retour en haut #}
+        <div class="p-3">
+            <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
+                <i class="bi bi-arrow-left"></i> Retour à l'accueil
+            </a>
+        </div>
 
     {# Contenu principal #}
     <div class="flex-grow-1 d-flex align-items-center justify-content-center p-4">
