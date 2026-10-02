@@ -16,8 +16,8 @@ class Membership
     private ?int $id = null;
 
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'memberships')]
-    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false)]
-    private User $user;
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?User $user = null;
 
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $isActive = true; // false = expirée ou annulée
@@ -55,12 +55,12 @@ class Membership
         return $this->id;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): self
     {
         $this->user = $user;
         return $this;
