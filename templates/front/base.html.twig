@@ -43,7 +43,14 @@
         
         {% block body %}{% endblock %}
         <footer class="bg-dark text-center text-warning py-3 mt-5">
-            &copy; {{ 'now'|date('Y') }} GéoMonkey - Tous droits réservés
+            <div class="container">
+                <p class="mb-1">&copy; {{ 'now'|date('Y') }} GéoMonkey - Tous droits réservés</p>
+                <p class="mb-0 small">
+                    <a href="{{ path('app_cgu') }}" class="text-warning text-decoration-none">Conditions Générales d'Adhésion</a>
+                    <span class="text-muted mx-2">·</span>
+                    <a href="{{ path('app_privacy') }}" class="text-warning text-decoration-none">Politique de Confidentialité</a>
+                </p>
+            </div>
         </footer>
         
         {% block javascripts %}

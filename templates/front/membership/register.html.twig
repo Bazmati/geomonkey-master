@@ -77,27 +77,7 @@
                                 
                                 <div class="col-12">
                                     {{ form_label(form.requestedFunction) }}
-                                    <div class="card border-light mb-3">
-                                        <div class="card-body p-3">
-                                            <div class="form-check">
-                                                {{ form_widget(form.requestedFunction, {'attr': {'class': 'form-check-input'}}) }}
-                                                <label class="form-check-label ms-2" for="registration_requestedFunction">
-                                                    <strong>Simple visiteur</strong> <span class="badge bg-secondary">Gratuit</span>
-                                                    <br>
-                                                    <small class="text-muted">Accès aux contenus publics uniquement</small>
-                                                </label>
-                                            </div>
-                                            <div class="form-check mt-2">
-                                                <input type="radio" class="form-check-input" id="membre_actif" 
-                                                       name="registration[requestedFunction]" value="membre_actif">
-                                                <label class="form-check-label ms-2" for="membre_actif">
-                                                    <strong>Membre actif</strong> <span class="badge bg-success">{{ "%.2f"|format(membershipFee) }} €/an</span>
-                                                    <br>
-                                                    <small class="text-muted">Accès complet + participation aux événements. Validation du bureau nécessaire.</small>
-                                                </label>
-                                            </div>
-                                        </div>
-                                    </div>
+                                    {{ form_widget(form.requestedFunction) }}
                                     <div class="text-danger">
                                         {{ form_errors(form.requestedFunction) }}
                                     </div>
@@ -110,6 +90,16 @@
                                     </div>
                                     <div class="text-danger">
                                         {{ form_errors(form.agreeTerms) }}
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <div class="form-check">
+                                        {{ form_widget(form.imageConsent, {'attr': {'class': 'form-check-input'}}) }}
+                                        {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
+                                    </div>
+                                    <div class="text-danger">
+                                        {{ form_errors(form.imageConsent) }}
                                     </div>
                                 </div>
                                 

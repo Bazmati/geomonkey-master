@@ -40,6 +40,7 @@
                                             <form method="post" 
                                                   action="{{ path('app_admin_membership_validate', {'id': user.id}) }}"
                                                   class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('validate' ~ user.id) }}">
                                                 <button type="submit" class="btn btn-sm btn-success" 
                                                         title="Valider la demande">
                                                     <i class="bi bi-check-lg me-1"></i> Valider

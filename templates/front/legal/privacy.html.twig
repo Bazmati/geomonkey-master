@@ -96,30 +96,43 @@
                         </p>
                         <ul>
                             <li>Chiffrement des mots de passe ;</li>
-                            <li>Hébergement sécurisé ;</li>
+                            <li>Hébergement sécurisé directement par l'association sur son propre serveur, situé dans l'Union européenne ;</li>
                             <li>Accès réservé au bureau de l'association ;</li>
                             <li>Paiements sécurisés via Stripe (conforme PCI-DSS).</li>
                         </ul>
 
-                        <h2>8. Sous-traitants</h2>
+                        <h2>8. Sous-traitants et transferts</h2>
                         <p>
-                            Nous utilisons les sous-traitants suivants :
+                            Nous faisons appel aux prestataires suivants, dans le cadre de leurs obligations 
+                            professionnelles de confidentialité et de sécurité :
                         </p>
                         <ul>
-                            <li><strong>Stripe</strong> : Traitement des paiements. Stripe traite vos données bancaires selon 
-                                ses propres conditions de confidentialité. Nous ne stockons aucun détail bancaire, 
-                                seulement l'ID de transaction pour la traçabilité.</li>
-                            <li><strong>Hébergeur</strong> : Nos données sont hébergées sur des serveurs sécurisés.</li>
+                            <li><strong>Stripe</strong> : traitement sécurisé des paiements (conformité PCI-DSS).
+                                Seules vos données d'identification (nom, email) et le montant sont transmis
+                                pour l'établissement du paiement. Aucune donnée bancaire n'est stockée par l'association.
+                                <a href="https://stripe.com/fr/privacy" target="_blank">Politique de confidentialité de Stripe</a> ;</li>
                         </ul>
-
-                        <h2>9. Transfert de données hors UE</h2>
                         <p>
                             Vos données sont traitées et stockées au sein de l'Union Européenne. 
-                            Stripe peut transférer certaines données aux États-Unis conformément à son programme de conformité 
-                            au Privacy Shield.
+                            Stripe peut transférer certaines données aux États-Unis conformément à ses conditions de confidentialité.
                         </p>
 
-                        <h2>10. Modifications de la politique</h2>
+                        <h2>9. Droit à l'image</h2>
+                        <p>
+                            La publication de vos photos prises lors des événements fait l'objet d'un
+                            <strong>consentement distinct et facultatif</strong>, recueilli lors de l'inscription
+                            et horodaté dans nos registres. Vous pouvez le retirer à tout moment en écrivant à
+                            contact@geomonkey.fr : les photos concernées seront retirées du site dans les meilleurs délais.
+                        </p>
+
+                        <h2>10. Réclamation</h2>
+                        <p>
+                            Si vous estimez, après nous avoir contactés, que vos droits ne sont pas respectés,
+                            vous pouvez introduire une réclamation auprès de la
+                            <a href="https://www.cnil.fr" target="_blank">CNIL</a> (Commission Nationale de l'Informatique et des Libertés).
+                        </p>
+
+                        <h2>11. Modifications de la politique</h2>
                         <p>
                             Cette politique de confidentialité peut être modifiée à tout moment. 
                             Vous serez informé de toute modification par email.
@@ -130,6 +143,7 @@
                                 En vigueur depuis le {{ 'now'|date('d/m/Y') }}<br>
                                 Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
                             </p>
+                            <p class="text-muted small mt-4">Hébergement : Association GéoMonkey (auto-hébergement sur serveur situé dans l'Union européenne)</p>
                             <a href="{{ path('app_home') }}" class="btn btn-secondary">
                                 <i class="bi bi-arrow-left me-2"></i> Retour à l'accueil
                             </a>

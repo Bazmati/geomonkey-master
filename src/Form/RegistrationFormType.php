@@ -53,23 +53,23 @@ class RegistrationFormType extends AbstractType
             ])
             ->add('requestedFunction', ChoiceType::class, [
                 'label' => 'Statut souhaité',
-                'choices' => $this->getAvailableRequestedFunctions(),
-                'choice_label' => function($value) {
+                'choices' => [
+                    'membre_actif' => 'membre_actif',
+                ],
+                'required' => false,
+                'expanded' => true,        // ← rend des radios au lieu d'un select
+                'placeholder' => false,     // pas d'option vide supplémentaire
+                'choice_label' => function ($value) {
                     return match ($value) {
                         'membre_actif' => 'Membre actif (accès complet, adhésion payante)',
-                        null => 'Simple visiteur (gratuit, accès public)',
-                        default => $value,
+                        default => 'Simple visiteur (gratuit, accès public)',
                     };
                 },
-                'choice_value' => function($value) {
-                    return $value;
-                },
-                'required' => false,
-                'placeholder' => 'Simple visiteur (gratuit)',
-                'attr' => ['class' => 'form-select'],
+                'attr' => ['class' => 'form-check-input'],
             ])
             ->add('agreeTerms', CheckboxType::class, [
-                'label' => 'J\'accepte les [Conditions Générales d\'Adhésion](/cgu) et la [Politique de Confidentialité](/confidentialite)',
+                'label' => 'J\'accepte les <a href="/legal/cgu" target="_blank">Conditions Générales d\'Adhésion</a> et la <a href="/legal/confidentialite" target="_blank">Politique de Confidentialité</a>',
+                'label_html' => true,
                 'mapped' => false,
                 'constraints' => [
                     new Assert\IsTrue(message: 'Vous devez accepter les conditions pour vous inscrire'),
@@ -77,7 +77,8 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['class' => 'form-check-input'],
             ])
             ->add('imageConsent', CheckboxType::class, [
-                'label' => 'J\'accepte que mes photos prises lors des événements soient publiées sur le site',
+                'label' => 'J\'accepte que mes photos prises lors des événements soient publiées sur le site (facultatif, retirable à tout moment en nous contactant)',
+                'label_html' => true,
                 'required' => false,
                 'attr' => ['class' => 'form-check-input'],
             ]);
