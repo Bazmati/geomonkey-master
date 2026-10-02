@@ -93,20 +93,13 @@ class StripeWebhookController extends AbstractController
         }
 
         // Récupérer ou créer une membership pour cet utilisateur
+        // Cette méthode crée aussi la membership et met à jour l'utilisateur
         $membership = $this->createOrUpdateMembership($user, $session);
 
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
-
-        // Marquer que l'utilisateur peut accéder aux contenus membres
-        $user->setIsRegistrationConfirmed(true);
-        $user->setRegistrationValidatedAt(new \DateTimeImmutable());
-        
-        // Stocker le payment ID
-        $membership->setStripePaymentId($session->id);
         
         $this->em->persist($user);
-        $this->em->persist($membership);
         $this->em->flush();
 
         return new Response('Checkout session completed handled', 200);
@@ -139,6 +132,11 @@ class StripeWebhookController extends AbstractController
 
     /**
      * Crée ou met à jour une membership pour l'utilisateur
+     * 
+     * Règle métier :
+     * - Si l'utilisateur avait déjà une fonction de bureau (président, trésorier, secrétaire) → conserve sa fonction
+     * - Si l'utilisateur était None (visiteur) → passe en membre_actif
+     * - La membership est valable 1 an à partir de maintenant
      */
     private function createOrUpdateMembership(User $user, object $session): Membership
     {
@@ -148,24 +146,34 @@ class StripeWebhookController extends AbstractController
             $amountCents = 1500; // 15.00 € par défaut
         }
 
-        // Chercher une membership non expirée pour cet utilisateur
+        $now = new \DateTimeImmutable();
+
+        // Désactiver toutes les memberships existantes de cet utilisateur
         foreach ($user->getMemberships() as $membership) {
-            if (!$membership->isExpired()) {
-                // Mettre à jour la membership existante
-                $membership->setIsActive(true);
-                $membership->setAmount($amountCents);
-                $membership->setRenewedAt(new \DateTimeImmutable());
-                $membership->setStripePaymentId($session->id);
-                return $membership;
-            }
+            $membership->setIsActive(false);
         }
 
-        // Créer une nouvelle membership
+        // Créer une nouvelle membership valable 1 an
         $membership = new Membership();
         $membership->setUser($user);
         $membership->setAmount($amountCents);
         $membership->setIsActive(true);
+        $membership->setStartedAt($now);
+        $membership->setExpiresAt($now->add(new \DateInterval('P1Y')));
         $membership->setStripePaymentId($session->id);
+        $membership->setPaymentStatus('paid');
+        
+        // Mettre à jour le statut utilisateur :
+        // Si None → membre_actif, sinon conserver la fonction existante
+        if ($user->getOfficeFunction() === \App\Enum\OfficeFunction::None) {
+            $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
+        }
+        
+        // Marquer l'inscription comme confirmée
+        $user->setIsRegistrationConfirmed(true);
+        $user->setRegistrationValidatedAt($now);
+        
+        $this->em->persist($membership);
         
         return $membership;
     }

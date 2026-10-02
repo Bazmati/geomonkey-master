@@ -40,6 +40,9 @@ class Membership
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
     private ?\DateTimeImmutable $reminderSentAt = null; // Pour le cron
 
+    #[ORM\Column(type: Types::STRING, length: 50, nullable: true)]
+    private ?string $paymentStatus = null; // paid, failed, pending, etc.
+
     public function __construct()
     {
         $this->startedAt = new \DateTimeImmutable();
@@ -142,6 +145,17 @@ class Membership
     public function setReminderSentAt(?\DateTimeImmutable $reminderSentAt): self
     {
         $this->reminderSentAt = $reminderSentAt;
+        return $this;
+    }
+
+    public function getPaymentStatus(): ?string
+    {
+        return $this->paymentStatus;
+    }
+
+    public function setPaymentStatus(?string $paymentStatus): self
+    {
+        $this->paymentStatus = $paymentStatus;
         return $this;
     }
 

@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Membership;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\MailService;
@@ -52,9 +53,22 @@ class MembershipController extends AbstractController
             return $this->redirectToRoute('app_admin_membership_requests');
         }
 
-        // Valider l'utilisateur
+        // Créer une membership en attente de paiement
+        $membership = new Membership();
+        $membership->setUser($user);
+        $membership->setIsActive(false); // Pas active jusqu'au paiement
+        $membership->setStartedAt(new \DateTimeImmutable());
+        // expiresAt sera défini après paiement (now + 1 year)
+        $membership->setAmount($this->feeService->getCurrentAmount());
+        $membership->setPaymentStatus('pending');
+
+        $this->em->persist($membership);
+
+        // Valider l'utilisateur (mais statut ne passe en membre_actif qu'après paiement)
         $user->setIsRegistrationConfirmed(true);
         $user->setRegistrationValidatedAt(new \DateTimeImmutable());
+        // NE PAS changer officeFunction ici - ça sera fait dans le webhook après paiement
+
         $this->em->flush();
 
         // Générer le lien de paiement
