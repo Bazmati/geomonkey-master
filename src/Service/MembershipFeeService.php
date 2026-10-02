@@ -47,14 +47,16 @@ class MembershipFeeService
     }
 
     /**
-     * Met à jour le tarif d'adhésion
+     * Met à jour le tarif d'adhésion en créant une nouvelle entrée d'historique
+     * Chaque tarif voté en AG est un enregistrement daté, on ne réécrit pas l'histoire.
      */
     public function updateFee(
         int $amount,
         ?\DateTimeImmutable $effectiveFrom = null,
         ?string $notes = null
     ): MembershipFee {
-        $fee = $this->feeRepository->findCurrentFee() ?? new MembershipFee();
+        // Toujours créer un nouveau MembershipFee pour conserver l'historique
+        $fee = new MembershipFee();
         
         $fee->setAmount($amount);
         $fee->setUpdatedAt(new \DateTimeImmutable());

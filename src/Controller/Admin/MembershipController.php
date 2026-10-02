@@ -37,10 +37,16 @@ class MembershipController extends AbstractController
 
     #[Route('/validate/{id}', name: 'validate', methods: ['POST'])]
     #[IsGranted('ENTITY_EDIT')]
-    public function validate(User $user): RedirectResponse
+    public function validate(Request $request, User $user): RedirectResponse
     {
         if (!$user->needsBureauValidation()) {
             $this->addFlash('error', 'Cette demande ne nécessite pas de validation.');
+            return $this->redirectToRoute('app_admin_membership_requests');
+        }
+
+        // Vérification du CSRF token pour la validation
+        if (!$this->isCsrfTokenValid('validate'.$user->getId(), $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
             return $this->redirectToRoute('app_admin_membership_requests');
         }
 
@@ -59,7 +65,7 @@ class MembershipController extends AbstractController
 
         // TODO: Envoyer le mail avec le lien de paiement
         $this->addFlash('success', sprintf(
-            'Demande de %s validée ! Un mail avec le lien de paiement a été envoyé.',
+            'Demande de %s validée ! TODO: Un mail avec le lien de paiement doit être envoyé.',
             $user->getEmail()
         ));
 
