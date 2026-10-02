@@ -124,8 +124,14 @@ class StripeWebhookController extends AbstractController
             return new Response(sprintf('User %d not found', $userId), 200);
         }
 
+        // Créer ou mettre à jour la membership (similaire à checkout.session.completed)
+        $membership = $this->createOrUpdateMembership($user, $paymentIntent);
+
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
+        
+        $this->em->persist($user);
+        $this->em->flush();
 
         return new Response('Payment intent succeeded handled', 200);
     }
@@ -146,22 +152,29 @@ class StripeWebhookController extends AbstractController
             $amountCents = 1500; // 15.00 € par défaut
         }
 
-        $now = new \DateTimeImmutable();
+        $now = new \DateTime();
 
         // Désactiver toutes les memberships existantes de cet utilisateur
         foreach ($user->getMemberships() as $membership) {
             $membership->setIsActive(false);
         }
 
-        // Créer une nouvelle membership valable 1 an
+        // Créer les dates avec les bons types
+        $now = new \DateTime();                        // Pour User.membershipValidUntil
+        $nowImmutable = new \DateTimeImmutable();      // Pour User.registrationValidatedAt et Membership
+        $expiresAt = $nowImmutable->add(new \DateInterval('P1Y'));
+        
         $membership = new Membership();
         $membership->setUser($user);
         $membership->setAmount($amountCents);
         $membership->setIsActive(true);
-        $membership->setStartedAt($now);
-        $membership->setExpiresAt($now->add(new \DateInterval('P1Y')));
-        $membership->setStripePaymentId($session->id);
+        $membership->setStartedAt($nowImmutable);
+        $membership->setExpiresAt($expiresAt);
+        $membership->setStripePaymentId($session->id ?? $session->getId());
         $membership->setPaymentStatus('paid');
+        
+        // Maintenir la relation bidirectionnelle
+        $user->addMembership($membership);
         
         // Mettre à jour le statut utilisateur :
         // Si None → membre_actif, sinon conserver la fonction existante
@@ -169,9 +182,10 @@ class StripeWebhookController extends AbstractController
             $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         }
         
-        // Marquer l'inscription comme confirmée
+        // Marquer l'inscription comme confirmée et mettre à jour la date d'expiration
         $user->setIsRegistrationConfirmed(true);
-        $user->setRegistrationValidatedAt($now);
+        $user->setRegistrationValidatedAt($nowImmutable);
+        $user->setMembershipValidUntil($now);
         
         $this->em->persist($membership);
         

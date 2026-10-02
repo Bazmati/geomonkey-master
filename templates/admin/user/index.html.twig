@@ -39,12 +39,10 @@
                     {% endif %}
                 </td>
                 <td>
-                    {% if user.membershipValidUntil is null %}
-                        <span class="badge bg-danger">Aucune</span>
-                    {% elseif user.membershipValidUntil < date() %}
-                        <span class="badge bg-danger">Expirée</span>
-                    {% else %}
+                    {% if user.hasActiveMembership() %}
                         <span class="badge bg-success">Valide jusqu'au {{ user.membershipValidUntil|date('d/m/Y') }}</span>
+                    {% else %}
+                        <span class="badge bg-danger">Expirée</span>
                     {% endif %}
                 </td>
                 <td class="text-end">
