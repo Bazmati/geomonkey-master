@@ -1,0 +1,34 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}{{ page.title }} - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm border-warning">
+                    <div class="card-header bg-warning text-dark text-center">
+                        <h2 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ page.title }}</h2>
+                    </div>
+                    <div class="card-body">
+                        {% if page.galleryImage and page.galleryImage.isPublished %}
+                            <div class="text-center mb-4">
+                                <img src="{{ asset('uploads/gallery/' ~ page.galleryImage.image) }}"
+                                     alt="{{ page.galleryImage.alt }}"
+                                     class="img-fluid rounded" style="max-height: 400px;">
+                            </div>
+                        {% endif %}
+
+                        <p class="text-white" style="white-space: pre-line;">{{ page.content }}</p>
+
+                        <a href="{{ path('app_presentation_index') }}" class="btn btn-outline-warning mt-3">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la présentation
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

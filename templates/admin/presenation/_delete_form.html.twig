@@ -1,0 +1,9 @@
+<form method="post"
+      action="{{ path('app_admin_presentation_delete', {'id': page.id}) }}"
+      class="d-inline"
+      onsubmit="return confirm('Supprimer cette page « {{ page.title|e('js') }} » ?');">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ page.id) }}">
+    <button class="btn btn-sm btn-danger" type="submit" title="Supprimer">
+        <i class="bi bi-trash-fill"></i>
+    </button>
+</form>

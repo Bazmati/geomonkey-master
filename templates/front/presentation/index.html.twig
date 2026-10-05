@@ -1,0 +1,33 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Présentation - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <h1 class="text-warning mb-4"><i class="bi bi-info-circle me-2"></i>Présentation de GéoMonkey</h1>
+
+        {% if pages is empty %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle me-2"></i>
+                La présentation arrive bientôt !
+            </div>
+        {% else %}
+            {% for page in pages %}
+                <div class="card shadow-sm mb-4 border-warning">
+                    <div class="card-body">
+                        <h2 class="text-warning">
+                            <i class="bi bi-pin-angle me-2"></i>{{ page.title }}
+                        </h2>
+                        <p class="text-white" style="white-space: pre-line;">{{ page.content|u.truncate(300, '…') }}</p>
+                        <a href="{{ path('app_presentation_show', {'slug': page.slug}) }}"
+                           class="btn btn-outline-warning btn-sm">
+                            Lire la page complète <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+{% endblock %}
