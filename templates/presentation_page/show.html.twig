@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+
+<title>PresentationPage</title>
+
+{% block body %}
+    <h1>PresentationPage</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ presentation_page.id }}</td>
+            </tr>
+            <tr>
+                <th>Title</th>
+                <td>{{ presentation_page.title }}</td>
+            </tr>
+            <tr>
+                <th>Slug</th>
+                <td>{{ presentation_page.slug }}</td>
+            </tr>
+            <tr>
+                <th>Content</th>
+                <td>{{ presentation_page.content }}</td>
+            </tr>
+            <tr>
+                <th>Position</th>
+                <td>{{ presentation_page.position }}</td>
+            </tr>
+            <tr>
+                <th>IsActive</th>
+                <td>{{ presentation_page.isActive ? 'Yes' : 'No' }}</td>
+            </tr>
+            <tr>
+                <th>UpdatedAt</th>
+                <td>{{ presentation_page.updatedAt ? presentation_page.updatedAt|date('Y-m-d H:i:s') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_presentation_page_index') }}">back to list</a>
+
+    <a href="{{ path('app_presentation_page_edit', {'id': presentation_page.id}) }}">edit</a>
+
+    {{ include('presentation_page/_delete_form.html.twig') }}
+{% endblock %}
