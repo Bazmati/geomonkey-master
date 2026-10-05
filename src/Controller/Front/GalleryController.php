@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Fron\Controller;
+namespace App\Front\Controller;
 
 use App\Entity\User;
 use App\Repository\GalleryImageRepository;
