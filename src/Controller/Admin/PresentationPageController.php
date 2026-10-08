@@ -96,16 +96,25 @@ class PresentationPageController extends AbstractController
                 $image->setTitle($page->getTitle());
                 $image->setAlt(trim($form->get('newImageAlt')->getData()));
                 $image->setVisibility(ImageVisibility::Public);
-                $image->giveConsent(); // daté automatiquement — déclenché par la case cochée (validée par le listener)
+                $image->giveConsent();
                 $image->setConsentDetail(sprintf(
                     'Image ajoutée via la page de présentation « %s »',
                     $page->getTitle()
                 ));
                 $image->setUploadedBy($this->getUser());
-                $image->setIsPublished(false); // OPTION A : publication par le président dans la galerie
+                $image->setIsPublished(false);
+
+                // ⚠️ Le flush initial exige image NOT NULL : on pose un placeholder temporaire.
+                // upload() écrasera par l'UUID juste après, et le flush final de handleForm
+                // (plus bas) enregistrera cette mise à jour, l'entité étant managée.
+                $image->setImage('pending-' . bin2hex(random_bytes(8)));
+
+                // ⚠️ ORDRE CRUCIAL : flusher D'ABORD pour obtenir l'ID,
+                // puis uploader → les fichiers atterrissent dans uploads/gallery/{id}/...
+                $this->em->persist($image);
+                $this->em->flush();
 
                 $this->imageManager->upload($image, $imageFile);
-                $this->em->persist($image);
                 $page->setGalleryImage($image);
 
                 $this->addFlash('warning',

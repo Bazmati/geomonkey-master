@@ -6,6 +6,7 @@ use App\Interface\ImageableInterface;
 use Intervention\Image\ImageManager as InterventionImageManager;
 use Intervention\Image\Drivers\Gd\Driver as GdDriver;
 use Intervention\Image\Drivers\Imagick\Driver as ImagickDriver;
+use Intervention\Image\Format;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
@@ -154,21 +155,7 @@ class ImageManager
         }
 
         $maxWidth = $this->sizes[$size];
-
-        /** 
-         * @var \Intervention\Image\Image $image
-         */
-        $image = $manager->read($file->getPathname());
-        
-        // 🔒 Strip all metadata for privacy (GPS, EXIF, ICC, etc.)
-        $image->strip();
-        
-        // Resize to max width, maintaining aspect ratio, don't upsize
-        $image->resize(
-            width: $maxWidth,
-            height: null,
-            mode: 'contain'
-        )->downsize();
+        $quality = $this->qualities[$size];
 
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);
         $dir = dirname($savePath);
@@ -176,7 +163,17 @@ class ImageManager
             mkdir($dir, 0755, true);
         }
 
-        $image->save($savePath);
+        // API v4 : lecture via decodePath
+        $image = $manager->decodePath($file->getPathname());
+
+        // Resize à la largeur max, sans jamais agrandir
+        $image->resizeDown(width: $maxWidth);
+
+        // 🔒 RGPD : le ré-encodage WebP reconstruit l'image depuis les pixels,
+        // les métadonnées (EXIF, GPS, ICC) ne sont pas copiées.
+        $encoded = $image->encodeUsingFormat(Format::WEBP, quality: $quality);
+
+        $encoded->save($savePath);
     }
 
     /**
@@ -185,10 +182,10 @@ class ImageManager
     private function createImageManager(): ?InterventionImageManager
     {
         if (extension_loaded('gd')) {
-            return new InterventionImageManager(new GdDriver());
+            return InterventionImageManager::usingDriver(GdDriver::class);
         }
         if (extension_loaded('imagick')) {
-            return new InterventionImageManager(new ImagickDriver());
+            return InterventionImageManager::usingDriver(ImagickDriver::class);
         }
         return null;
     }
@@ -238,21 +235,36 @@ class ImageManager
 
         $uuid = $entity->getImage();
         $entityId = $entity->getId();
-        
+
         if ($entityId === null) {
             return;
         }
-        
-        $basePath = $this->publicDir . '/uploads/' . $entity->getImagePath() . '/' . $entityId;
 
-        foreach (self::AVAILABLE_SIZES as $size) {
-            $filePath = $basePath . '/' . $size . '/' . $uuid . '.webp';
-            if (file_exists($filePath)) {
-                unlink($filePath);
+        $imagePath = $entity->getImagePath();
+        $extensions = ['webp', 'jpg', 'jpeg', 'png', 'gif'];
+        $sizes = ['small', 'medium', 'large'];
+
+        // Racines possibles : standard (id), legacy (sans id), temp (ancien bug d'upload)
+        $roots = [
+            $this->publicDir . '/uploads/' . $imagePath . '/' . $entityId,
+            $this->publicDir . '/uploads/' . $imagePath,       // ancien format sans id
+            $this->publicDir . '/uploads/' . $imagePath . '/temp',
+        ];
+
+        foreach ($roots as $root) {
+            foreach ($sizes as $size) {
+                foreach ($extensions as $ext) {
+                    $filePath = $root . '/' . $size . '/' . $uuid . '.' . $ext;
+                    if (file_exists($filePath)) {
+                        @unlink($filePath);
+                    }
+                }
             }
         }
 
-        $this->cleanupEmptyDirectories($basePath);
+        // Nettoyage des dossiers vides devenus inutiles
+        $this->cleanupEmptyDirectories($this->publicDir . '/uploads/' . $imagePath . '/' . $entityId);
+        $this->cleanupEmptyDirectories($this->publicDir . '/uploads/' . $imagePath . '/temp');
     }
 
     /**
