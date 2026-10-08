@@ -20,7 +20,7 @@
                         <h2 class="text-warning">
                             <i class="bi bi-pin-angle me-2"></i>{{ page.title }}
                         </h2>
-                        <p class="text-white" style="white-space: pre-line;">{{ page.content|u.truncate(300, '…') }}</p>
+                        <p class="text-white" style="white-space: pre-line;">{{ page.content|slice(0, 300) }}{% if page.content|length > 300 %}…{% endif %}</p>
                         <a href="{{ path('app_presentation_show', {'slug': page.slug}) }}"
                            class="btn btn-outline-warning btn-sm">
                             Lire la page complète <i class="bi bi-arrow-right ms-1"></i>

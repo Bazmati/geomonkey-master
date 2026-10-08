@@ -14,6 +14,13 @@
                     </div>
                     <div class="card-body">
                         {% if page.galleryImage and page.galleryImage.isPublished %}
+                           {% if image_url %}
+                            <div class="text-center mb-4">
+                                <img src="{{ asset(image_url) }}"
+                                    alt="{{ page.galleryImage.alt }}"
+                                    class="img-fluid rounded" style="max-height: 400px;">
+                            </div>
+                        {% endif %} 
                             <div class="text-center mb-4">
                                 <img src="{{ asset('uploads/gallery/' ~ page.galleryImage.image) }}"
                                      alt="{{ page.galleryImage.alt }}"

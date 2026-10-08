@@ -56,15 +56,14 @@ class GalleryImageType extends AbstractType
             ])
             ->add('visibility', ChoiceType::class, [
                 'label' => 'Visibilité',
-                'choices' => array_combine(
-                    array_map(fn($v) => $v->value, $options['visibility_choices']),
-                    array_map(fn($v) => $v->getLabel(), $options['visibility_choices'])
-                ),
+                'choices' => $options['visibility_choices'],   // le tableau d'enums, tel quel
+                'choice_label' => fn (ImageVisibility $v) => $v->getLabel(),
+                'choice_value' => fn (?ImageVisibility $v) => $v?->value,
                 'expanded' => false,
                 'multiple' => false,
                 'constraints' => [
-                    new Assert\NotBlank(message: 'La visibilité est obligatoire')
-                ]
+                    new Assert\NotBlank(message: 'La visibilité est obligatoire'),
+                ],
             ])
             ->add('rgpdConsent', CheckboxType::class, [
                 'label' => 'Consentement RGPD',
@@ -96,18 +95,6 @@ class GalleryImageType extends AbstractType
                 'attr' => ['class' => 'form-check-input']
             ]);
 
-        // Model Transformer pour gérer ImageVisibility (enum) ↔ string
-        $builder->get('visibility')->addModelTransformer(new CallbackTransformer(
-            function (?ImageVisibility $visibility): ?string {
-                return $visibility?->value;
-            },
-            function (?string $value): ?ImageVisibility {
-                if ($value === null) {
-                    return null;
-                }
-                return ImageVisibility::from($value);
-            }
-        ));
     }
 
     public function configureOptions(OptionsResolver $resolver): void
