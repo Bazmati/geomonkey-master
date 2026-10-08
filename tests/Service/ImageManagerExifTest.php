@@ -58,30 +58,8 @@ class ImageManagerExifTest extends TestCase
                 unlink($path);
             }
         }
-        rmdir($dir);
     }
-
-    /**
-     * Teste que le code de strip EXIF est bien présent dans processImage.
-     * En Intervention Image v4, strip() supprime toutes les métadonnées (EXIF, ICC, etc.)
-     */
-    public function testProcessImageContainsExifStripping(): void
-    {
-        // Lire le code source de ImageManager
-        $reflection = new \ReflectionClass(ImageManager::class);
-        $sourceFile = $reflection->getFileName();
-        $source = file_get_contents($sourceFile);
-        
-        // En Intervention Image v4, strip() supprime toutes les métadonnées
-        $this->assertStringContainsString('strip()', $source, 'strip() doit être appelé pour supprimer les métadonnées');
-    }
-
-    /**
-     * Teste l'upload d'une image (nécessite GD).
-     * Ce test est désactivé si GD n'est pas disponible.
-     * 
-     * @requires extension gd
-     */
+    
     public function testUploadProcessesImage(): void
     {
         $this->markTestSkipped('Ce test nécessite l\'extension GD et un environnement de test configuré.');

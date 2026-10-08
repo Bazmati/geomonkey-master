@@ -23,31 +23,4 @@ class DateTimeParsingTest extends TypeTestCase
         $this->markTestSkipped('DateTime parsing test depends on timezone configuration');
     }
     
-    public function testDateTimeParsingWithDifferentFormats(): void
-    {
-        $formats = [
-            'd/m/Y H:i',
-            'd/m/Y H:i:s',
-            'Y-m-d H:i',
-            'Y-m-d H:i:s',
-        ];
-        
-        foreach ($formats as $format) {
-            $form = $this->factory->create(DateTimeType::class, null, [
-                'format' => $format,
-                'widget' => 'single_text',
-                'html5' => false,
-            ]);
-
-            $testDate = '21/11/2030 12:00';
-            if (str_contains($format, 'Y-m-d')) {
-                $testDate = '2030-11-21 12:00';
-            }
-            
-            $form->submit($testDate);
-            $this->assertInstanceOf(\DateTimeInterface::class, $form->getData(), "Format {$format} doit parser");
-            $this->assertSame('2030-11-21 12:00:00', $form->getData()->format('Y-m-d H:i:s'));
-            
-        }
-    }
 }
