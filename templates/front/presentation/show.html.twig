@@ -13,20 +13,14 @@
                         <h2 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ page.title }}</h2>
                     </div>
                     <div class="card-body">
-                        {% if page.galleryImage and page.galleryImage.isPublished %}
-                           {% if image_url %}
-                            <div class="text-center mb-4">
-                                <img src="{{ asset(image_url) }}"
-                                    alt="{{ page.galleryImage.alt }}"
-                                    class="img-fluid rounded" style="max-height: 400px;">
-                            </div>
-                        {% endif %} 
-                            <div class="text-center mb-4">
-                                <img src="{{ asset('uploads/gallery/' ~ page.galleryImage.image) }}"
-                                     alt="{{ page.galleryImage.alt }}"
-                                     class="img-fluid rounded" style="max-height: 400px;">
-                            </div>
-                        {% endif %}
+                    {% if page.galleryImage and page.galleryImage.isPublished and image_url %}
+                        <div class="text-center mb-4">
+                            <img src="{{ asset(image_url) }}"
+                                alt="{{ page.galleryImage.alt }}"
+                                class="img-fluid rounded"
+                                style="max-height: 400px;">
+                        </div>
+                    {% endif %}
 
                         <p class="text-white" style="white-space: pre-line;">{{ page.content }}</p>
 

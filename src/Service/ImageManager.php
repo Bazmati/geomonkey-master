@@ -71,6 +71,7 @@ class ImageManager
 
         try {
             $manager = $this->createImageManager();
+            error_log('[IMG] manager=' . ($manager ? get_class($manager) : 'NULL → fallback copie'));
 
             foreach (self::AVAILABLE_SIZES as $size) {
                 $savePath = $this->getAbsolutePath($entity, $size, $uuid);
@@ -158,9 +159,11 @@ class ImageManager
         $quality = $this->qualities[$size];
 
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);
+        error_log('[IMG] taille=' . $size . ' savePath=' . $savePath);
         $dir = dirname($savePath);
         if (!is_dir($dir)) {
-            mkdir($dir, 0755, true);
+            $ok = @mkdir($dir, 0755, true);
+            error_log('[IMG] mkdir(' . $dir . ')=' . var_export($ok, true));
         }
 
         // API v4 : lecture via decodePath
@@ -227,13 +230,13 @@ class ImageManager
     /**
      * Delete all images for an entity.
      */
-    public function deleteForEntity(ImageableInterface $entity): void
+    public function deleteForEntity(ImageableInterface $entity, ?string $uuid = null): void
     {
-        if (!$entity->getImage()) {
-            return;
+        $uuid ??= $entity->getImage();
+        
+        if (!$uuid || str_starts_with($uuid, 'pending-')) {
+            return; // nothing on disk for a placeholder
         }
-
-        $uuid = $entity->getImage();
         $entityId = $entity->getId();
 
         if ($entityId === null) {

@@ -175,17 +175,32 @@ class GalleryImageController extends AbstractController
      * Traite la soumission du formulaire.
      */
     private function processFormSubmission(
-        \Symfony\Component\Form\FormInterface $form,
-        GalleryImage $galleryImage,
-        bool $isNew
+    \Symfony\Component\Form\FormInterface $form,
+    GalleryImage $galleryImage,
+    bool $isNew
     ): Response {
         // Gestion du consentement RGPD
         $this->handleRgpdConsent($galleryImage);
 
-        // Gestion de l'upload d'image
         $imageFile = $form->get('imageFile')->getData();
-        if ($imageFile instanceof UploadedFile) {
-            if ($galleryImage->hasImage()) {
+        $hasNewFile = $imageFile instanceof UploadedFile;
+
+        // ⚠️ ORDRE CRUCIAL : persister et flusher D'ABORD pour obtenir l'ID,
+        // puis uploader → les fichiers atterrissent dans uploads/gallery/{id}/...
+        if ($isNew && $hasNewFile && !$galleryImage->hasImage()) {
+            $galleryImage->setImage('pending-' . bin2hex(random_bytes(8)));
+        }
+        if ($isNew) {
+            $this->em->persist($galleryImage);
+        } else {
+            $galleryImage->setUpdatedAt(new \DateTime());
+        }
+        $this->em->flush();   // ← l'ID est généré ici
+
+        // Maintenant l'upload écrit dans le bon dossier (avec l'ID)
+        if ($hasNewFile) {
+            // Si édition : supprimer les ANCIENS fichiers avant d'écrire les nouveaux
+            if (!$isNew && $galleryImage->hasImage()) {
                 $this->imageManager->deleteForEntity($galleryImage);
             }
             $this->imageManager->upload($galleryImage, $imageFile);
@@ -197,19 +212,13 @@ class GalleryImageController extends AbstractController
             return $this->redirectToRoute('app_admin_gallery_image_index');
         }
 
-        // Persister si c'est une nouvelle image
-        if ($isNew) {
-            $this->em->persist($galleryImage);
-        } else {
-            $galleryImage->setUpdatedAt(new \DateTime());
-        }
+        $this->em->flush();   // ← persiste l'UUID réel (remplace le placeholder)
 
-        $this->em->flush();
         $this->addFlash('success', $isNew ? 'Image de galerie créée avec succès.' : 'Image de galerie modifiée avec succès.');
 
         return $this->redirectToRoute('app_admin_gallery_image_index');
     }
-
+    
     /**
      * Gère le consentement RGPD.
      */

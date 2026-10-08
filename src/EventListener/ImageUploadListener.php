@@ -42,17 +42,16 @@ class ImageUploadListener
 
         // Check if image field is being changed
         if ($args->hasChangedField('image')) {
-            $oldValue = $args->getOldValue('image');
-            $newValue = $args->getNewValue('image');
-            
-            // If image is being removed (set to null)
-            if ($oldValue !== null && $newValue === null) {
-                $this->imageManager->deleteForEntity($entity);
+        $oldValue = $args->getOldValue('image');
+        $newValue = $args->getNewValue('image');
+
+            if ($oldValue === $newValue) {
+                return;
             }
             // If image is being changed to a new value
             elseif ($oldValue !== null && $newValue !== null && $oldValue !== $newValue) {
                 // Delete old images immediately when image field changes
-                $this->imageManager->deleteForEntity($entity);
+                $this->imageManager->deleteForEntity($entity, $oldValue);
             }
         }
     }
