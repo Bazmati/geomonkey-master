@@ -10,11 +10,12 @@ final class RegistrationConsentTest extends WebTestCase
     public function testRegistrationTimestampsConsents(): void
     {
         $client = static::createClient();
+        $this->seedMembershipFee();
         $crawler = $client->request('GET', '/inscription');
         $this->assertResponseIsSuccessful();
 
         $email = 'consent-test-' . time() . '@local.fr';
-        $form = $crawler->selectButton('S\'inscrire')->form([
+        $form = $crawler->filter('button[type="submit"]')->first()->form([
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'Consent',
@@ -40,10 +41,11 @@ final class RegistrationConsentTest extends WebTestCase
     public function testRegistrationRequiresTermsAcceptance(): void
     {
         $client = static::createClient();
+        $this->seedMembershipFee();
         $crawler = $client->request('GET', '/inscription');
 
         $email = 'no-consent-' . time() . '@local.fr';
-        $form = $crawler->selectButton('S\'inscrire')->form([
+        $form = $crawler->filter('button[type="submit"]')->first()->form([
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'NoConsent',
@@ -64,10 +66,11 @@ final class RegistrationConsentTest extends WebTestCase
     public function testRegistrationWithImageConsentOnly(): void
     {
         $client = static::createClient();
+        $this->seedMembershipFee();
         $crawler = $client->request('GET', '/inscription');
 
         $email = 'image-consent-' . time() . '@local.fr';
-        $form = $crawler->selectButton('S\'inscrire')->form([
+        $form = $crawler->filter('button[type="submit"]')->first()->form([
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'ImageConsent',
@@ -85,5 +88,14 @@ final class RegistrationConsentTest extends WebTestCase
         $this->assertNotNull($user);
         $this->assertFalse($user->getImageConsent(), 'imageConsent doit être false');
         $this->assertNull($user->getImageConsentAt(), 'imageConsentAt doit être null quand consentement refusé');
+    }
+
+    private function seedMembershipFee(): void
+    {
+        $em = static::getContainer()->get('doctrine')->getManager();
+        $fee = new \App\Entity\MembershipFee();
+        $fee->setAmount(1500); // 15 € — updatedAt est posé par le constructeur, effectiveFrom peut rester null
+        $em->persist($fee);
+        $em->flush();
     }
 }

@@ -38,6 +38,8 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer une image Public publiée
         $publicImage = new GalleryImage();
+        $publicImage->setImage("test-" . bin2hex(random_bytes(6)));
+        $publicImage->setImage('test-uuid-public-001');    // ← AJOUT (colonne NOT NULL)
         $publicImage->setVisibility(ImageVisibility::Public);
         $publicImage->setIsPublished(true);
         $publicImage->setTitle('Image publique');
@@ -46,6 +48,8 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image Members publiée
         $membersImage = new GalleryImage();
+        $membersImage->setImage("test-" . bin2hex(random_bytes(6)));
+        $membersImage->setImage('test-uuid-members-002');
         $membersImage->setVisibility(ImageVisibility::Members);
         $membersImage->setIsPublished(true);
         $membersImage->setTitle('Image membres');
@@ -54,6 +58,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image Bureau publiée
         $bureauImage = new GalleryImage();
+        $bureauImage->setImage("test-" . bin2hex(random_bytes(6)));
         $bureauImage->setVisibility(ImageVisibility::Bureau);
         $bureauImage->setIsPublished(true);
         $bureauImage->setTitle('Image bureau');
@@ -62,6 +67,8 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image non publiée
         $unpublishedImage = new GalleryImage();
+        $unpublishedImage->setImage("test-" . bin2hex(random_bytes(6)));
+        $unpublishedImage->setImage('test-uuid-unpub-003');
         $unpublishedImage->setVisibility(ImageVisibility::Public);
         $unpublishedImage->setIsPublished(false);
         $unpublishedImage->setTitle('Image non publiée');
@@ -81,12 +88,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur du bureau
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('president@asso.fr');
         $user->setOfficeFunction(OfficeFunction::President);
         $this->em->persist($user);
 
         // Créer des images de toutes visibilités
         $publicImage = new GalleryImage();
+        $publicImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publicImage->setVisibility(ImageVisibility::Public);
         $publicImage->setIsPublished(true);
         $publicImage->setTitle('Image publique');
@@ -94,6 +105,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($publicImage);
 
         $membersImage = new GalleryImage();
+        $membersImage->setImage("test-" . bin2hex(random_bytes(6)));
         $membersImage->setVisibility(ImageVisibility::Members);
         $membersImage->setIsPublished(true);
         $membersImage->setTitle('Image membres');
@@ -101,6 +113,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($membersImage);
 
         $bureauImage = new GalleryImage();
+        $bureauImage->setImage("test-" . bin2hex(random_bytes(6)));
         $bureauImage->setVisibility(ImageVisibility::Bureau);
         $bureauImage->setIsPublished(true);
         $bureauImage->setTitle('Image bureau');
@@ -108,6 +121,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($bureauImage);
 
         $unpublishedImage = new GalleryImage();
+        $unpublishedImage->setImage("test-" . bin2hex(random_bytes(6)));
         $unpublishedImage->setVisibility(ImageVisibility::Public);
         $unpublishedImage->setIsPublished(false);
         $unpublishedImage->setTitle('Image non publiée');
@@ -132,12 +146,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur membre actif
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('membre@asso.fr');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $this->em->persist($user);
 
         // Créer des images
         $publicImage = new GalleryImage();
+        $publicImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publicImage->setVisibility(ImageVisibility::Public);
         $publicImage->setIsPublished(true);
         $publicImage->setTitle('Image publique');
@@ -145,6 +163,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($publicImage);
 
         $membersImage = new GalleryImage();
+        $membersImage->setImage("test-" . bin2hex(random_bytes(6)));
         $membersImage->setVisibility(ImageVisibility::Members);
         $membersImage->setIsPublished(true);
         $membersImage->setTitle('Image membres');
@@ -152,6 +171,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($membersImage);
 
         $bureauImage = new GalleryImage();
+        $bureauImage->setImage("test-" . bin2hex(random_bytes(6)));
         $bureauImage->setVisibility(ImageVisibility::Bureau);
         $bureauImage->setIsPublished(true);
         $bureauImage->setTitle('Image bureau');
@@ -175,6 +195,9 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur membre actif
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('participant@asso.fr');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $this->em->persist($user);
@@ -193,6 +216,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image Participants liée à l'événement
         $participantsImage = new GalleryImage();
+        $participantsImage->setImage("test-" . bin2hex(random_bytes(6)));
         $participantsImage->setVisibility(ImageVisibility::Participants);
         $participantsImage->setIsPublished(true);
         $participantsImage->setTitle('Image participants');
@@ -210,6 +234,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($otherEvent);
 
         $otherParticipantsImage = new GalleryImage();
+        $otherParticipantsImage->setImage("test-" . bin2hex(random_bytes(6)));
         $otherParticipantsImage->setVisibility(ImageVisibility::Participants);
         $otherParticipantsImage->setIsPublished(true);
         $otherParticipantsImage->setTitle('Autre image participants');
@@ -219,6 +244,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image Public
         $publicImage = new GalleryImage();
+        $publicImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publicImage->setVisibility(ImageVisibility::Public);
         $publicImage->setIsPublished(true);
         $publicImage->setTitle('Image publique');
@@ -243,12 +269,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur membre actif
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('membre@asso.fr');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $this->em->persist($user);
 
         // Créer une image Public non publiée
         $unpublishedImage = new GalleryImage();
+        $unpublishedImage->setImage("test-" . bin2hex(random_bytes(6)));
         $unpublishedImage->setVisibility(ImageVisibility::Public);
         $unpublishedImage->setIsPublished(false);
         $unpublishedImage->setTitle('Image non publiée');
@@ -257,6 +287,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer une image Public publiée
         $publishedImage = new GalleryImage();
+        $publishedImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publishedImage->setVisibility(ImageVisibility::Public);
         $publishedImage->setIsPublished(true);
         $publishedImage->setTitle('Image publiée');
@@ -280,12 +311,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
         
         // Créer un utilisateur président
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('president@asso.fr');
         $user->setOfficeFunction(OfficeFunction::President);
         $this->em->persist($user);
 
         // Créer des images publiées et non publiées
         $publishedImage = new GalleryImage();
+        $publishedImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publishedImage->setVisibility(ImageVisibility::Public);
         $publishedImage->setIsPublished(true);
         $publishedImage->setTitle('Image publiée');
@@ -293,6 +328,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($publishedImage);
 
         $unpublishedImage = new GalleryImage();
+        $unpublishedImage->setImage("test-" . bin2hex(random_bytes(6)));
         $unpublishedImage->setVisibility(ImageVisibility::Public);
         $unpublishedImage->setIsPublished(false);
         $unpublishedImage->setTitle('Image non publiée');
@@ -312,12 +348,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('membre@asso.fr');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $this->em->persist($user);
 
         // Créer des images avec des dates différentes
         $firstImage = new GalleryImage();
+        $firstImage->setImage("test-" . bin2hex(random_bytes(6)));
         $firstImage->setVisibility(ImageVisibility::Public);
         $firstImage->setIsPublished(true);
         $firstImage->setTitle('Première image');
@@ -326,6 +366,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($firstImage);
 
         $secondImage = new GalleryImage();
+        $secondImage->setImage("test-" . bin2hex(random_bytes(6)));
         $secondImage->setVisibility(ImageVisibility::Public);
         $secondImage->setIsPublished(true);
         $secondImage->setTitle('Deuxième image');
@@ -334,6 +375,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($secondImage);
 
         $thirdImage = new GalleryImage();
+        $thirdImage->setImage("test-" . bin2hex(random_bytes(6)));
         $thirdImage->setVisibility(ImageVisibility::Public);
         $thirdImage->setIsPublished(true);
         $thirdImage->setTitle('Troisième image');
@@ -364,12 +406,16 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur sans fonction (None)
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('visiteur@asso.fr');
         $user->setOfficeFunction(OfficeFunction::None);
         $this->em->persist($user);
 
         // Créer des images de différentes visibilités
         $publicImage = new GalleryImage();
+        $publicImage->setImage("test-" . bin2hex(random_bytes(6)));
         $publicImage->setVisibility(ImageVisibility::Public);
         $publicImage->setIsPublished(true);
         $publicImage->setTitle('Image publique');
@@ -377,6 +423,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($publicImage);
 
         $membersImage = new GalleryImage();
+        $membersImage->setImage("test-" . bin2hex(random_bytes(6)));
         $membersImage->setVisibility(ImageVisibility::Members);
         $membersImage->setIsPublished(true);
         $membersImage->setTitle('Image membres');
@@ -384,6 +431,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
         $this->em->persist($membersImage);
 
         $bureauImage = new GalleryImage();
+        $bureauImage->setImage("test-" . bin2hex(random_bytes(6)));
         $bureauImage->setVisibility(ImageVisibility::Bureau);
         $bureauImage->setIsPublished(true);
         $bureauImage->setTitle('Image bureau');
@@ -412,6 +460,9 @@ class GalleryImageRepositoryTest extends KernelTestCase
     {
         // Créer un utilisateur participant
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('participant@asso.fr');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         $this->em->persist($user);
@@ -430,6 +481,7 @@ class GalleryImageRepositoryTest extends KernelTestCase
 
         // Créer UNIQUEMENT des images Participants (pas de Public/Members)
         $participantsImage = new GalleryImage();
+        $participantsImage->setImage("test-" . bin2hex(random_bytes(6)));
         $participantsImage->setVisibility(ImageVisibility::Participants);
         $participantsImage->setIsPublished(true);
         $participantsImage->setTitle('Image participants');

@@ -39,6 +39,9 @@ class EventParticipantRepositoryTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName("Test");
+        $user->setLastName("User");
         $user->setEmail('test@example.com');
         $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         
@@ -56,6 +59,9 @@ class EventParticipantRepositoryTest extends KernelTestCase
 
         // Créer un autre utilisateur qui ne participe pas
         $otherUser = new User();
+        $otherUser->setPassword("test-hash-123");
+        $otherUser->setFirstName("Test");
+        $otherUser->setLastName("User");
         $otherUser->setEmail('other@example.com');
         $otherUser->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         $this->em->persist($otherUser);
@@ -82,6 +88,9 @@ class EventParticipantRepositoryTest extends KernelTestCase
         $event2->setLocation('Test Location 2');
         
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName("Test");
+        $user->setLastName("User");
         $user->setEmail('test@example.com');
         $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         
@@ -134,10 +143,16 @@ class EventParticipantRepositoryTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user1 = new User();
+        $user1->setPassword("test-hash-123");
+        $user1->setFirstName("Test");
+        $user1->setLastName("User");
         $user1->setEmail('user1@example.com');
         $user1->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         
         $user2 = new User();
+        $user2->setPassword("test-hash-123");
+        $user2->setFirstName("Test");
+        $user2->setLastName("User");
         $user2->setEmail('user2@example.com');
         $user2->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         

@@ -219,4 +219,96 @@ class ImageManagerTest extends TestCase
         // This should not throw an exception
         $this->imageManager->deleteForEntity($event);
     }
+
+        // ==================== PIPELINE V4 TESTS ====================
+
+    public function testUploadCreatesThreeWebpSizes(): void
+    {
+        $imagePath = __DIR__ . '/../../public/images/logo.png';
+        $this->assertFileExists($imagePath);
+        $tmpFile = tempnam(sys_get_temp_dir(), 'test_sizes');
+        file_put_contents($tmpFile, file_get_contents($imagePath));
+
+        $uploadedFile = new UploadedFile($tmpFile, 'test.png', 'image/png', null, true);
+
+        $event = new Event();
+        $event->setTitle('Test');
+        $event->setDescription('Test description');
+        $r = new \ReflectionClass($event);
+        $r->getProperty('id')->setValue($event, 77);
+        // L'entité doit avoir un image non-null (sinon le temp path)
+        $event->setImage('pending-test');
+
+        $this->imageManager->upload($event, $uploadedFile);
+
+        $uuid = $event->getImage();
+        $this->assertDoesNotMatchRegularExpression('/^pending-/', $uuid, 'upload() doit remplacer le placeholder par l\'UUID réel');
+
+        foreach (['small', 'medium', 'large'] as $size) {
+            $path = "{$this->publicDir}/uploads/events/77/{$size}/{$uuid}.webp";
+            $this->assertFileExists($path, "La taille {$size} doit exister en .webp");
+            $this->assertSame('webp', strtolower(pathinfo($path, PATHINFO_EXTENSION)));
+        }
+    }
+
+    public function testGetUrlReturnsWebpPath(): void
+    {
+        $event = new Event();
+        $event->setTitle('T');
+        $event->setDescription('D');
+        $r = new \ReflectionClass($event);
+        $r->getProperty('id')->setValue($event, 88);
+        $event->setImage('url-test-uuid');
+
+        // pas de fichier : getUrl doit retourner null
+        $this->assertNull($this->imageManager->getUrl($event, 'medium'));
+
+        // on crée le fichier : getUrl doit le trouver
+        $dir = "{$this->publicDir}/uploads/events/88/medium";
+        mkdir($dir, 0755, true);
+        file_put_contents("{$dir}/url-test-uuid.webp", 'fake');
+
+        $this->assertSame('/uploads/events/88/medium/url-test-uuid.webp', $this->imageManager->getUrl($event, 'medium'));
+    }
+
+    public function testDeleteForEntityDeletesOnlyGivenUuid(): void
+    {
+        // simule 2 images pour la même entité (id 99)
+        $dir = "{$this->publicDir}/uploads/gallery/99/medium";
+        mkdir($dir, 0755, true);
+        file_put_contents("{$dir}/aaa.webp", 'a');
+        file_put_contents("{$dir}/bbb.webp", 'b');
+
+        $image = new \App\Entity\GalleryImage();
+        $image->setTitle('T');
+        $image->setAlt('A');
+        $image->setImage('bbb'); // l'entité pointe sur bbb
+        $r = new \ReflectionClass($image);
+        $r->getProperty('id')->setValue($image, 99);
+
+        // suppression ciblée sur aaa : bbb doit survivre
+        $this->imageManager->deleteForEntity($image, 'aaa');
+
+        $this->assertFileDoesNotExist("{$dir}/aaa.webp");
+        $this->assertFileExists("{$dir}/bbb.webp");
+    }
+
+    public function testDeleteForEntityIgnoresPendingPlaceholder(): void
+    {
+        $image = new \App\Entity\GalleryImage();
+        $image->setTitle('T');
+        $image->setAlt('A');
+        $image->setImage('pending-xyz');
+        $r = new \ReflectionClass($image);
+        $r->getProperty('id')->setValue($image, 100);
+
+        $dir = "{$this->publicDir}/uploads/gallery/100/small";
+        mkdir($dir, 0755, true);
+        file_put_contents("{$dir}/real.webp", 'x');
+
+        // Ne doit rien supprimer (pas de fichiers pending sur disque)
+        $this->imageManager->deleteForEntity($image);
+
+        $this->assertFileExists("{$dir}/real.webp");
+    }
 }

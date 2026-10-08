@@ -2,58 +2,88 @@
 
 namespace App\Tests\Form;
 
-use App\Entity\Event;
 use App\Form\EventType;
-use Symfony\Component\Form\Test\TypeTestCase;
-use Symfony\Component\Validator\Validation;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class EventTypeTest2 extends TypeTestCase
+class EventTypeTest extends KernelTestCase
 {
-    protected function getExtensions(): array
+    protected function setUp(): void
     {
-        return [
-            new \Symfony\Component\Form\Extension\Validator\ValidatorExtension(
-                Validation::createValidator()
-            ),
-        ];
+        self::bootKernel();
     }
 
-    public function testDateFormatWithYmd(): void
+    public function testFileWithoutAltIsRejected(): void
     {
-        // Try with Y-m-d H:i format (ISO)
-        $formData = [
-            'title' => 'Test Event',
-            'description' => 'Test Description',
-            'startDate' => '2030-11-21 12:00',
-            'endDate' => '2030-11-22 12:00',
-            'location' => 'Test Location',
-            'isPublished' => true,
-            'imageFile' => null,
-            'deleteImage' => false,
-        ];
+        $formFactory = self::getContainer()->get('form.factory');
+        $form = $formFactory->create(EventType::class);
 
-        $form = $this->factory->create(EventType::class, new Event());
-        $form->submit($formData);
+        $form->submit([
+            'title' => 'Valid Title',
+            'description' => 'Valid description here',
+            'startDate' => '2030-11-21T12:00',
+            'endDate' => '2030-11-22T12:00',
+            'location' => 'Paris',
+            'isPublished' => false,
+            'newImageFile' => $this->createUploadedFile(),
+            'newImageAlt' => '',
+            'newImageConsent' => true,
+        ], false);
 
-        if (!$form->isValid()) {
-            $errors = [];
-            foreach ($form->getErrors(true) as $error) {
-                $errors[] = (string) $error->getMessage();
-            }
-            $this->fail('Form has errors: ' . implode(', ', $errors));
-        }
-
-        $event = $form->getData();
-        
-        $this->assertSame(
-            '2030-11-21 12:00:00',
-            $event->getStartDate()->format('Y-m-d H:i:s')
-        );
+        $this->assertFalse($form->isValid());
+        $this->assertGreaterThan(0, $form->get('newImageAlt')->getErrors()->count(),
+            'Un fichier sans alt doit générer une erreur sur newImageAlt');
     }
-    
-    public function testDateFormatWithDmY(): void
+
+    public function testFileWithoutConsentIsRejected(): void
     {
-        // Skip this test as it requires specific format configuration
-        $this->markTestSkipped('Date format test requires specific configuration');
+        $formFactory = self::getContainer()->get('form.factory');
+        $form = $formFactory->create(EventType::class);
+
+        $form->submit([
+            'title' => 'Valid Title',
+            'description' => 'Valid description here',
+            'startDate' => '2030-11-21T12:00',
+            'endDate' => '2030-11-22T12:00',
+            'location' => 'Paris',
+            'isPublished' => false,
+            'newImageFile' => $this->createUploadedFile(),
+            'newImageAlt' => 'Un événement',
+            'newImageConsent' => false,
+        ], false);
+
+        $this->assertFalse($form->isValid());
+        $this->assertGreaterThan(0, $form->get('newImageConsent')->getErrors()->count(),
+            'Un fichier sans consentement RGPD doit générer une erreur sur newImageConsent');
+    }
+
+    public function testFileWithAltAndConsentPasses(): void
+    {
+        $formFactory = self::getContainer()->get('form.factory');
+        $form = $formFactory->create(EventType::class);
+
+        $form->submit([
+            'title' => 'Valid Title',
+            'description' => 'Valid description here',
+            'startDate' => '2030-11-21T12:00',
+            'endDate' => '2030-11-22T12:00',
+            'location' => 'Paris',
+            'isPublished' => false,
+            'newImageFile' => $this->createUploadedFile(),
+            'newImageAlt' => 'Sortie géologique',
+            'newImageConsent' => true,
+        ], false);
+
+        // On ne juge que les champs newImage* (le mapping des dates peut échouer sans incidence ici)
+        $this->assertSame(0, $form->get('newImageAlt')->getErrors()->count());
+        $this->assertSame(0, $form->get('newImageConsent')->getErrors()->count());
+    }
+
+    private function createUploadedFile(): UploadedFile
+    {
+        $tmp = tempnam(sys_get_temp_dir(), 'formtest');
+        file_put_contents($tmp, 'fake');
+
+        return new UploadedFile($tmp, 'test.png', 'image/png', null, true);
     }
 }

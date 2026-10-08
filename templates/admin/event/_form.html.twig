@@ -15,21 +15,20 @@
         {# Image upload section #}
         <div class="mb-3">
             <label class="form-label">Image</label>
-            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.galleryImages, {'attr': {'class': 'form-select'}}) }}
+            {{ form_row(form.newImageFile, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.newImageAlt, {'attr': {'class': 'form-control'}}) }}
+            {{ form_row(form.newImageConsent, {'attr': {'class': 'form-check-input'}}) }}
             <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 5Mo)</div>
             
             {# Image preview - show under input if exists #}
-            {% if event.hasImage() %}
-                <div class="mt-2">
-                    <label class="form-label">Image actuelle</label>
-                    <div class="border rounded p-2 image-preview-container" style="height: 200px; background-color: #2d2d2d;">
-                        {{ image_tag(event, 'medium', event.title, 'w-100 h-100 rounded') }}
-                    </div>
-                    <div class="mt-2">
-                        {{ form_row(form.deleteImage) }}
-                    </div>
-                </div>
-            {% endif %}
+            {% for img in event.galleryImages %}
+                {% if img.isPublished %}
+                    {{ image_tag(img, 'small', img.alt, 'img-thumbnail m-1') }}
+                {% else %}
+                    <span class="badge bg-warning">« {{ img.title }} » en attente de publication</span>
+                {% endif %}
+            {% endfor %}
         </div>
     </div>
 {{ form_end(form) }}

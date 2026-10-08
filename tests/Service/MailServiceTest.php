@@ -142,7 +142,6 @@ class MailServiceTest extends TestCase
         // Utiliser la réflexion pour vérifier la propriété privée
         $reflection = new \ReflectionClass($this->mailService);
         $property = $reflection->getProperty('assuranceDetails');
-        $property->setAccessible(true);
         
         $this->assertEquals($details, $property->getValue($this->mailService));
     }

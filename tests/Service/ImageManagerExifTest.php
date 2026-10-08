@@ -116,6 +116,7 @@ class ImageManagerExifTest extends TestCase
         $url = $this->imageManager->getUrl($galleryImage, 'medium');
         
         // Comme le fichier n'existe pas, il retourne le chemin par défaut
-        $this->assertStringContainsString('uploads/gallery/1/medium/test-uuid.webp', $url);
+        // Sans fichier sur disque, getUrl retourne null (comportement documenté)
+        $this->assertNull($this->imageManager->getUrl($galleryImage, 'medium'));
     }
 }

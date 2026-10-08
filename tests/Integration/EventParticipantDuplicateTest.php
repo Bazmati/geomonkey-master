@@ -38,8 +38,14 @@ class EventParticipantDuplicateTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName("Test");
+        $user->setLastName("User");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('test@example.com');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
+// la colonne password est NOT NULL
         
         $this->em->persist($event);
         $this->em->persist($user);
@@ -74,6 +80,11 @@ class EventParticipantDuplicateTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName("Test");
+        $user->setLastName("User");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('test@example.com');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         
@@ -117,6 +128,11 @@ class EventParticipantDuplicateTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user = new User();
+        $user->setPassword("test-hash-123");
+        $user->setFirstName("Test");
+        $user->setLastName("User");
+        $user->setFirstName('Test');
+        $user->setLastName('User');
         $user->setEmail('test@example.com');
         $user->setOfficeFunction(OfficeFunction::ActiveMember);
         
@@ -163,10 +179,20 @@ class EventParticipantDuplicateTest extends KernelTestCase
         $event->setLocation('Test Location');
         
         $user1 = new User();
+        $user1->setPassword("test-hash-123");
+        $user1->setFirstName("Test");
+        $user1->setLastName("User");
+        $user1->setFirstName('Test');
+        $user1->setLastName('User');
         $user1->setEmail('user1@example.com');
         $user1->setOfficeFunction(OfficeFunction::ActiveMember);
         
         $user2 = new User();
+        $user2->setPassword("test-hash-123");
+        $user2->setFirstName("Test");
+        $user2->setLastName("User");
+        $user2->setFirstName('Test');
+        $user2->setLastName('User');
         $user2->setEmail('user2@example.com');
         $user2->setOfficeFunction(OfficeFunction::ActiveMember);
         

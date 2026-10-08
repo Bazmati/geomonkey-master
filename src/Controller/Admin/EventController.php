@@ -3,6 +3,8 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Event;
+use App\Entity\GalleryImage;
+use App\Enum\ImageVisibility;
 use App\Form\EventType;
 use App\Repository\EventRepository;
 use App\Service\ImageManager;
@@ -37,17 +39,35 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $imageFile = $form->get('imageFile')->getData();
 
             $entityManager->persist($event);
             $entityManager->flush();
 
-            // Process image upload AFTER persist so entity has an ID
-            if ($imageFile) {
-                $imageManager->upload($event, $imageFile);
-            }
+            $imageFile = $form->get('newImageFile')->getData();
 
-            $entityManager->flush();
+            if ($imageFile) {
+                $image = new GalleryImage();
+                $image->setTitle($event->getTitle());
+                $image->setAlt(trim($form->get('newImageAlt')->getData()));
+                $image->setVisibility(ImageVisibility::Public);
+                $image->giveConsent();
+                $image->setConsentDetail(sprintf('Image ajoutée via l\'événement « %s »', $event->getTitle()));
+                $image->setUploadedBy($this->getUser());
+                $image->setIsPublished(false);
+                $image->setImage('pending-' . bin2hex(random_bytes(8)));
+
+                $entityManager->persist($image);
+                $entityManager->flush();              // ← ID généré, upload dans gallery/{id}/
+                $imageManager->upload($image, $imageFile);
+
+                $event->addGalleryImage($image);      // ← liaison ManyToMany déjà existante
+                $entityManager->flush();             // persiste l'UUID réel
+
+                $this->addFlash('warning',
+                    'Image ajoutée à la galerie en attente de publication. '.
+                    'Un président doit la publier dans « Gestion de la galerie » pour qu\'elle soit visible.'
+                );
+            }
 
             $this->addFlash('success', 'L\'événement a été créé avec succès.');
 
@@ -72,12 +92,6 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Handle image deletion
-            $deleteImage = $form->get('deleteImage')->getData();
-            if ($deleteImage && $event->hasImage()) {
-                $imageManager->deleteForEntity($event);
-                $event->setImage(null);
-            }
 
             // Handle image upload (takes precedence over deletion)
             $imageFile = $form->get('imageFile')->getData();
@@ -86,6 +100,32 @@ final class EventController extends AbstractController
             }
 
             $entityManager->flush();
+
+            $imageFile = $form->get('newImageFile')->getData();
+
+            if ($imageFile) {
+                $image = new GalleryImage();
+                $image->setTitle($event->getTitle());
+                $image->setAlt(trim($form->get('newImageAlt')->getData()));
+                $image->setVisibility(ImageVisibility::Public);
+                $image->giveConsent();
+                $image->setConsentDetail(sprintf('Image ajoutée via l\'événement « %s »', $event->getTitle()));
+                $image->setUploadedBy($this->getUser());
+                $image->setIsPublished(false);
+                $image->setImage('pending-' . bin2hex(random_bytes(8)));
+
+                $entityManager->persist($image);
+                $entityManager->flush();              // ← ID généré, upload dans gallery/{id}/
+                $imageManager->upload($image, $imageFile);
+
+                $event->addGalleryImage($image);      // ← liaison ManyToMany déjà existante
+                $entityManager->flush();             // persiste l'UUID réel
+
+                $this->addFlash('warning',
+                    'Image ajoutée à la galerie en attente de publication. '.
+                    'Un président doit la publier dans « Gestion de la galerie » pour qu\'elle soit visible.'
+                );
+            }
 
             $this->addFlash('success', 'L\'événement a été modifié avec succès.');
 
