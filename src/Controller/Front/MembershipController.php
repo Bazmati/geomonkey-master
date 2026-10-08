@@ -69,12 +69,18 @@ class MembershipController extends AbstractController
             $em->persist($user);
             $em->flush();
 
-            // M1: Envoyer le mail de confirmation à l'utilisateur
-            $this->mailService->sendRegistrationConfirmation($user);
+            // L'inscription est acquise : un échec d'email ne doit pas la faire échouer
+            // M1: mail de confirmation à l'utilisateur
+            // M2: si membre actif, alerte au bureau
+            try {
+                $this->mailService->sendRegistrationConfirmation($user);
 
-            // M2: Si membre actif, envoyer alerte au bureau
-            if ($user->needsBureauValidation()) {
-                $this->mailService->sendMembershipRequestAlert($user);
+                if ($user->needsBureauValidation()) {
+                    $this->mailService->sendMembershipRequestAlert($user);
+                }
+            } catch (\Throwable $e) {
+                // Log pour monitoring, mais l'utilisateur continue son parcours
+                $this->addFlash('warning', 'Ton inscription est bien enregistrée, mais l\'envoi de l\'email de confirmation a échoué.');
             }
 
             // Redirection selon le statut
