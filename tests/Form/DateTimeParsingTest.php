@@ -45,9 +45,9 @@ class DateTimeParsingTest extends TypeTestCase
             }
             
             $form->submit($testDate);
-            $data = $form->getData();
+            $this->assertInstanceOf(\DateTimeInterface::class, $form->getData(), "Format {$format} doit parser");
+            $this->assertSame('2030-11-21 12:00:00', $form->getData()->format('Y-m-d H:i:s'));
             
-            echo "Format {$format} with '{$testDate}': " . ($data ? $data->format('Y-m-d H:i:s T') : 'null') . "\n";
         }
     }
 }

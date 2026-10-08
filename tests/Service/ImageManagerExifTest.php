@@ -117,6 +117,6 @@ class ImageManagerExifTest extends TestCase
         
         // Comme le fichier n'existe pas, il retourne le chemin par défaut
         // Sans fichier sur disque, getUrl retourne null (comportement documenté)
-        $this->assertNull($this->imageManager->getUrl($galleryImage, 'medium'));
+        $this->assertNull($url);
     }
 }
