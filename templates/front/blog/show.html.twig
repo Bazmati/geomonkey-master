@@ -1,0 +1,69 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ post.title }} — {{ parent() }}{% endblock %}
+{% block meta %}
+    {# Meta Open Graph : base du partage Facebook / WhatsApp / LinkedIn #}
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ post.title }}">
+    <meta property="og:description" content="{{ post.excerpt }}">
+    <meta property="og:url" content="{{ app.request.uri }}">
+    {% if post.hasImage %}
+        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog_posts/' ~ post.image)) }}">
+    {% endif %}
+    <meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block body %}
+<article class="py-5">
+    <div class="container" style="max-width: 800px;">
+        <nav aria-label="Fil d'Ariane">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
+                <li class="breadcrumb-item"><a href="{{ path('app_blog_index') }}">Blog</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
+            </ol>
+        </nav>
+
+        <h1 class="mb-3">{{ post.title }}</h1>
+
+        <p class="text-muted">
+            <i class="bi bi-person"></i>
+            {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
+            — publié le {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
+            {% if post.updatedAt and post.updatedAt > post.createdAt %}
+                · modifié le {{ post.updatedAt|date('d/m/Y') }}
+            {% endif %}
+        </p>
+
+        {% if post.hasImage %}
+            <img src="{{ asset('uploads/blog_posts/' ~ post.image) }}"
+                 class="img-fluid rounded mb-4"
+                 alt="Illustration de l'article {{ post.title }}">
+        {% endif %}
+
+        {# ⚠️ Échappement strict : le contenu est saisi en texte brut.
+           Pas de |raw ici tant qu'on n'a pas d'éditeur + purificateur HTML. #}
+        <div class="article-content">
+            {{ post.content|nl2ru|nl2br }}
+        </div>
+
+        {# Boutons de partage social — aucun token requis #}
+        {{ include('front/blog/_share_buttons.html.twig', {'post': post}) }}
+
+        {% if post.galleryImages|length > 0 %}
+            <hr class="my-5">
+            <h3><i class="bi bi-images"></i> Images de l'article</h3>
+            <div class="row g-3">
+                {% for image in post.galleryImages %}
+                    {% if image.isPublished %}
+                        <div class="col-md-4">
+                            <img src="{{ image_manager_url(image, 'medium') }}"
+                                 class="img-fluid rounded" alt="{{ image.alt }}">
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}

@@ -25,4 +25,18 @@ class BlogPostRepository extends ServiceEntityRepository
     {
         return $this->findBy(['isPublished' => true], ['createdAt' => 'DESC'], $limit);
     }
+
+    /**
+     * Un seul article publié par son slug — le front ne doit JAMAIS
+     * servir un brouillon, même avec le slug deviné.
+     */
+    public function findOnePublishedBySlug(string $slug): ?BlogPost
+    {
+        return $this->createQueryBuilder('b')
+            ->andWhere('b.slug = :slug')
+            ->andWhere('b.isPublished = true')
+            ->setParameter('slug', $slug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
 }
