@@ -1,4 +1,5 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
+
 
 {% block title %}{{ post.title }} — {{ parent() }}{% endblock %}
 {% block meta %}
@@ -7,13 +8,14 @@
     <meta property="og:title" content="{{ post.title }}">
     <meta property="og:description" content="{{ post.excerpt }}">
     <meta property="og:url" content="{{ app.request.uri }}">
-    {% if post.hasImage %}
-        <meta property="og:image" content="{{ absolute_url(asset('uploads/blog_posts/' ~ post.image)) }}">
+    {% if image_url %}
+        <meta property="og:image" content="{{ absolute_url(asset(image_url)) }}">
     {% endif %}
     <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
 {% block body %}
+{% include 'partials/_navbar.html.twig' %}
 <article class="py-5">
     <div class="container" style="max-width: 800px;">
         <nav aria-label="Fil d'Ariane">
@@ -36,15 +38,13 @@
         </p>
 
         {% if post.hasImage %}
-            <img src="{{ asset('uploads/blog_posts/' ~ post.image) }}"
-                 class="img-fluid rounded mb-4"
-                 alt="Illustration de l'article {{ post.title }}">
+            {{ image_tag(post, 'large', 'Illustration de l\'article ' ~ post.title, 'img-fluid rounded mb-4') }}
         {% endif %}
 
         {# ⚠️ Échappement strict : le contenu est saisi en texte brut.
            Pas de |raw ici tant qu'on n'a pas d'éditeur + purificateur HTML. #}
         <div class="article-content">
-            {{ post.content|nl2ru|nl2br }}
+            {{ post.content|nl2br }}
         </div>
 
         {# Boutons de partage social — aucun token requis #}
@@ -57,8 +57,7 @@
                 {% for image in post.galleryImages %}
                     {% if image.isPublished %}
                         <div class="col-md-4">
-                            <img src="{{ image_manager_url(image, 'medium') }}"
-                                 class="img-fluid rounded" alt="{{ image.alt }}">
+                            {{ image_tag(image, 'medium', image.alt, 'img-fluid rounded') }}
                         </div>
                     {% endif %}
                 {% endfor %}

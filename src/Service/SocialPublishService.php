@@ -6,7 +6,7 @@ use App\Entity\BlogPost;
 use App\Interface\SocialPublisherInterface;
 use App\Repository\SocialNetworkSettingRepository;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\DependencyInjection\Attribute\TaggedIterator;
+use Symfony\Component\DependencyInjection\Attribute\AutowireIterator;
 
 /**
  * Orchestrateur : un article mis en ligne → publication sur chaque
@@ -21,7 +21,7 @@ class SocialPublishService
     public function __construct(
         private SocialNetworkSettingRepository $settingRepo,
         private LoggerInterface $logger,
-        #[TaggedIterator('app.social_publisher')]
+        #[AutowireIterator(SocialPublisherInterface::class)]
         iterable $publishers,
     ) {
         foreach ($publishers as $publisher) {

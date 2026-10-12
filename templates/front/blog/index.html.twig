@@ -1,8 +1,9 @@
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
 {% block title %}Blog — {{ parent() }}{% endblock %}
 
 {% block body %}
+{% include 'partials/_navbar.html.twig' %}
 <section class="py-5">
     <div class="container">
         <h1 class="mb-4"><i class="bi bi-newspaper"></i> Le blog de l'association</h1>

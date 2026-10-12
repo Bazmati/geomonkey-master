@@ -8,7 +8,8 @@ use App\Entity\User;
 use App\Enum\ImageVisibility;
 use App\Form\BlogPostType;
 use App\Repository\BlogPostRepository;
-use App\Repository\GalleryImageRepository;
+use App\Message\PublishBlogPostMessage;
+use Symfony\Component\Messenger\MessageBusInterface;
 use App\Service\ImageManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -24,6 +25,7 @@ class BlogPostController extends AbstractController
     public function __construct(
         private EntityManagerInterface $em,
         private ImageManager $imageManager,
+        private MessageBusInterface $bus,
     ) {}
 
     #[Route('/', name: 'index', methods: ['GET'])]
@@ -83,9 +85,13 @@ class BlogPostController extends AbstractController
                 $post->publish();
                 $this->addFlash('success', 'Article mis en ligne : il est désormais visible publiquement.');
 
-                // TODO (étape réseaux sociaux) : dispatch d'un message Messenger
-                // SocialPublishMessage($post->getId()) pour diffusion asynchrone
-                // sur les réseaux activés dans Paramètres → Réseaux sociaux.
+                // Publication sociale asynchrone sur les réseaux configurés
+                $this->bus->dispatch(new PublishBlogPostMessage(
+                    $post->getId(),
+                    $request->getSchemeAndHttpHost()   // https://www.geomonkey.fr
+                ));
+
+                $this->em->flush();
             }
 
             $this->em->flush();

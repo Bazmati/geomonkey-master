@@ -29,14 +29,13 @@ class BlogController extends AbstractController
     public function show(
         #[MapEntity(mapping: ['slug' => 'slug'])] BlogPost $post
     ): Response {
-        // Double barrière : MapEntity garantit l'existence, ce contrôle
-        // garantit la publication. Un brouillon = 404, jamais servi.
         if (!$post->isPublished()) {
             throw $this->createNotFoundException();
         }
 
         return $this->render('front/blog/show.html.twig', [
             'post' => $post,
+            'image_url' => $this->imageManager->getUrl($post, 'large'),
         ]);
     }
 }
