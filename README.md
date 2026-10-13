@@ -32,7 +32,7 @@
 ### 🚧 En cours
 
 - 🎨 Refonte du style des pages
-- - 🗂️ **CRUD Projets** avec relation événement ↔ article
+- 🗂️ **CRUD Projets** avec relation événement ↔ article
 
 ### 📋 À faire (V1)
 
