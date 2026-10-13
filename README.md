@@ -72,8 +72,8 @@ Docker
 - PHP 8.4+ avec les extensions usuelles
 - Composer
 - Node.js + npm
-- {-PostgreSQL ou Docker-}
-- {+MySQL ou Docker+}
+- PostgreSQL
+- Docker
 
 ### Avec Docker (recommandé)
 
