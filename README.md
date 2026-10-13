@@ -32,13 +32,10 @@
 ### 🚧 En cours
 
 - 🎨 Refonte du style des pages
-- 📝 CRUD Présentation (l'entité `PresentationPage` est déjà en place)
-- 🖼️ Sélecteur d'images pour la présentation
+- - 🗂️ **CRUD Projets** avec relation événement ↔ article
 
 ### 📋 À faire (V1)
 
-- 📰 **Blog** (l'entité `BlogPost` existe déjà, reste le CRUD et les pages publiques)
-- 🗂️ **CRUD Projets** avec relation événement ↔ article
 - 📈 SEO : métadonnées, sitemap, balisage
 - 📱 Style responsive
 - 📆 **FullCalendar** pour l'affichage des événements
