@@ -60,7 +60,7 @@ Docker
 - **Backend** : PHP 8.4, Symfony 8, Doctrine ORM 3, Doctrine Migrations
 - **Frontend** : Twig, Bootstrap 5.3, Stimulus, Turbo (Symfony UX)
 - {-**Base de données** : PostgreSQL-}
-- {+**Base de données** : MySQL / MariaDB+}
+- {+**Base de données** : PostgreSQL}
 - **Images** : Intervention Image (redimensionnement + conversion WebP)
 - **Paiements** : Stripe (adhésions en ligne, webhook dédié)
 - **Tests** : PHPUnit
