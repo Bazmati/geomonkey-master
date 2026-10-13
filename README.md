@@ -25,6 +25,8 @@
 | 🔐 Sécurité        | Formulaires sécurisés, validation des données, contrôle d'accès |
 | ⚖️ RGPD            | Consentement, données personnelles maîtrisées                   |
 | 📜 Pages légales   | Conditions générales d'adhésion, politique de confidentialité   |
+| 📰 Blog            | CRUD BlogPost + pages publiques                                 |
+| 📝 Présentation    | CRUD Présentation (entité `PresentationPage`)                   |
 
 
 ### 🚧 En cours
