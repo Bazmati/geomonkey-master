@@ -1,11 +1,11 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}Politique de Confidentialité - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
+    
+    {{ breadcrumb() }}
 
     <div class="container py-5">
         <div class="row justify-content-center">

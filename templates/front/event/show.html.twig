@@ -19,13 +19,7 @@
 {% include 'partials/_navbar.html.twig' %}
 <article class="py-5">
     <div class="container" style="max-width: 800px;">
-        <nav aria-label="Fil d'Ariane">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
-                <li class="breadcrumb-item"><a href="{{ path('app_event_index') }}">Événements</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
-            </ol>
-        </nav>
+        {{ breadcrumb() }}
 
         <h1 class="mb-3">{{ event.title }}</h1>
 
@@ -66,7 +60,7 @@
         <div class="card-body">
             <h3 class="h6 mb-2"><i class="bi bi-newspaper"></i> Articles liés</h3>
             <ul class="list-unstyled mb-0">
-                {% for post in event.blogPosts if post.isPublished %}
+                {% for post in event.blogPosts|filter(post => post.isPublished)%}
                     <li><i class="bi bi-file-text"></i>
                         <a href="{{ path('app_blog_show', {'slug': post.slug}) }}">{{ post.title }}</a></li>
                 {% endfor %}

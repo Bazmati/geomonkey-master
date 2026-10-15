@@ -1,13 +1,14 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}Présentation - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
     <div class="container py-5">
+
+        {{ breadcrumb() }}
+        
         <h1 class="text-warning mb-4"><i class="bi bi-info-circle me-2"></i>Présentation de GéoMonkey</h1>
 
         {% if pages is empty %}

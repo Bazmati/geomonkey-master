@@ -105,8 +105,10 @@ class ContentExtension extends AbstractExtension
      *
      * @param \App\Entity\BlogImage[] $images
      */
-    public function formatContentWithImages(?string $raw, array $images = []): string
+    public function formatContentWithImages(?string $raw, iterable $images = []): string
     {
+        $images = $images instanceof \Traversable ? iterator_to_array($images) : (array) $images;
+
         if ($images === []) {
             return $this->formatContent($raw);
         }

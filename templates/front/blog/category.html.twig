@@ -1,7 +1,5 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}Articles — {{ category.name }} — {{ parent() }}{% endblock %}
 {% block meta %}
     <meta name="description" content="Tous les articles de l'association GéoMonkey classés dans la catégorie « {{ category.name }} ».">

@@ -1,6 +1,5 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
 
 {% block title %}Événements — {{ parent() }}{% endblock %}
 {% block meta %}
@@ -11,12 +10,8 @@
 {% include 'partials/_navbar.html.twig' %}
 <section class="py-5 bg-surface">
     <div class="container">
-        <nav aria-label="Fil d'Ariane">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
-                <li class="breadcrumb-item active" aria-current="page">Événements</li>
-            </ol>
-        </nav>
+       
+        {{ breadcrumb() }}
 
         <h1 class="mb-4"><i class="bi bi-calendar-event"></i> Nos événements</h1>
 

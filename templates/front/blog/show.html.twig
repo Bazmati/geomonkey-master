@@ -1,7 +1,5 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}{{ post.title }} — {{ parent() }}{% endblock %}
 {% block meta %}
     <meta name="description" content="{{ post.metaDescription }}">
@@ -18,15 +16,9 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
+{{ breadcrumb() }}
 <article class="py-5">
     <div class="container" style="max-width: 800px;">
-        <nav aria-label="Fil d'Ariane">
-            <ol class="breadcrumb">
-                <li class="breadcrumb-item"><a href="{{ path('app_home') }}">Accueil</a></li>
-                <li class="breadcrumb-item"><a href="{{ path('app_blog_index') }}">Blog</a></li>
-                <li class="breadcrumb-item active" aria-current="page">{{ post.title }}</li>
-            </ol>
-        </nav>
 
         <p class="mb-2">
             {% if post.category %}

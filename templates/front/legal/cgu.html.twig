@@ -1,12 +1,12 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}Conditions Générales d'Adhésion - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
+    {{ breadcrumb() }}
+    
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">

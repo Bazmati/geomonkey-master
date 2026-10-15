@@ -1,26 +1,11 @@
-{#
-    Usage :
-    {% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-    {{ breadcrumb_macros.breadcrumb([
-        ('Accueil', path('app_home')),
-        ('Événements', path('app_event_index')),
-        (event.title, null),
-    ]) }}
-    Dernier élément = page courante (sans lien, aria-current).
-    URL null ⇒ élément non cliquable.
-#}
-{% macro breadcrumb(items) %}
-    <nav aria-label="Fil d'Ariane" class="mb-3">
-        <ol class="breadcrumb mb-0">
-            {% for item in items %}
-                {% set label = item[0] %}
-                {% set url = item[1] %}
-                {% if url %}
-                    <li class="breadcrumb-item"><a href="{{ url }}">{{ label }}</a></li>
-                {% else %}
-                    <li class="breadcrumb-item active" aria-current="page">{{ label }}</li>
-                {% endif %}
-            {% endfor %}
-        </ol>
-    </nav>
-{% endmacro %}
+<nav aria-label="Fil d'Ariane" class="mb-3">
+    <ol class="breadcrumb mb-0">
+        {% for item in items %}
+            {% if item.url and not loop.last %}
+                <li class="breadcrumb-item"><a href="{{ item.url }}">{{ item.label }}</a></li>
+            {% else %}
+                <li class="breadcrumb-item active" aria-current="page">{{ item.label }}</li>
+            {% endif %}
+        {% endfor %}
+    </ol>
+</nav>
