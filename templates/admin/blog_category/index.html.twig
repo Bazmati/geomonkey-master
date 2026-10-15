@@ -1,0 +1,62 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_content %}
+    <div class="p-4">
+        <h1 class="text-success mb-4"><i class="bi bi-folder"></i> Catégories du blog</h1>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ path('admin_blog_category_new') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nouvelle catégorie
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if categories is empty %}
+                    <div class="text-center py-4" style="color: #c0c0c0;">
+                        <i class="bi bi-folder-x fs-1"></i>
+                        <p class="mt-2 text-light">Aucune catégorie trouvée</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover table-light">
+                            <thead class="table-dark text-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Slug</th>
+                                    <th>Articles</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                    <tr class="text-light">
+                                        <td>{{ category.id }}</td>
+                                        <td>{{ category.name }}</td>
+                                        <td><code>{{ category.slug }}</code></td>
+                                        <td>{{ category.posts|length }}</td>
+                                        <td>
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ path('admin_blog_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                {% include 'front/partials/_delete_button.html.twig' with {
+                                                    id: category.id,
+                                                    path: path('admin_blog_category_delete', {'id': category.id}),
+                                                    entity_type: 'catégorie',
+                                                    confirm_message: 'Êtes-vous sûr de vouloir supprimer cette catégorie ?',
+                                                    csrf_token: csrf_token('delete' ~ category.id)
+                                                } %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -71,6 +71,9 @@ class Event implements ImageableInterface
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
 
+    #[ORM\ManyToMany(targetEntity: BlogPost::class, mappedBy: 'events')]
+    private Collection $blogPosts;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -325,5 +328,20 @@ class Event implements ImageableInterface
     public function isPubliclyVisible(): bool
     {
         return $this->isPublished && !$this->isMembersOnly;
+    }
+
+    /**
+     * Articles de blog rattachés à cet événement (bilans, annonces…).
+     */
+    public function getBlogPosts(): Collection { return $this->blogPosts; }
+    public function addBlogPost(BlogPost $post): static
+    {
+        if (!$this->blogPosts->contains($post)) { $this->blogPosts->add($post); $post->addEvent($this); }
+        return $this;
+    }
+    public function removeBlogPost(BlogPost $post): static
+    {
+        if ($this->blogPosts->removeElement($post)) { $post->removeEvent($this); }
+        return $this;
     }
 }

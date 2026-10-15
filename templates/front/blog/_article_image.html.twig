@@ -1,0 +1,6 @@
+<figure class="article-figure my-4">
+    {{ image_tag(image, 'large', image.alt, 'img-fluid rounded') }}
+    {% if caption %}
+        <figcaption class="text-muted small text-center mt-2">{{ caption }}</figcaption>
+    {% endif %}
+</figure>

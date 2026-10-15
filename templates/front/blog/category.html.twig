@@ -1,0 +1,24 @@
+{% extends 'front/base.html.twig' %}
+
+{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
+
+{% block title %}Articles — {{ category.name }} — {{ parent() }}{% endblock %}
+{% block meta %}
+    <meta name="description" content="Tous les articles de l'association GéoMonkey classés dans la catégorie « {{ category.name }} ».">
+{% endblock %}
+
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+<section class="py-5">
+    <div class="container">
+        {{ breadcrumb_macros.breadcrumb([
+            ('Accueil', path('app_home')),
+            ('Actualités', path('app_blog_index')),
+            (category.name, null),
+        ]) }}
+
+        <h1 class="mb-4"><i class="bi bi-folder"></i> {{ category.name }}</h1>
+        {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
+    </div>
+</section>
+{% endblock %}

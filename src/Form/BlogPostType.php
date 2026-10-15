@@ -5,6 +5,11 @@ namespace App\Form;
 use App\Entity\BlogPost;
 use App\Entity\GalleryImage;
 use App\Enum\ImageVisibility;
+use App\Entity\BlogCategory;
+use App\Entity\BlogTag;
+use App\Entity\Event;
+use App\Form\BlogImageType;
+use Symfony\Component\Form\Extension\Core\Type\CollectionType;
 use App\Repository\GalleryImageRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
@@ -34,12 +39,71 @@ class BlogPostType extends AbstractType
                     ),
                 ],
             ])
+            ->add('summary', TextareaType::class, [
+                'label' => 'Résumé (meta description)',
+                'required' => false,
+                'attr' => [
+                    'rows' => 3,
+                    'class' => 'form-control',
+                    'data-summary-counter' => 'summaryCounter',
+                    'placeholder' => 'Accroche qui donne envie de cliquer et contient les mots-clés de l\'article. 150 à 160 caractères : c\'est ce que Google affiche dans ses résultats.',
+                ],
+                'help' => 'Idéal : 150 à 160 caractères (minimum 80). C\'est ce texte que Google affiche sous le titre de la page dans ses résultats — il doit résumer l\'article et donner envie de cliquer.',
+                'constraints' => [
+                    new Assert\Length(
+                        min: 80,
+                        max: 160,
+                        minMessage: 'Le résumé doit faire au moins {{ limit }} caractères pour une meta description efficace.',
+                        maxMessage: 'Le résumé ne peut pas dépasser {{ limit }} caractères (limite de troncature Google).'
+                    ),
+                ],
+            ])
             ->add('content', TextareaType::class, [
                 'label' => 'Contenu',
-                'attr' => ['rows' => 15, 'placeholder' => 'Le contenu de l\'article (visible par les visiteurs une fois publié)'],
+                'attr' => [
+                    'rows' => 15,
+                    'placeholder' => "Introduction de l'article...\n\n## Un sous-titre\nTexte du paragraphe...\n\n- élément de liste\n- autre élément\n\n> Une citation éventuelle",
+                ],
+                'help' => 'Laissez une ligne vide entre les paragraphes. ## Titre = sous-titre, ### = sous-sous-titre, "- " = liste à puces, "> " = citation.',
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le contenu est obligatoire.'),
                 ],
+            ])
+                        ->add('category', EntityType::class, [
+                'class' => BlogCategory::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'placeholder' => '— Aucune catégorie —',
+                'label' => 'Catégorie',
+            ])
+            ->add('tags', EntityType::class, [
+                'class' => BlogTag::class,
+                'choice_label' => 'name',
+                'multiple' => true,
+                'expanded' => true,   // cases à cocher : parfait pour < 20 tags
+                'required' => false,
+                'label' => 'Tags',
+                'help' => 'Un article peut avoir plusieurs tags.',
+            ])
+            ->add('events', EntityType::class, [
+                'class' => Event::class,
+                'choice_label' => 'title',
+                'multiple' => true,
+                'expanded' => false,
+                'required' => false,
+                'label' => 'Événements liés',
+                'help' => 'Rattachez cet article à un ou plusieurs événements (annonce, bilan…).',
+            ])
+            ->add('images', CollectionType::class, [
+                'entry_type' => BlogImageType::class,
+                'entry_options' => ['label' => false],
+                'allow_add' => true,
+                'allow_delete' => true,
+                'by_reference' => false,
+                'delete_empty' => true,
+                'required' => false,
+                'label' => 'Images dans l\'article',
+                'help' => 'Choisissez une image de la galerie, sa position (début/milieu/fin) et son ordre.',
             ])
             ->add('galleryImages', EntityType::class, [
                 'class' => GalleryImage::class,

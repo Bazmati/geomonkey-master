@@ -23,7 +23,66 @@
                 </div>
 
                 <div class="col-12">
+                    {{ form_row(form.summary, {'attr': {'class': 'form-control', 'data-summary-counter': 'summaryCounter'}}) }}
+                    <div class="d-flex justify-content-end">
+                        <small id="summaryCounter" class="form-text text-muted"></small>
+                    </div>
+                </div>
+
+                <div class="col-12">
                     {{ form_row(form.content, {'attr': {'class': 'form-control', 'rows': 15}}) }}
+                                        <div class="accordion accordion-flush mt-2" id="formatHelp">
+                        <div class="accordion-item border-0">
+                            <h2 class="accordion-header">
+                                <button class="accordion-button collapsed ps-0 bg-transparent fw-normal text-info"
+                                        type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#formatHelpBody" aria-expanded="false"
+                                        aria-controls="formatHelpBody">
+                                    <i class="bi bi-question-circle me-2"></i>
+                                    Comment mettre en forme mon article ?
+                                </button>
+                            </h2>
+                            <div id="formatHelpBody" class="accordion-collapse collapse"
+                                 data-bs-parent="#formatHelp">
+                                <div class="accordion-body px-0 text-muted small">
+                                    <p class="mb-2">Laissez une <strong>ligne vide</strong> entre chaque bloc pour créer un nouveau paragraphe. Syntaxe disponible :</p>
+                                    <div class="table-responsive">
+                                        <table class="table table-sm table-striped table-light align-middle">
+                                            <thead>
+                                                <tr>
+                                                    <th>Vous écrivez</th>
+                                                    <th>Résultat sur le site</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><code>## Mon sous-titre</code></td>
+                                                    <td><strong>Sous-titre</strong> (titre de section)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>### Ma sous-section</code></td>
+                                                    <td><strong>Sous-section</strong> (niveau inférieur)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>- premier point</code><br><code>- second point</code></td>
+                                                    <td>• premier point<br>• second point (liste à puces)</td>
+                                                </tr>
+                                                <tr>
+                                                    <td><code>&gt; une citation</code></td>
+                                                    <td><em>Citation mise en retrait</em></td>
+                                                </tr>
+                                                <tr>
+                                                    <td>Ligne vide entre deux paragraphes</td>
+                                                    <td>Nouveau paragraphe</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p class="mb-0 fst-italic">💡 Un simple retour à la ligne à l'intérieur d'un bloc reste dans le même paragraphe (pas besoin de <code>&lt;br&gt;</code>).</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 {# Image de couverture : upload #}
@@ -58,6 +117,12 @@
                 </div>
 
                 <div class="col-12">
+                    {{ form_row(form.images) }}
+                    <button type="button" class="btn btn-outline-success btn-sm"
+                            id="add-blog-image"><i class="bi bi-plus-lg"></i> Ajouter une image</button>
+                </div>
+
+                <div class="col-12">
                     <div class="d-flex justify-content-end gap-2">
                         <a href="{{ path('app_admin_blog_index') }}" class="btn btn-secondary">
                             <i class="bi bi-arrow-left"></i> Annuler
@@ -72,4 +137,38 @@
             </div>
         </div>
     </div>
+    {% endblock %}
+    {% block admin_javascripts %}
+    <script>
+        (function () {
+            const collection = document.getElementById('blog_post_images');
+            const addBtn = document.getElementById('add-blog-image');
+            if (!collection || !addBtn) { return; }
+
+            const proto = collection.dataset.prototype;
+            let idx = parseInt(collection.dataset.index || '0', 10);
+
+            addBtn.addEventListener('click', () => {
+                // __name__ est le placeholder de Symfony dans le prototype :
+                // on le remplace par un numéro unique à chaque clic.
+                const html = proto.replace(/__name__/g, idx++);
+                const div = document.createElement('div');
+                div.className = 'border rounded p-3 mb-2 blog-image-item';
+                div.innerHTML = html
+                    + '<button type="button" class="btn btn-outline-danger btn-sm mt-2 blog-image-remove">'
+                    + '<i class="bi bi-trash"></i> Retirer</button>';
+                collection.appendChild(div);
+                div.querySelectorAll('select, input[type="number"], input[type="text"]')
+                    .forEach(el => el.classList.add('form-control', 'form-select', 'mb-1'));
+            });
+
+            // Boutons "Retirer" des images déjà enregistrées (mode édition)
+            collection.addEventListener('click', (e) => {
+                const btn = e.target.closest('.blog-image-remove');
+                if (btn) { btn.closest('.blog-image-item').remove(); }
+            });
+
+            collection.dataset.index = idx;
+        })();
+    </script>
 {% endblock %}

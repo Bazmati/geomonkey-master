@@ -1,12 +1,14 @@
 {% extends 'front/base.html.twig' %}
 
+{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
 
 {% block title %}{{ post.title }} — {{ parent() }}{% endblock %}
 {% block meta %}
+    <meta name="description" content="{{ post.metaDescription }}">
     {# Meta Open Graph : base du partage Facebook / WhatsApp / LinkedIn #}
     <meta property="og:type" content="article">
     <meta property="og:title" content="{{ post.title }}">
-    <meta property="og:description" content="{{ post.excerpt }}">
+    <meta property="og:description" content="{{ post.metaDescription }}">
     <meta property="og:url" content="{{ app.request.uri }}">
     {% if image_url %}
         <meta property="og:image" content="{{ absolute_url(asset(image_url)) }}">
@@ -26,6 +28,17 @@
             </ol>
         </nav>
 
+        <p class="mb-2">
+            {% if post.category %}
+                <a href="{{ path('app_blog_category', {'slug': post.category.slug}) }}"
+                   class="badge bg-success text-decoration-none">{{ post.category.name }}</a>
+            {% endif %}
+            {% for tag in post.tags %}
+                <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
+                   class="badge bg-secondary text-decoration-none">#{{ tag.name }}</a>
+            {% endfor %}
+        </p>
+
         <h1 class="mb-3">{{ post.title }}</h1>
 
         <p class="text-muted">
@@ -41,11 +54,28 @@
             {{ image_tag(post, 'large', 'Illustration de l\'article ' ~ post.title, 'img-fluid rounded mb-4') }}
         {% endif %}
 
-        {# ⚠️ Échappement strict : le contenu est saisi en texte brut.
-           Pas de |raw ici tant qu'on n'a pas d'éditeur + purificateur HTML. #}
+        {# Mise en forme sécurisée (H2/H3, listes, citations) + images positionnées.
+           Le filtre échappe chaque fragment — pas de |raw dangereux. #}
         <div class="article-content">
-            {{ post.content|nl2br }}
+            {{ post.content|content_with_images(post.images|filter(i => i.galleryImage.isPublished)) }}
         </div>
+
+                {% if post.events|length > 0 %}
+            <div class="card bg-light border-0 mt-4">
+                <div class="card-body">
+                    <h3 class="h6 mb-2"><i class="bi bi-calendar-event"></i> Événements liés</h3>
+                    <ul class="list-unstyled mb-0">
+                        {% for event in post.events %}
+                            <li>
+                                <i class="bi bi-calendar"></i>
+                                <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.title }}</a>
+                                <small class="text-muted">— {{ event.startDate|date('d/m/Y') }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+        {% endif %}
 
         {# Boutons de partage social — aucun token requis #}
         {{ include('front/blog/_share_buttons.html.twig', {'post': post}) }}

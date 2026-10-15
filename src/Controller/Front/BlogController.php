@@ -9,6 +9,8 @@ use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\BlogCategoryRepository;
+use App\Repository\BlogTagRepository;
 
 #[Route('/blog', name: 'app_blog_')]
 class BlogController extends AbstractController
@@ -18,10 +20,25 @@ class BlogController extends AbstractController
     ) {}
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(BlogPostRepository $repo): Response
+    public function index(BlogPostRepository $repo, BlogTagRepository $tagRepo): Response
     {
         return $this->render('front/blog/index.html.twig', [
             'posts' => $repo->findPublishedPosts(),
+            'tags' => $tagRepo->findUsedTags(),
+        ]);
+    }
+
+        #[Route('/categorie/{slug}', name: 'category', methods: ['GET'])]
+    public function category(string $slug, BlogCategoryRepository $repo): Response
+    {
+        $category = $repo->findOneBy(['slug' => $slug]);
+        if (!$category) {
+            throw $this->createNotFoundException('Catégorie inconnue.');
+        }
+
+        return $this->render('front/blog/category.html.twig', [
+            'category' => $category,
+            'posts' => $category->getPosts()->filter(static fn ($p) => $p->isPublished()),
         ]);
     }
 

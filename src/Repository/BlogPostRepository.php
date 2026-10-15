@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\BlogPost;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\BlogCategory;
 
 /**
  * @extends ServiceEntityRepository<BlogPost>
@@ -24,6 +25,20 @@ class BlogPostRepository extends ServiceEntityRepository
     public function findRecentPosts(int $limit = 5): array
     {
         return $this->findBy(['isPublished' => true], ['createdAt' => 'DESC'], $limit);
+    }
+
+    /**
+     * Articles publiés d'une catégorie.
+     */
+    public function findPublishedByCategory(BlogCategory $category): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.category = :category')
+            ->andWhere('p.isPublished = true')
+            ->setParameter('category', $category)
+            ->orderBy('p.publishedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
     }
 
     /**

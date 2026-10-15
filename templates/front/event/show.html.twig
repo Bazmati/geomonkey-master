@@ -1,5 +1,7 @@
 {% extends 'front/base.html.twig' %}
 
+{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
+
 {% block title %}{{ event.title }} — {{ parent() }}{% endblock %}
 {% block meta %}
     <meta name="description" content="{{ event.description|striptags|slice(0, 155) }}">
@@ -59,4 +61,17 @@
         {% endif %}
     </div>
 </article>
+{% if event.blogPosts|length > 0 %}
+    <div class="card bg-light border-0 mt-4">
+        <div class="card-body">
+            <h3 class="h6 mb-2"><i class="bi bi-newspaper"></i> Articles liés</h3>
+            <ul class="list-unstyled mb-0">
+                {% for post in event.blogPosts if post.isPublished %}
+                    <li><i class="bi bi-file-text"></i>
+                        <a href="{{ path('app_blog_show', {'slug': post.slug}) }}">{{ post.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+{% endif %}
 {% endblock %}

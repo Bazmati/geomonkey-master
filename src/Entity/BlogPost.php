@@ -40,6 +40,19 @@ class BlogPost implements ImageableInterface
     )]
     private ?string $slug = null;
 
+    /**
+     * Résumé de l'article (150 à 160 caractères) utilisé comme meta
+     * description pour Google et comme accroche dans les listes.
+     */
+    #[ORM\Column(length: 165, nullable: true)]
+    #[Assert\Length(
+        min: 80,
+        max: 160,
+        minMessage: 'Le résumé doit faire au moins {{ limit }} caractères pour une meta description efficace.',
+        maxMessage: 'Le résumé ne peut pas dépasser {{ limit }} caractères (limite de troncature Google).'
+    )]
+    private ?string $summary = null;
+
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: 'Le contenu est obligatoire.')]
     private ?string $content = null;
@@ -81,10 +94,29 @@ class BlogPost implements ImageableInterface
     )]
     private ?File $imageFile = null;
 
+    #[ORM\ManyToOne(targetEntity: BlogCategory::class, inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?BlogCategory $category = null;
+
+    #[ORM\ManyToMany(targetEntity: BlogTag::class, inversedBy: 'posts')]
+    #[ORM\JoinTable(name: 'blog_post_tag')]
+    private Collection $tags;
+
+    #[ORM\OneToMany(targetEntity: BlogImage::class, mappedBy: 'blogPost', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC', 'sortOrder' => 'ASC'])]
+    private Collection $images;
+
+    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'blogPosts')]
+    #[ORM\JoinTable(name: 'blog_post_event')]
+    private Collection $events;
+
     public function __construct()
     {
         $this->galleryImages = new ArrayCollection();
         $this->createdAt = new \DateTimeImmutable();
+        $this->tags = new ArrayCollection();
+        $this->images = new ArrayCollection();
+        $this->events = new ArrayCollection();
     }
 
     // =========================================
@@ -149,6 +181,17 @@ class BlogPost implements ImageableInterface
         return ($lastSpace !== false ? mb_substr($excerpt, 0, $lastSpace) : $excerpt) . '…';
     }
 
+        /**
+     * Texte à utiliser dans la balise meta description :
+     * le résumé rédigé s'il existe, sinon un extrait du contenu.
+     */
+    public function getMetaDescription(): string
+    {
+        $summary = trim($this->summary ?? '');
+
+        return $summary !== '' ? $summary : $this->getExcerpt(155);
+    }
+
     public function __toString(): string
     {
         return $this->title !== null && $this->title !== '' ? $this->title : 'Article sans titre';
@@ -177,6 +220,9 @@ class BlogPost implements ImageableInterface
     public function getSlug(): ?string { return $this->slug; }
     public function setSlug(?string $slug): static { $this->slug = $slug; return $this; }
 
+    public function getSummary(): ?string { return $this->summary; }
+    public function setSummary(?string $summary): static { $this->summary = $summary; return $this; }
+
     public function getContent(): ?string { return $this->content; }
     public function setContent(string $content): static { $this->content = $content; return $this; }
 
@@ -185,6 +231,70 @@ class BlogPost implements ImageableInterface
 
     public function getUpdatedAt(): ?\DateTimeImmutable { return $this->updatedAt; }
     public function setUpdatedAt(?\DateTimeImmutable $updatedAt): static { $this->updatedAt = $updatedAt; return $this; }
+
+        // Catégorie
+    public function getCategory(): ?BlogCategory { return $this->category; }
+    public function setCategory(?BlogCategory $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    // Tags
+    public function getTags(): Collection { return $this->tags; }
+    public function addTag(BlogTag $tag): static
+    {
+        if (!$this->tags->contains($tag)) { $this->tags->add($tag); }
+        return $this;
+    }
+    public function removeTag(BlogTag $tag): static
+    {
+        $this->tags->removeElement($tag);
+        return $this;
+    }
+
+    // Images positionnées
+    public function getImages(): Collection { return $this->images; }
+    public function addImage(BlogImage $image): static
+    {
+        if (!$this->images->contains($image)) {
+            $image->setBlogPost($this);
+            $this->images->add($image);
+        }
+        return $this;
+    }
+    public function removeImage(BlogImage $image): static
+    {
+        if ($this->images->removeElement($image)) {
+            if ($image->getBlogPost() === $this) { $image->setBlogPost(null); }
+        }
+        return $this;
+    }
+
+    /**
+     * Images d'une position donnée, dans l'ordre.
+     * @return BlogImage[]
+     */
+    public function getImagesByPosition(\App\Enum\ImagePosition $position): array
+    {
+        return array_values(array_filter(
+            $this->images->toArray(),
+            static fn (BlogImage $i) => $i->getPosition() === $position
+        ));
+    }
+
+    // Événements liés
+    public function getEvents(): Collection { return $this->events; }
+    public function addEvent(Event $event): static
+    {
+        if (!$this->events->contains($event)) { $this->events->add($event); }
+        return $this;
+    }
+    public function removeEvent(Event $event): static
+    {
+        $this->events->removeElement($event);
+        return $this;
+    }
 
     public function isPublished(): bool { return $this->isPublished; }
 
