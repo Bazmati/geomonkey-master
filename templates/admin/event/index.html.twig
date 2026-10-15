@@ -29,6 +29,7 @@
                                     <th>Date de fin</th>
                                     <th>Lieu</th>
                                     <th>Publié</th>
+                                    <th>Visibilité</th>
                                     <th>Image</th>
                                     <th>Actions</th>
                                 </tr>
@@ -46,6 +47,17 @@
                                             <span class="badge bg-{{ event.isPublished ? 'success' : 'secondary' }} text-{{ event.isPublished ? 'light' : 'dark' }}">
                                                 {{ event.isPublished ? 'Oui' : 'Non' }}
                                             </span>
+                                        </td>
+                                        <td>
+                                            {% if event.isMembersOnly %}
+                                                <span class="badge bg-warning text-dark" title="Visible uniquement par les membres actifs">
+                                                    <i class="bi bi-people"></i> Membres
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-info text-dark" title="Visible par tous">
+                                                    <i class="bi bi-globe"></i> Public
+                                                </span>
+                                            {% endif %}
                                         </td>
                                         <td>{{ event.image }}</td>
                                         <td>

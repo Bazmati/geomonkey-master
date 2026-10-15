@@ -43,12 +43,10 @@ class Event implements ImageableInterface
 
     #[ORM\Column]
     #[Assert\NotNull(message: "La date de début est obligatoire")]
-    // #[Assert\DateTime(message: "Format de date invalide")]
     private ?\DateTime $startDate = null;
 
     #[ORM\Column]
     #[Assert\NotNull(message: "La date de fin est obligatoire")]
-    // #[Assert\DateTime(message: "Format de date invalide")]
     #[Assert\Expression(
         "this.getStartDate() === null or this.getEndDate() >= this.getStartDate()",
         message: "La date de fin doit être postérieure à la date de début"
@@ -62,6 +60,13 @@ class Event implements ImageableInterface
 
     #[ORM\Column]
     private ?bool $isPublished = false;
+
+    /**
+     * Si true, l'événement n'est visible sur le site que par les
+     * membres actifs de l'association (adhésion valide et non expirée).
+     */
+    #[ORM\Column]
+    private ?bool $isMembersOnly = false;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
@@ -139,6 +144,18 @@ class Event implements ImageableInterface
     public function setIsPublished(bool $isPublished): static
     {
         $this->isPublished = $isPublished;
+
+        return $this;
+    }
+
+    public function isMembersOnly(): ?bool
+    {
+        return $this->isMembersOnly;
+    }
+
+    public function setIsMembersOnly(bool $isMembersOnly): static
+    {
+        $this->isMembersOnly = $isMembersOnly;
 
         return $this;
     }
@@ -229,23 +246,20 @@ class Event implements ImageableInterface
 
     /**
      * Ajoute un participant à cet événement.
-     * 
+     *
      * Comportement :
      * - Si l'utilisateur est déjà participant, retourne le participant existant
      * - Si un rôle est fourni ($role !== null), met à jour le rôle existant
      * - Si aucun rôle n'est fourni, préserve le rôle existant (pas de rétrogradation)
      * - Sinon, crée un nouveau participant avec rôle = Participant (par défaut)
-     * 
+     *
      * La contrainte d'unicité (event_id, user_id) en base garantit qu'il n'y a jamais
      * de doublons, mais cette vérification applicative évite un flush inutile.
      */
     public function addParticipant(User $user, ?ParticipantRole $role = null): EventParticipant
     {
-        // Vérifier si l'utilisateur est déjà participant à cet événement
         foreach ($this->participants as $existing) {
             if ($existing->getUser() === $user) {
-                // Si un rôle est fourni, mettre à jour le rôle existant
-                // Sinon, conserver le rôle actuel (pas de modification silencieuse)
                 if ($role !== null) {
                     $existing->setRole($role);
                 }
@@ -253,7 +267,6 @@ class Event implements ImageableInterface
             }
         }
 
-        // Créer un nouveau participant
         $participant = new EventParticipant();
         $participant->setEvent($this);
         $participant->setUser($user);
@@ -303,5 +316,14 @@ class Event implements ImageableInterface
         return array_reduce($this->participants->toArray(), function($carry, $participant) {
             return $carry + ($participant->hasAttended() ? 1 : 0);
         }, 0);
+    }
+
+    /**
+     * L'événement est-il visible par le public ?
+     * (un événement non publié n'est jamais visible)
+     */
+    public function isPubliclyVisible(): bool
+    {
+        return $this->isPublished && !$this->isMembersOnly;
     }
 }

@@ -39,6 +39,12 @@ class EventType extends AbstractType
             ->add('isPublished', CheckboxType::class, [
                 'required' => false,
             ])
+            ->add('isMembersOnly', CheckboxType::class, [
+                'required' => false,
+                'label' => 'Réservé aux membres actifs',
+                'help' => 'Si coché, cet événement ne sera visible sur le site que par les membres ayant une adhésion active et non expirée.',
+                'attr' => ['class' => 'form-check-input'],
+            ])
             ->add('galleryImages', EntityType::class, [
                 'class' => GalleryImage::class,
                 'choice_label' => 'title',
@@ -63,7 +69,7 @@ class EventType extends AbstractType
             ->add('newImageAlt', TextType::class, [
                 'mapped' => false, 'required' => false,
                 'label' => 'Description alternative (alt)',
-                'attr' => ['placeholder' => 'Décrivez ce que montre l\'image'],
+                'attr' => ['placeholder' => "Décrivez ce que montre l'image"],
             ])
             ->add('newImageConsent', CheckboxType::class, [
                 'mapped' => false, 'required' => false,
@@ -71,25 +77,25 @@ class EventType extends AbstractType
                 'attr' => ['class' => 'form-check-input'],
             ]);
 
-            // Validation croisée : fichier soumis ⇒ alt + consentement obligatoires
-            $builder->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
-                $form = $event->getForm();
-                if ($form->get('newImageFile')->getData() === null) {
-                    return;
-                }
+        // Validation croisée : fichier soumis ⇒ alt + consentement obligatoires
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function ($event) {
+            $form = $event->getForm();
+            if ($form->get('newImageFile')->getData() === null) {
+                return;
+            }
 
-                if (trim((string) $form->get('newImageAlt')->getData()) === '') {
-                    $form->get('newImageAlt')->addError(new FormError(
-                        'La description alternative (alt) est obligatoire pour l\'accessibilité.'
-                    ));
-                }
+            if (trim((string) $form->get('newImageAlt')->getData()) === '') {
+                $form->get('newImageAlt')->addError(new FormError(
+                    "La description alternative (alt) est obligatoire pour l'accessibilité."
+                ));
+            }
 
-                if (!$form->get('newImageConsent')->getData()) {
-                    $form->get('newImageConsent')->addError(new FormError(
-                        'Le consentement RGPD est obligatoire pour une image publique.'
-                    ));
-                }
-            });
+            if (!$form->get('newImageConsent')->getData()) {
+                $form->get('newImageConsent')->addError(new FormError(
+                    'Le consentement RGPD est obligatoire pour une image publique.'
+                ));
+            }
+        });
     }
 
     public function configureOptions(OptionsResolver $resolver): void
