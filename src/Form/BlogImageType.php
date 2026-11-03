@@ -13,6 +13,7 @@ use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
 
 class BlogImageType extends AbstractType
 {
@@ -28,11 +29,11 @@ class BlogImageType extends AbstractType
                     ->orderBy('g.title', 'ASC'),
                 'help' => 'Seules les images publiées de la galerie sont proposées.',
             ])
-            ->add('position', ChoiceType::class, [
+            ->add('position', EnumType::class, [
                 'class' => ImagePosition::class,
-                'choice_label' => fn (?ImagePosition $p) => $p?->label(),
                 'label' => 'Position',
                 'help' => 'Début, milieu ou fin de l\'article.',
+                'choice_label' => fn (?ImagePosition $p) => $p?->label(),
             ])
             ->add('sortOrder', IntegerType::class, [
                 'label' => 'Ordre',

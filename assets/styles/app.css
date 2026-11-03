@@ -204,3 +204,101 @@ input[type="datetime-local"] {
 
 /* Tags cliquables */
 a.badge:hover { filter: brightness(1.15); }
+
+/* ============================================
+   BACKOFFICE — Layout pro : sidebar fixe, footer sticky
+   ============================================ */
+
+.admin-shell {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    min-height: 100vh;
+}
+
+/* --- Sidebar : fixe, hauteur viewport, ne scrolle JAMAIS avec la page.
+       Si le menu déborde (petit écran), c'est le menu seul qui défile en interne. --- */
+.admin-sidebar {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;           /* filet de sécurité, invisible sur desktop */
+    background: var(--gm-surface);
+    border-right: 1px solid #3a3a38;
+    scrollbar-width: thin;      /* Firefox */
+    overscroll-behavior: contain;
+}
+.admin-sidebar::-webkit-scrollbar { width: 6px; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+
+/* --- Zone principale : c'est ELLE qui scrolle, la sidebar reste immobile --- */
+.admin-main {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.admin-content {
+    flex: 1 1 auto;            /* pousse le footer vers le bas quand le contenu est court */
+    padding: 0;
+}
+
+/* --- Footer : toujours visible en bas du viewport --- */
+.admin-footer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.5rem;
+    background: var(--gm-surface);
+    border-top: 1px solid #3a3a38;
+    color: #adb5bd;
+    font-size: 0.875rem;
+    position: sticky;
+    bottom: 0;
+    z-index: 10;
+}
+
+/* --- Sidebar interne : menu structuré en sections --- */
+.admin-nav { display: flex; flex-direction: column; height: 100%; padding: 1rem 0.75rem; }
+
+.admin-nav .nav-section {
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #6c757d;
+    padding: 0.75rem 0.75rem 0.35rem;
+    margin-bottom: 0.15rem;
+}
+
+.admin-nav .nav-link {
+    color: var(--gm-text);
+    border-radius: 0.5rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    transition: background-color 0.15s ease;
+}
+.admin-nav .nav-link i { font-size: 1rem; width: 1.25rem; text-align: center; }
+.admin-nav .nav-link:hover { background: rgba(224, 192, 32, 0.15); color: #fff; }
+.admin-nav .nav-link.active {
+    background: var(--gm-yellow);
+    color: #1c1c1a;
+    font-weight: 600;
+}
+
+/* --- Responsive : < lg, la sidebar devient un drawer coulissant --- */
+@media (max-width: 991.98px) {
+    .admin-shell { grid-template-columns: 1fr; }
+    .admin-sidebar {
+        position: fixed;
+        inset: 0 auto 0 0;
+        width: 260px;
+        transform: translateX(-100%);
+        transition: transform 0.25s ease;
+        z-index: 1040;
+        box-shadow: 0 0 2rem rgba(0, 0, 0, .5);
+    }
+    .admin-shell.sidebar-open .admin-sidebar { transform: translateX(0); }
+    .admin-main { min-height: 100vh; }
+}

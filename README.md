@@ -120,6 +120,7 @@ Les retours sont bienvenus : ouvrez une issue ou une pull request. Toute suggest
 **Basile Malin** — Concepteur-Développeur d'Applications (ENI, 2022-2024)
 
 - 💼 CV : [bazmati.github.io/basile-malin-cv-2026](https://bazmati.github.io/basile-malin-cv-2026/)
+- ✍️ Blog : [basile-malin.fr](https://basile-malin.fr)
 - 🐙 GitHub : [github.com/Bazmati](https://github.com/Bazmati)
 
 ## 📄 Licence
