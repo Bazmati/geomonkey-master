@@ -1,19 +1,23 @@
 {% extends 'front/base.html.twig' %}
 
 {% block body %}
-    <div class="container-fluid">
-        <div class="row">
-            {# Sidebar (menu latéral) #}
-            <div class="col-md-3 col-lg-2 bg-dark vh-100 p-0">
-                {% include 'admin/partials/_sidebar.html.twig' %}
-            </div>
+<div class="admin-shell">
+    <button class="btn btn-outline-warning d-lg-none mb-3" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')">
+        <i class="bi bi-list"></i>
+    </button>
+    {# Sidebar : fixe, ne bouge jamais #}
+    <aside class="admin-sidebar">
+        {% include 'admin/partials/_sidebar.html.twig' %}
+    </aside>
 
-            {# Contenu principal #}
-            <div class="col-md-9 col-lg-10">
-                {% block admin_content %}{% endblock %}
-            </div>
+    {# Zone principale : scrolle SEULE, footer toujours visible en bas #}
+    <div class="admin-main">
+        <div class="admin-content">
+            {% block admin_content %}{% endblock %}
         </div>
+        {% include 'admin/partials/_footer.html.twig' %}
     </div>
+</div>
 {% endblock %}
 
 
