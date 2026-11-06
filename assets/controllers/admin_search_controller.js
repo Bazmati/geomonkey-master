@@ -1,7 +1,17 @@
 // assets/controllers/admin_search_controller.js
+// NOTE : bootstrap.bundle.min.js est un bundle UMD, pas ESM — il n'a AUCUN export nommé.
+// Son import comme module casserait le chargement de CE contrôleur (Stimulus ne l'enregistre pas).
+// Le bundle est déjà chargé en global par app.js : on récupère Modal via window.bootstrap.
 import { Controller } from '@hotwired/stimulus';
-// assets/vendor/ est généré par importmap:require (gitignoré, présent en local)
-import { Modal } from '../vendor/bootstrap/js/bootstrap.bundle.min.js';
+
+const bootstrapModal = (element) => {
+    const M = window.bootstrap?.Modal ?? window.Bootstrap?.Modal;
+    if (!M) {
+        console.error('[admin-search] Bootstrap Modal indisponible : bootstrap.bundle.min.js est-il importé dans app.js ?');
+        return null;
+    }
+    return M.getOrCreateInstance(element);
+};
 
 export default class extends Controller {
     static targets = ['input', 'results'];
@@ -33,7 +43,7 @@ export default class extends Controller {
     }
 
     open() {
-        Modal.getOrCreateInstance(this.element).show();
+        bootstrapModal(this.element)?.show();
     }
 
     search() {
@@ -71,12 +81,13 @@ export default class extends Controller {
 
     _render(groups) {
         this.activeIndex = -1;
-        const fragment = document.createDocumentFragment();
 
         if (groups.length === 0) {
             this._hint('Aucun résultat');
             return;
         }
+
+        const fragment = document.createDocumentFragment();
 
         for (const group of groups) {
             const header = document.createElement('div');
@@ -138,7 +149,7 @@ export default class extends Controller {
         }
         event.preventDefault();
         const item = this.items[Math.max(this.activeIndex, 0)];
-        Modal.getOrCreateInstance(this.element).hide();
+        bootstrapModal(this.element)?.hide();
         window.location.assign(item.getAttribute('href'));
     }
 
