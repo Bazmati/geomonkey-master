@@ -1,7 +1,7 @@
-<nav class="navbar navbar-dark bg-gm-dark flex-column p-3 h-100">
-    <a class="navbar-brand mb-4" href="{{ path('app_admin_dashboard') }}">
-        <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" width="40" class="img-fluid d-inline-block align-top">
-        <span class="ms-2 fw-bold text-gm-warning">Admin Panel</span>
+<div class="admin-nav">
+    <a class="d-flex align-items-center mb-4 text-decoration-none" href="{{ path('app_admin_dashboard') }}">
+        <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" width="40" class="img-fluid me-2">
+        <span class="fw-bold text-gm-warning">Admin Panel</span>
     </a>
     
     {# Menu dynamique - route courante #}
@@ -25,22 +25,16 @@
     ] %}
     {# Fin du menu - les entrées avec route='#' sont des placeholders pour modules futurs #}
     
-    <ul class="nav nav-pills flex-column">
-        {% for item in menu %}
-            {% if item.route != '#' %}
-                <li class="nav-item">
-                    <a class="nav-link {{ route starts with item.match ? 'active bg-gm-warning text-gm-bg' : 'text-gm-warning' }}" 
-                       href="{{ path(item.route) }}">
-                        <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
-                    </a>
-                </li>
-            {% else %}
-                <li class="nav-item">
-                    <a class="nav-link text-gm-muted disabled" href="#">
-                        <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
-                    </a>
-                </li>
-            {% endif %}
-        {% endfor %}
-    </ul>
-</nav>
+    {% for item in menu %}
+        {% if item.route != '#' %}
+            <a class="nav-link {{ route starts with item.match ? 'active' : '' }}" 
+               href="{{ path(item.route) }}">
+                <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+            </a>
+        {% else %}
+            <a class="nav-link disabled" href="#">
+                <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+            </a>
+        {% endif %}
+    {% endfor %}
+</div>

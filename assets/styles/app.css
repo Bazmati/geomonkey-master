@@ -289,7 +289,7 @@ a.badge:hover { filter: brightness(1.15); }
 }
 
 .admin-nav .nav-link {
-    color: var(--gm-text);
+    color: var(--gm-warning);
     border-radius: 0.5rem;
     padding: 0.5rem 0.75rem;
     margin-bottom: 2px;
@@ -304,6 +304,10 @@ a.badge:hover { filter: brightness(1.15); }
     background: var(--gm-yellow);
     color: var(--gm-bg);
     font-weight: 600;
+}
+.admin-nav .nav-link.disabled {
+    color: var(--gm-muted);
+    opacity: 0.6;
 }
 
 /* --- Responsive : < lg, la sidebar devient un drawer coulissant --- */
@@ -404,6 +408,8 @@ a.badge:hover { filter: brightness(1.15); }
 .admin-topbar {
     background: var(--gm-surface);
     border-bottom: 1px solid var(--gm-gray-900);
+    position: sticky;
+    top: 0;
     z-index: 1030;
 }
 
