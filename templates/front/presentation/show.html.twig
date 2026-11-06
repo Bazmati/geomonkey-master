@@ -19,12 +19,11 @@
                         <div class="text-center mb-4">
                             <img src="{{ asset(image_url) }}"
                                 alt="{{ page.galleryImage.alt }}"
-                                class="img-fluid rounded"
-                                style="max-height: 400px;">
+                                class="img-fluid rounded max-h-400">
                         </div>
                     {% endif %}
 
-                        <p class="text-white" style="white-space: pre-line;">{{ page.content }}</p>
+                        <p class="text-white pre-line">{{ page.content }}</p>
 
                         <a href="{{ path('app_presentation_index') }}" class="btn btn-outline-warning mt-3">
                             <i class="bi bi-arrow-left me-1"></i> Retour à la présentation

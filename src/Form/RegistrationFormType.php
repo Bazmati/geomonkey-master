@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Form\Extension\Core\Type\HiddenType;
 
 class RegistrationFormType extends AbstractType
 {
@@ -48,7 +49,8 @@ class RegistrationFormType extends AbstractType
                 'attr' => ['class' => 'form-control', 'autocomplete' => 'new-password'],
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le mot de passe est obligatoire'),
-                    new Assert\Length(min: 8, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères'),
+                    new Assert\PasswordStrength(minScore: 4, message: 'Le mot de passe doit être plus robuste (au moins 12 caractères avec majuscules, minuscules, chiffres et symboles)'),
+                    new Assert\Length(min: 12, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères'),
                 ],
             ])
             ->add('requestedFunction', ChoiceType::class, [
@@ -81,6 +83,14 @@ class RegistrationFormType extends AbstractType
                 'label_html' => true,
                 'required' => false,
                 'attr' => ['class' => 'form-check-input'],
+            ])
+            // Champ honeypot anti-bot (ne doit pas être rempli)
+            ->add('honeypot', HiddenType::class, [
+                'mapped' => false,
+                'constraints' => [
+                    new Assert\Blank(message: 'Désolé, il semble que tu sois un bot.')
+                ],
+                'attr' => ['style' => 'display: none;'],
             ]);
     }
 

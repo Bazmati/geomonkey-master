@@ -273,4 +273,84 @@ class MailService
     {
         $this->assuranceDetails = $details;
     }
+
+    /**
+     * M6: Email de vérification d'email
+     * Envoi d'un lien pour valider son adresse email
+     */
+    public function sendEmailVerification(User $user, string $verificationUrl): void
+    {
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($user->getEmail())
+            ->subject('Vérifie ton adresse email pour GéoMonkey')
+            ->html($this->renderEmailVerificationEmail($user, $verificationUrl));
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * M7: Email de reset de mot de passe
+     * Envoi d'un lien pour réinitialiser son mot de passe
+     */
+    public function sendPasswordReset(User $user, string $resetUrl): void
+    {
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($user->getEmail())
+            ->subject('Réinitialisation de ton mot de passe GéoMonkey')
+            ->html($this->renderPasswordResetEmail($user, $resetUrl));
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * Rend le template pour la vérification d'email
+     */
+    private function renderEmailVerificationEmail(User $user, string $verificationUrl): string
+    {
+        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
+        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
+        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
+        $html .= '<h3>✉️ Vérifie ton adresse email</h3>';
+        $html .= '</div>';
+        $html .= '<p>Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
+        $html .= '<p>Merci pour ton inscription sur GéoMonkey !</p>';
+        $html .= '<p>Pour finaliser ton inscription, clique sur le lien ci-dessous pour vérifier ton adresse email :</p>';
+        $html .= '<div style="text-align: center; margin: 20px 0;">';
+        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">', $verificationUrl);
+        $html .= 'Vérifier mon email';
+        $html .= '</a>';
+        $html .= '</div>';
+        $html .= '<p><small>Ce lien expirera dans 24 heures. Si tu n\'as pas demandé cette inscription, ignore cet email.</small></p>';
+        $html .= '<p style="margin-top: 20px; color: #666;">Cordialement,<br>L\'équipe GéoMonkey</p>';
+        $html .= '</div></body></html>';
+        
+        return $html;
+    }
+
+    /**
+     * Rend le template pour le reset de mot de passe
+     */
+    private function renderPasswordResetEmail(User $user, string $resetUrl): string
+    {
+        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
+        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
+        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
+        $html .= '<h3>🔐 Réinitialisation de mot de passe</h3>';
+        $html .= '</div>';
+        $html .= '<p>Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
+        $html .= '<p>Tu as demandé une réinitialisation de ton mot de passe GéoMonkey.</p>';
+        $html .= '<p>Clique sur le lien ci-dessous pour créer un nouveau mot de passe :</p>';
+        $html .= '<div style="text-align: center; margin: 20px 0;">';
+        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #28a745; color: #fff; text-decoration: none; border-radius: 4px;">', $resetUrl);
+        $html .= 'Réinitialiser mon mot de passe';
+        $html .= '</a>';
+        $html .= '</div>';
+        $html .= '<p><small>Ce lien expirera dans 1 heure. Si tu n\'as pas demandé cette réinitialisation, ignore cet email.</small></p>';
+        $html .= '<p style="margin-top: 20px; color: #666;">Cordialement,<br>L\'équipe GéoMonkey</p>';
+        $html .= '</div></body></html>';
+        
+        return $html;
+    }
 }

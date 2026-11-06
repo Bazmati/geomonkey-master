@@ -1,0 +1,45 @@
+{# templates/front/membership/check_email.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block title %}Vérifie ton adresse email - GéoMonkey{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    <h2 class="card-title mb-0">✉️ Vérifie ton adresse email</h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <i class="fas fa-envelope fa-4x text-primary mb-3"></i>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <h4>Un email de vérification t'a été envoyé !</h4>
+                        <p class="mb-0">
+                            Nous avons envoyé un lien de vérification à ton adresse email. 
+                            Clique sur le lien dans l'email pour activer ton compte.
+                        </p>
+                    </div>
+                    
+                    <div class="alert alert-warning">
+                        <p class="mb-0">
+                            <strong>Note :</strong> Si tu ne vois pas l'email, vérifie tes spams ou attends quelques minutes.
+                        </p>
+                    </div>
+                    
+                    <div class="mt-4">
+                        <p class="mb-0">
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-arrow-left me-2"></i> Retour à la connexion
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

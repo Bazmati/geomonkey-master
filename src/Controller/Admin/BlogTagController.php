@@ -20,7 +20,7 @@ class BlogTagController extends AbstractController
     public function index(BlogTagRepository $repo): Response
     {
         return $this->render('admin/blog_tag/index.html.twig', [
-            'categories' => $repo->findAll(),
+            'tags' => $repo->findAll(),
         ]);
     }
 
@@ -39,7 +39,7 @@ class BlogTagController extends AbstractController
         }
 
         return $this->render('admin/blog_tag/form.html.twig', [
-            'form' => $form, 'category' => $category,
+            'form' => $form, 'tag' => $category,
         ]);
     }
 
@@ -56,7 +56,7 @@ class BlogTagController extends AbstractController
         }
 
         return $this->render('admin/blog_tag/form.html.twig', [
-            'form' => $form, 'category' => $category,
+            'form' => $form, 'tag' => $category,
         ]);
     }
 

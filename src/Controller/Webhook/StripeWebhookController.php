@@ -92,9 +92,12 @@ class StripeWebhookController extends AbstractController
             return new Response(sprintf('User %d not found', $userId), 200);
         }
 
+        // Récupérer le montant du paiement depuis Stripe (en cents)
+        $amountCents = $session->amount_total ?? null;
+        
         // Récupérer ou créer une membership pour cet utilisateur
         // Cette méthode crée aussi la membership et met à jour l'utilisateur
-        $membership = $this->createOrUpdateMembership($user, $session);
+        $membership = $this->createOrUpdateMembership($user, $session, $amountCents);
 
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
@@ -124,8 +127,11 @@ class StripeWebhookController extends AbstractController
             return new Response(sprintf('User %d not found', $userId), 200);
         }
 
+        // Récupérer le montant du paiement depuis Stripe (en cents)
+        $amountCents = $paymentIntent->amount ?? null;
+        
         // Créer ou mettre à jour la membership (similaire à checkout.session.completed)
-        $membership = $this->createOrUpdateMembership($user, $paymentIntent);
+        $membership = $this->createOrUpdateMembership($user, $paymentIntent, $amountCents);
 
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
@@ -143,13 +149,17 @@ class StripeWebhookController extends AbstractController
      * - Si l'utilisateur avait déjà une fonction de bureau (président, trésorier, secrétaire) → conserve sa fonction
      * - Si l'utilisateur était None (visiteur) → passe en membre_actif
      * - La membership est valable 1 an à partir de maintenant
+     * - Le montant est extrait du paiement Stripe (pas de relire le service)
      */
-    private function createOrUpdateMembership(User $user, object $session): Membership
+    private function createOrUpdateMembership(User $user, object $session, ?int $amountCents = null): Membership
     {
-        try {
-            $amountCents = $this->feeService->getCurrentAmount();
-        } catch (\RuntimeException $e) {
-            $amountCents = 1500; // 15.00 € par défaut
+        // Si le montant n'est pas fourni, utiliser celui du service (fallback)
+        if ($amountCents === null) {
+            try {
+                $amountCents = $this->feeService->getCurrentAmount();
+            } catch (\RuntimeException $e) {
+                $amountCents = 1500; // 15.00 € par défaut
+            }
         }
 
         $now = new \DateTime();

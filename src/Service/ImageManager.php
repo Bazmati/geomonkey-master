@@ -71,7 +71,6 @@ class ImageManager
 
         try {
             $manager = $this->createImageManager();
-            error_log('[IMG] manager=' . ($manager ? get_class($manager) : 'NULL → fallback copie'));
 
             foreach (self::AVAILABLE_SIZES as $size) {
                 $savePath = $this->getAbsolutePath($entity, $size, $uuid);
@@ -159,11 +158,9 @@ class ImageManager
         $quality = $this->qualities[$size];
 
         $savePath = $this->getAbsolutePath($entity, $size, $uuid);
-        error_log('[IMG] taille=' . $size . ' savePath=' . $savePath);
         $dir = dirname($savePath);
         if (!is_dir($dir)) {
             $ok = @mkdir($dir, 0755, true);
-            error_log('[IMG] mkdir(' . $dir . ')=' . var_export($ok, true));
         }
 
         // API v4 : lecture via decodePath

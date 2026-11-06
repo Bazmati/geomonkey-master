@@ -84,7 +84,7 @@
                         {% if gallery_image.hasImage() %}
                             <div class="mt-3">
                                 <label class="form-label">Image actuelle</label>
-                                <div class="border rounded p-3 bg-white" style="max-height: 400px; overflow: hidden;">
+                                <div class="border rounded p-3 bg-white max-h-400 overflow-hidden">
                                     {% include 'admin/gallery_image/_picture.html.twig' with {
                                         image: gallery_image,
                                         size: 'medium',

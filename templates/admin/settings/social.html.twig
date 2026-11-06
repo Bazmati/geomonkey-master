@@ -79,8 +79,7 @@
                                               class="d-flex gap-1">
                                             <input type="hidden" name="_token"
                                                    value="{{ csrf_token('social-ext' ~ setting.id) }}">
-                                            <input type="text" name="external_id" class="form-control form-control-sm"
-                                                   style="max-width: 220px;"
+                                            <input type="text" name="external_id" class="form-control form-control-sm max-w-220"
                                                    value="{{ setting.externalId }}"
                                                    placeholder="ID page, URN…">
                                             <button class="btn btn-sm btn-outline-primary" type="submit" title="Enregistrer">

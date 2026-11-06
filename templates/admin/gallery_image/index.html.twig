@@ -16,7 +16,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if gallery_images is empty %}
-                    <div class="text-center py-4" style="color: #c0c0c0;">
+                    <div class="text-center py-4 text-muted-light">
                         <i class="bi bi-image fs-1"></i>
                         <p class="mt-2 text-light">Aucune image dans la galerie</p>
                         <a href="{{ path('app_admin_gallery_image_new') }}" class="btn btn-primary">

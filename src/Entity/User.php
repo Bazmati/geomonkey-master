@@ -78,6 +78,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(type: Types::BOOLEAN)]
     private bool $whatsappInviteSent = false; // Invitation WhatsApp envoyée
 
+    // === VÉRIFICATION EMAIL ===
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: true)]
+    private ?string $emailVerificationToken = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $emailVerificationTokenExpiresAt = null;
+
+    // === RESET MOT DE PASSE ===
+    #[ORM\Column(type: Types::STRING, length: 64, nullable: true)]
+    private ?string $passwordResetToken = null;
+
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $passwordResetTokenExpiresAt = null;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
@@ -375,5 +389,95 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         if (!$this->hasActiveMembership() && $this->getOfficeFunction() !== OfficeFunction::None) {
             $this->setOfficeFunction(OfficeFunction::None);
         }
+    }
+
+    // === GETTERS/SETTERS POUR VÉRIFICATION EMAIL ===
+
+    public function getEmailVerificationToken(): ?string
+    {
+        return $this->emailVerificationToken;
+    }
+
+    public function setEmailVerificationToken(?string $emailVerificationToken): self
+    {
+        $this->emailVerificationToken = $emailVerificationToken;
+        return $this;
+    }
+
+    public function getEmailVerificationTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->emailVerificationTokenExpiresAt;
+    }
+
+    public function setEmailVerificationTokenExpiresAt(?\DateTimeImmutable $emailVerificationTokenExpiresAt): self
+    {
+        $this->emailVerificationTokenExpiresAt = $emailVerificationTokenExpiresAt;
+        return $this;
+    }
+
+    // === GETTERS/SETTERS POUR RESET MOT DE PASSE ===
+
+    public function getPasswordResetToken(): ?string
+    {
+        return $this->passwordResetToken;
+    }
+
+    public function setPasswordResetToken(?string $passwordResetToken): self
+    {
+        $this->passwordResetToken = $passwordResetToken;
+        return $this;
+    }
+
+    public function getPasswordResetTokenExpiresAt(): ?\DateTimeImmutable
+    {
+        return $this->passwordResetTokenExpiresAt;
+    }
+
+    public function setPasswordResetTokenExpiresAt(?\DateTimeImmutable $passwordResetTokenExpiresAt): self
+    {
+        $this->passwordResetTokenExpiresAt = $passwordResetTokenExpiresAt;
+        return $this;
+    }
+
+    /**
+     * Génère un token de vérification d'email
+     */
+    public function generateEmailVerificationToken(): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->setEmailVerificationToken($token);
+        $this->setEmailVerificationTokenExpiresAt(new \DateTimeImmutable('+24 hours'));
+        return $token;
+    }
+
+    /**
+     * Vérifie si le token de vérification d'email est valide
+     */
+    public function isEmailVerificationTokenValid(string $token): bool
+    {
+        return $this->emailVerificationToken === $token 
+            && $this->emailVerificationTokenExpiresAt 
+            && $this->emailVerificationTokenExpiresAt > new \DateTimeImmutable();
+    }
+
+    /**
+     * Génère un token de reset de mot de passe
+     */
+    public function generatePasswordResetToken(): string
+    {
+        $token = bin2hex(random_bytes(32));
+        $this->setPasswordResetToken($token);
+        $this->setPasswordResetTokenExpiresAt(new \DateTimeImmutable('+1 hour'));
+        return $token;
+    }
+
+    /**
+     * Vérifie si le token de reset de mot de passe est valide
+     */
+    public function isPasswordResetTokenValid(string $token): bool
+    {
+        return $this->passwordResetToken === $token 
+            && $this->passwordResetTokenExpiresAt 
+            && $this->passwordResetTokenExpiresAt > new \DateTimeImmutable();
     }
 }

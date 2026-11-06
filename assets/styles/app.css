@@ -10,6 +10,20 @@
   --bs-body-bg: var(--gm-bg);
   --bs-body-color: var(--gm-text);
   --bs-secondary: var(--gm-surface);
+
+  /* Gray palette */
+  --gm-gray-900: #3a3a38;
+  --gm-gray-800: #333;
+  --gm-gray-700: #444;
+  --gm-gray-600: #666;
+  --gm-gray-500: #888;
+  --gm-gray-400: #999;
+  --gm-gray-300: #c0c0c0;
+  --gm-gray-200: #e0e0e0;
+  --gm-gray-100: #adb5bd;
+  --gm-white: #fff;
+  --gm-light-gray: #f8f9fa;
+  --gm-danger: #ff6b6b;
 }
 
 body {
@@ -64,52 +78,52 @@ footer {
 /* Card background for forms */
 .card {
     background: var(--gm-surface);
-    border-color: #3a3a38;
+    border-color: var(--gm-gray-900);
 }
 
 /* Form control styling for dark theme */
 .form-control,
 .form-select {
-    background: #333;
-    border-color: #444;
-    color: #fff;
+    background: var(--gm-gray-800);
+    border-color: var(--gm-gray-700);
+    color: var(--gm-white);
 }
 
 .form-control:focus,
 .form-select:focus {
-    background: #333;
+    background: var(--gm-gray-800);
     border-color: var(--gm-green);
-    color: #fff;
+    color: var(--gm-white);
     box-shadow: 0 0 0 0.25rem rgba(0, 160, 64, 0.25);
 }
 
 .form-control::placeholder {
-    color: #888;
+    color: var(--gm-gray-500);
 }
 
 /* File input styling */
 .form-control[type="file"] {
-    background: #333;
-    border-color: #444;
-    color: #fff;
+    background: var(--gm-gray-800);
+    border-color: var(--gm-gray-700);
+    color: var(--gm-white);
 }
 
 /* Form labels */
 .form-label,
 .label {
-    color: #e0e0e0;
+    color: var(--gm-gray-200);
     font-weight: 500;
 }
 
 /* Form text (help text) */
 .form-text {
-    color: #999;
+    color: var(--gm-gray-400);
 }
 
 /* Form check (checkbox/radio) */
 .form-check-input {
-    background: #333;
-    border-color: #666;
+    background: var(--gm-gray-800);
+    border-color: var(--gm-gray-600);
 }
 
 .form-check-input:checked {
@@ -118,47 +132,47 @@ footer {
 }
 
 .form-check-label {
-    color: #e0e0e0;
+    color: var(--gm-gray-200);
 }
 
 /* Error messages */
 .text-danger,
 .form-error {
-    color: #ff6b6b !important;
+    color: var(--gm-danger) !important;
 }
 
 /* Image preview container - adjust for dark theme */
 .border {
-    border-color: #444 !important;
+    border-color: var(--gm-gray-700) !important;
 }
 
 /* Form field container */
 .mb-3 > .form-control,
 .mb-3 > .form-select {
-    background: #333;
-    border-color: #444;
-    color: #fff;
+    background: var(--gm-gray-800);
+    border-color: var(--gm-gray-700);
+    color: var(--gm-white);
 }
 
 /* File input button text - make it visible */
 .form-control[type="file"]::file-selector-button {
-    background: #444;
-    border-color: #555;
-    color: #fff;
+    background: var(--gm-gray-700);
+    border-color: var(--gm-gray-600);
+    color: var(--gm-white);
     padding: 0.375rem 0.75rem;
 }
 
 .form-control[type="file"]::file-selector-button:hover {
-    background: #555;
-    border-color: #666;
+    background: var(--gm-gray-600);
+    border-color: var(--gm-gray-500);
 }
 
 /* Date input styling */
 .form-control[type="date"],
 .form-control[type="datetime-local"] {
-    background: #333;
-    border-color: #444;
-    color: #fff;
+    background: var(--gm-gray-800);
+    border-color: var(--gm-gray-700);
+    color: var(--gm-white);
 }
 
 /* Date picker icon (calendar icon) - make it white */
@@ -192,9 +206,9 @@ input[type="datetime-local"] {
 .article-content ul { padding-left: 1.5rem; margin-bottom: 1rem; }
 .article-content li { margin-bottom: .35rem; }
 .article-content blockquote {
-    border-left: 4px solid #198754; /* ta couleur d'accent */
+    border-left: 4px solid var(--gm-green);
     padding: .5rem 1rem;
-    color: #6c757d;
+    color: var(--gm-gray-100);
     font-style: italic;
     margin: 1.5rem 0;
 }
@@ -223,12 +237,12 @@ a.badge:hover { filter: brightness(1.15); }
     height: 100vh;
     overflow-y: auto;           /* filet de sécurité, invisible sur desktop */
     background: var(--gm-surface);
-    border-right: 1px solid #3a3a38;
+    border-right: 1px solid var(--gm-gray-900);
     scrollbar-width: thin;      /* Firefox */
     overscroll-behavior: contain;
 }
 .admin-sidebar::-webkit-scrollbar { width: 6px; }
-.admin-sidebar::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: var(--gm-gray-700); border-radius: 3px; }
 
 /* --- Zone principale : c'est ELLE qui scrolle, la sidebar reste immobile --- */
 .admin-main {
@@ -249,8 +263,8 @@ a.badge:hover { filter: brightness(1.15); }
     gap: 1rem;
     padding: 0.75rem 1.5rem;
     background: var(--gm-surface);
-    border-top: 1px solid #3a3a38;
-    color: #adb5bd;
+    border-top: 1px solid var(--gm-gray-900);
+    color: var(--gm-gray-100);
     font-size: 0.875rem;
     position: sticky;
     bottom: 0;
@@ -264,7 +278,7 @@ a.badge:hover { filter: brightness(1.15); }
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #6c757d;
+    color: var(--gm-gray-100);
     padding: 0.75rem 0.75rem 0.35rem;
     margin-bottom: 0.15rem;
 }
@@ -280,10 +294,10 @@ a.badge:hover { filter: brightness(1.15); }
     transition: background-color 0.15s ease;
 }
 .admin-nav .nav-link i { font-size: 1rem; width: 1.25rem; text-align: center; }
-.admin-nav .nav-link:hover { background: rgba(224, 192, 32, 0.15); color: #fff; }
+.admin-nav .nav-link:hover { background: rgba(224, 192, 32, 0.15); color: var(--gm-white); }
 .admin-nav .nav-link.active {
     background: var(--gm-yellow);
-    color: #1c1c1a;
+    color: var(--gm-bg);
     font-weight: 600;
 }
 
@@ -302,3 +316,58 @@ a.badge:hover { filter: brightness(1.15); }
     .admin-shell.sidebar-open .admin-sidebar { transform: translateX(0); }
     .admin-main { min-height: 100vh; }
 }
+
+/* ============================================
+   UTILITY CLASSES - Pour remplacer les styles inline
+   ============================================ */
+
+/* Width utilities */
+.w-100 { width: 100%; }
+.max-w-800 { max-width: 800px; }
+.max-w-600 { max-width: 600px; }
+.max-w-220 { max-width: 220px; }
+
+/* Height utilities */
+.h-150 { height: 150px; }
+.max-h-200 { max-height: 200px; }
+.max-h-400 { max-height: 400px; }
+
+/* Image utilities */
+.img-fit-cover { object-fit: cover; }
+
+/* Text utilities */
+.pre-line { white-space: pre-line; }
+.text-muted-light { color: var(--gm-gray-300); }
+
+/* Container utilities */
+.container-800 { max-width: 800px; margin-left: auto; margin-right: auto; }
+
+/* Hero section styles (moved from front/base.html.twig) */
+.hero-section {
+    min-height: 70vh;
+    background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%);
+}
+.hero-logo {
+    max-width: 100%;
+    height: auto;
+}
+
+/* Background surface (moved from front/base.html.twig) */
+.bg-surface {
+    background-color: var(--gm-light-gray);
+}
+
+/* Nav link hover for admin sidebar (moved from admin/partials/_sidebar.html.twig) */
+.admin-sidebar .nav-link:hover {
+    background-color: rgba(255, 193, 7, 0.2);
+}
+
+/* Rounded images */
+.rounded-circle-80 { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; }
+
+/* Card border radius */
+.border-radius-15 { border-radius: 15px; }
+.border-radius-8 { border-radius: 8px; }
+
+/* Overflow utilities */
+.overflow-hidden { overflow: hidden; }

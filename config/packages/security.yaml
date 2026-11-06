@@ -27,6 +27,7 @@ security:
                 login_path: app_login
                 check_path: app_login
                 enable_csrf: true
+            login_throttling: ~
             logout:
                 path: app_logout
                 # where to redirect after logout
@@ -34,6 +35,9 @@ security:
             remember_me:
                 secret: '%env(APP_SECRET)%'
                 lifetime: 604800   # 7 jours
+                secure: true
+                httponly: true
+                samesite: 'lax'
 
             # Activate different ways to authenticate:
             # https://symfony.com/doc/current/security.html#the-firewall
