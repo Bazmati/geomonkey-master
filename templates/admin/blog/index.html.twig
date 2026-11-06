@@ -18,9 +18,9 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if posts is empty %}
-                    <div class="text-center py-4 text-muted-light">
+                    <div class="text-center py-4 text-gm-muted-light">
                         <i class="bi bi-newspaper fs-1"></i>
-                        <p class="mt-2 text-light">Aucun article</p>
+                        <p class="mt-2">Aucun article</p>
                         {% if is_granted('ENTITY_CREATE') %}
                             <a href="{{ path('app_admin_blog_new') }}" class="btn btn-primary">
                                 <i class="bi bi-plus-circle"></i> Créer le premier article
@@ -29,8 +29,8 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover table-light">
-                            <thead class="table-dark text-light">
+                        <table class="table table-gm table-striped table-hover">
+                            <thead>
                                 <tr>
                                     <th>Titre</th>
                                     <th>Slug</th>
@@ -58,7 +58,7 @@
                                             <div class="d-flex gap-1">
                                                 {% if post.isPublished %}
                                                     <a href="{{ path('app_blog_show', {'slug': post.slug}) }}"
-                                                       class="btn btn-sm btn-light" title="Voir sur le site" target="_blank">
+                                                       class="btn btn-sm btn-gm-green" title="Voir sur le site" target="_blank">
                                                         <i class="bi bi-eye-fill"></i>
                                                     </a>
                                                 {% endif %}

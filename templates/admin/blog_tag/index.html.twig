@@ -16,14 +16,14 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if tags is empty %}
-                    <div class="text-center py-4 text-muted-light">
+                    <div class="text-center py-4 text-gm-muted-light">
                         <i class="bi bi-tag-x fs-1"></i>
-                        <p class="mt-2 text-light">Aucune catégorie trouvée</p>
+                        <p class="mt-2">Aucune catégorie trouvée</p>
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover table-light">
-                            <thead class="table-dark text-light">
+                        <table class="table table-gm table-striped table-hover">
+                            <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Nom</th>
@@ -34,7 +34,7 @@
                             </thead>
                             <tbody>
                                 {% for tag in tags %}
-                                    <tr class="text-light">
+                                    <tr>
                                         <td>{{ tag.id }}</td>
                                         <td>{{ tag.name }}</td>
                                         <td><code>{{ tag.slug }}</code></td>

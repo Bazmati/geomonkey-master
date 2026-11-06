@@ -6,11 +6,28 @@
   --gm-surface: #242422;
   --gm-text: #F5F0D0;
 
+  /* --- Surcharge Bootstrap : primaire + déclinaisons -rgb (sinon le bleu #0d6efd revient) --- */
   --bs-primary: var(--gm-green);
+  --bs-primary-rgb: 0, 160, 64;
+  --bs-primary-text-emphasis: var(--gm-green);
+  --bs-primary-bg-subtle: rgba(0, 160, 64, 0.15);
+  --bs-primary-border-subtle: rgba(0, 160, 64, 0.4);
+
   --bs-warning: var(--gm-yellow);
+  --bs-warning-rgb: 224, 192, 32;
+
   --bs-body-bg: var(--gm-bg);
   --bs-body-color: var(--gm-text);
   --bs-secondary: var(--gm-surface);
+  --bs-secondary-rgb: 36, 36, 34;
+
+  --bs-link-color: var(--gm-green);
+  --bs-link-color-rgb: 0, 160, 64;
+  --bs-link-hover-color: var(--gm-green-dark);
+  --bs-link-hover-color-rgb: 0, 138, 55;
+
+  --bs-focus-ring-color: rgba(0, 160, 64, 0.25);
+  --bs-border-color: var(--gm-gray-900);
 
   /* Gray palette - aligned with Bootstrap convention (higher number = darker) */
   --gm-gray-900: #1a1a18;
@@ -258,7 +275,7 @@ a.badge:hover { filter: brightness(1.15); }
 
 .admin-content {
     flex: 1 1 auto;            /* pousse le footer vers le bas quand le contenu est court */
-    padding: 0;
+    padding: 1.5rem;
 }
 
 /* --- Footer : toujours visible en bas du viewport --- */
@@ -324,6 +341,22 @@ a.badge:hover { filter: brightness(1.15); }
     }
     .admin-shell.sidebar-open .admin-sidebar { transform: translateX(0); }
     .admin-main { min-height: 100vh; }
+}
+
+/* Tableaux admin sur thème sombre */
+.table-gm {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--gm-text);
+  --bs-table-border-color: var(--gm-gray-900);
+  --bs-table-striped-color: var(--gm-text);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-color: var(--gm-text);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
+  color: var(--gm-text);
+}
+.table-gm thead th {
+  background: var(--gm-gray-900);
+  color: var(--gm-text);
 }
 
 /* ============================================
@@ -411,14 +444,15 @@ a.badge:hover { filter: brightness(1.15); }
     position: sticky;
     top: 0;
     z-index: 1030;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
 }
 
-/* Search slot placeholder */
-.search-slot {
-    min-width: 150px;
+/* Flashs : centrés sur la zone de contenu */
+.admin-flash {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
 }
 
-/* Admin main content */
-.admin-content {
-    padding: 1.5rem;
-}
