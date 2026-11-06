@@ -5,7 +5,7 @@
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
-    <div class="min-vh-100 d-flex flex-column bg-dark">
+    <div class="min-vh-100 d-flex flex-column bg-gm-bg">
         {# Lien de retour en haut #}
         <div class="p-3">
             <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
@@ -19,27 +19,24 @@
             {# Card de connexion #}
             <div class="card border-warning shadow-lg border-radius-15 overflow-hidden">
                 {# En-tête avec logo #}
-                <div class="card-header bg-warning text-dark text-center py-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="img-fluid rounded-circle border border-3 border-dark rounded-circle-80 img-fit-cover">
+                <div class="card-header bg-gm-warning text-gm-bg text-center py-4">
+                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="img-fluid rounded-circle border border-3 border-gm-bg img-avatar">
                     <h2 class="h4 mt-3 mb-0 fw-bold">GéoMonkey</h2>
                     <p class="mb-0 small">Espace membre</p>
                 </div>
 
                 {# Corps de la card #}
-                <div class="card-body bg-dark text-white">
+                <div class="card-body bg-gm-surface text-gm-text">
                     {% if app.user %}
                         <div class="alert alert-info mb-4">
-                            Vous êtes déjà connecté en tant que {{ app.user.userIdentifier }}, 
-                            <a href="{{ logout_path() }}" class="alert-link">Se déconnecter</a>
+                            Vous êtes déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, 
+                            <a href="{{ logout_path() }}" class="alert-link text-gm-green">Se déconnecter</a>
                         </div>
                     {% endif %}
 
-                    
-Copier
-
                     {% if error %}
                         <div class="alert alert-danger mb-4">
-                            {{ error.messageKey|trans(error.messageData, 'security') }}
+                            <strong>Erreur :</strong> {{ error.messageKey|trans(error.messageData, 'security') }}
                         </div>
                     {% endif %}
 
@@ -48,11 +45,11 @@ Copier
                         <div class="mb-4">
                             <label for="inputEmail" class="form-label fw-semibold">Email</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light text-dark border-0">
+                                <span class="input-group-text bg-gm-light text-gm-text border-0">
                                     <i class="bi bi-envelope"></i>
                                 </span>
                                 <input type="email" id="inputEmail" name="_username"
-                                    class="form-control form-control-lg bg-light text-dark"
+                                    class="form-control form-control-lg"
                                     autocomplete="email" placeholder="votre@email.com"
                                     value="{{ last_username }}" required autofocus>
                             </div>
@@ -62,11 +59,11 @@ Copier
                         <div class="mb-4">
                             <label for="inputPassword" class="form-label fw-semibold">Mot de passe</label>
                             <div class="input-group">
-                                <span class="input-group-text bg-light text-dark border-0">
+                                <span class="input-group-text bg-gm-light text-gm-text border-0">
                                     <i class="bi bi-lock"></i>
                                 </span>
                                 <input type="password" id="inputPassword" name="_password"
-                                    class="form-control form-control-lg bg-light text-dark"
+                                    class="form-control form-control-lg"
                                     autocomplete="current-password" placeholder="••••••••" required>
                             </div>
                         </div>
@@ -92,15 +89,15 @@ Copier
 
                     {# Lien mot de passe oublié - placeholder #}
                     <div class="mt-4 text-center">
-                        <small class="text-muted">
-                            <a href="#" class="text-warning text-decoration-none">Mot de passe oublié ?</a>
+                        <small class="text-gm-muted">
+                            <a href="#" class="text-gm-warning text-decoration-none">Mot de passe oublié ?</a>
                         </small>
                     </div>
                 </div>
 
                 {# Pied de la card #}
-                <div class="card-footer bg-warning text-dark text-center py-2 small">
-                    <p class="mb-0">Pas encore membre ? <a href="{{ path('app_membership_register') }}" class="fw-bold text-dark">Rejoignez-nous</a></p>
+                <div class="card-footer bg-gm-warning text-gm-bg text-center py-2 small">
+                    <p class="mb-0">Pas encore membre ? <a href="{{ path('app_membership_register') }}" class="fw-bold text-gm-bg">Rejoignez-nous</a></p>
                 </div>
             </div>
         </div>

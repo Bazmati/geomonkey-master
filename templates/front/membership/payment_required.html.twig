@@ -9,23 +9,23 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8 text-center">
-                <div class="card shadow-sm border-success">
-                    <div class="card-header bg-success text-white">
+                <div class="card shadow-sm border-gm-green">
+                    <div class="card-header bg-gm-green text-gm-white">
                         <h2 class="mb-0"><i class="bi bi-check-circle me-2"></i>Inscription validée</h2>
                     </div>
                     <div class="card-body">
                         <div class="py-4">
-                            <i class="bi bi-credit-card-2-front text-success display-4"></i>
-                            <h3 class="mt-3 text-success">Félicitations !</h3>
-                            <p class="lead text-muted">
+                            <i class="bi bi-credit-card-2-front text-gm-green display-4"></i>
+                            <h3 class="mt-3 text-gm-green">Félicitations !</h3>
+                            <p class="lead text-gm-muted">
                                 Ton inscription en tant que membre actif a été validée par le bureau.
                             </p>
-                            <p class="text-muted">
+                            <p class="text-gm-muted">
                                 Pour finaliser ton adhésion et accéder à tous les contenus réservés, 
                                 il ne te reste plus qu'à effectuer le paiement.
                             </p>
                             {% if payment_url is defined and payment_url %}
-                                <a href="{{ payment_url }}" class="btn btn-success btn-lg px-4">
+                                <a href="{{ payment_url }}" class="btn btn-gm-green btn-lg px-4">
                                     <i class="bi bi-credit-card me-2"></i>
                                     Payer mon adhésion ({{ "%.2f"|format(membership_fee) }} €)
                                 </a>
@@ -40,7 +40,7 @@
                             <i class="bi bi-shield-check me-2"></i>
                             <strong>Sécurisé :</strong> Le paiement est effectué via Stripe, une plateforme certifiée.
                         </div>
-                        <a href="{{ path('app_home') }}" class="btn btn-secondary">
+                        <a href="{{ path('app_home') }}" class="btn btn-gm-green btn-outline">
                             <i class="bi bi-house me-2"></i> Retour à l'accueil
                         </a>
                     </div>

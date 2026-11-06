@@ -1,18 +1,21 @@
 {% block body %}
 <div class="admin-shell">
-    <button class="btn btn-outline-warning d-lg-none mb-3" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')">
-        <i class="bi bi-list"></i>
-    </button>
     {# Sidebar : fixe, ne bouge jamais #}
     <aside class="admin-sidebar">
         {% include 'admin/partials/_sidebar.html.twig' %}
     </aside>
 
-    {# Zone principale : scrolle SEULE, footer toujours visible en bas #}
+    {# Zone principale #}
     <div class="admin-main">
+        {# Topbar sticky : titre + breadcrumb + bouton retour #}
+        {% include 'admin/partials/_topbar.html.twig' %}
+        
+        {# Contenu principal : scrolle #}
         <div class="admin-content">
             {% block admin_content %}{% endblock %}
         </div>
+        
+        {# Footer #}
         {% include 'admin/partials/_footer.html.twig' %}
     </div>
 </div>

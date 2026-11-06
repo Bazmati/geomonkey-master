@@ -1,78 +1,47 @@
-<nav class="navbar navbar-dark bg-dark flex-column p-3 h-100">
+<nav class="navbar navbar-dark bg-gm-dark flex-column p-3 h-100">
     <a class="navbar-brand mb-4" href="{{ path('app_admin_dashboard') }}">
         <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" width="40" class="img-fluid d-inline-block align-top">
-        <span class="ms-2 fw-bold text-warning">Admin Panel</span>
+        <span class="ms-2 fw-bold text-gm-warning">Admin Panel</span>
     </a>
+    
+    {# Menu dynamique - route courante #}
+    {% set route = app.request.attributes.get('_route') %}
+    {% set menu = [
+        {label: 'Tableau de bord', icon: 'house', route: 'app_admin_dashboard', match: 'app_admin_dashboard'},
+        {label: 'Présentation', icon: 'newspaper', route: 'app_admin_presentation_index', match: 'app_admin_presentation'},
+        {label: 'Actualités', icon: 'newspaper', route: 'app_admin_blog_index', match: 'app_admin_blog'},
+        {label: 'Catégories blog', icon: 'folder', route: 'admin_blog_category_index', match: 'admin_blog_category'},
+        {label: 'Tags blog', icon: 'tag', route: 'admin_blog_tag_index', match: 'admin_blog_tag'},
+        {label: 'Événements', icon: 'calendar', route: 'admin_events_index', match: 'admin_events'},
+        {label: 'Galerie', icon: 'images', route: 'app_admin_gallery_image_index', match: 'app_admin_gallery_image'},
+        {# Futurs modules #}
+        {label: 'Projets', icon: 'folder', route: '#', match: 'app_admin_project'},
+        {label: 'Boutique', icon: 'shop', route: '#', match: 'app_admin_shop'},
+        {label: 'Billetterie', icon: 'ticket-perforated', route: '#', match: 'app_admin_ticket'},
+        {# Fin futurs modules #}
+        {label: 'Utilisateurs', icon: 'people', route: 'app_admin_user_index', match: 'app_admin_user'},
+        {label: 'Adhésions', icon: 'person-plus', route: 'app_admin_membership_requests', match: 'app_admin_membership'},
+        {label: 'Tarif adhésion', icon: 'currency-euro', route: 'app_admin_membership_fee_index', match: 'app_admin_membership_fee'},
+        {label: 'Messages', icon: 'envelope', route: '#', match: 'app_admin_message'},
+        {label: 'Paramètres', icon: 'gear', route: '#', match: 'app_admin_settings'},
+    ] %}
+    
     <ul class="nav nav-pills flex-column">
-        <li class="nav-item">
-            <a class="nav-link active bg-warning text-dark" href="{{ path('app_admin_dashboard') }}">
-                <i class="bi bi-house"></i> Tableau de bord
-            </a>
-        </li>
-         <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_presentation_index') }}">
-                <i class="bi bi-newspaper"></i> Présentation
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_blog_index') }}">
-                <i class="bi bi-newspaper"></i> Actualités
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('admin_blog_category_index') }}">
-                <i class="bi bi-folder"></i> Catégories blog
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('admin_blog_tag_index') }}">
-                <i class="bi bi-tag"></i> Tags blog
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('admin_events_index') }}">
-                <i class="bi bi-calendar"></i> Événements
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_gallery_image_index') }}">
-                <i class="bi bi-images"></i> Galerie
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="#">
-                <i class="bi bi-folder"></i> Projets
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_user_index') }}">
-                <i class="bi bi-people"></i> Utilisateurs
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_membership_requests') }}">
-                <i class="bi bi-person-plus"></i> Adhésions
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="{{ path('app_admin_membership_fee_index') }}">
-                <i class="bi bi-currency-euro"></i> Tarif adhésion
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="#">
-                <i class="bi bi-envelope"></i> Messages
-            </a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-warning" href="#">
-                <i class="bi bi-gear"></i> Paramètres
-            </a>
-        </li>
+        {% for item in menu %}
+            {% if item.route != '#' %}
+                <li class="nav-item">
+                    <a class="nav-link {{ route starts with item.match ? 'active bg-gm-warning text-gm-bg' : 'text-gm-warning' }}" 
+                       href="{{ path(item.route) }}">
+                        <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+                    </a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a class="nav-link text-gm-muted disabled" href="#">
+                        <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+                    </a>
+                </li>
+            {% endif %}
+        {% endfor %}
     </ul>
-    <div class="mt-auto">
-        <a class="btn btn-primary w-100" href="{{ path('app_home') }}">
-            <i class="bi bi-arrow-left"></i> Retour au site public
-        </a>
-    </div>
 </nav>

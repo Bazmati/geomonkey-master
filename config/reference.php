@@ -1466,6 +1466,21 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     enable_static_query_cache?: bool|Param, // Default: true
  *     connection_keys?: list<mixed>,
  * }
+ * @psalm-type ZmkrCloudflareTurnstileConfig = array{
+ *     captcha?: array{
+ *         sitekey?: scalar|Param|null,
+ *         secret_key?: scalar|Param|null,
+ *         explicit_js_loader?: scalar|Param|null, // Default: null
+ *         compatibility_mode?: scalar|Param|null, // Default: null
+ *         enabled?: bool|Param, // Default: true
+ *     },
+ *     error_manager?: array{
+ *         throw_on_core_failure?: bool|Param, // Default: false
+ *     },
+ *     http_client?: array{
+ *         options?: array<string, scalar|Param|null>,
+ *     },
+ * }
  * @psalm-type ConfigType = array{
  *     imports?: ImportsConfig,
  *     parameters?: ParametersConfig,
@@ -1479,6 +1494,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *     twig_extra?: TwigExtraConfig,
  *     security?: SecurityConfig,
  *     monolog?: MonologConfig,
+ *     zmkr_cloudflare_turnstile?: ZmkrCloudflareTurnstileConfig,
  *     "when@dev"?: array{
  *         imports?: ImportsConfig,
  *         parameters?: ParametersConfig,
@@ -1496,6 +1512,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         monolog?: MonologConfig,
  *         maker?: MakerConfig,
  *         dama_doctrine_test?: DamaDoctrineTestConfig,
+ *         zmkr_cloudflare_turnstile?: ZmkrCloudflareTurnstileConfig,
  *     },
  *     "when@prod"?: array{
  *         imports?: ImportsConfig,
@@ -1510,6 +1527,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         twig_extra?: TwigExtraConfig,
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
+ *         zmkr_cloudflare_turnstile?: ZmkrCloudflareTurnstileConfig,
  *     },
  *     "when@test"?: array{
  *         imports?: ImportsConfig,
@@ -1526,6 +1544,7 @@ use Symfony\Component\Config\Loader\ParamConfigurator as Param;
  *         security?: SecurityConfig,
  *         monolog?: MonologConfig,
  *         dama_doctrine_test?: DamaDoctrineTestConfig,
+ *         zmkr_cloudflare_turnstile?: ZmkrCloudflareTurnstileConfig,
  *     },
  *     ...<string, ExtensionType|array{ // extra keys must follow the when@%env% pattern or match an extension alias
  *         imports?: ImportsConfig,

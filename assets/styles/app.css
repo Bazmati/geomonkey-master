@@ -1,5 +1,6 @@
 :root {
   --gm-green: #00A040;
+  --gm-green-dark: #008a37;
   --gm-yellow: #E0C020;
   --gm-bg: #1C1C1A;
   --gm-surface: #242422;
@@ -24,6 +25,10 @@
   --gm-white: #fff;
   --gm-light-gray: #f8f9fa;
   --gm-danger: #ff6b6b;
+  --gm-info: #0dcaf0;
+  
+  /* Button colors */
+  --gm-btn-warning-text: var(--gm-bg);
 }
 
 body {
@@ -40,14 +45,14 @@ footer {
 .btn-primary {
   --bs-btn-bg: var(--gm-green);
   --bs-btn-border-color: var(--gm-green);
-  --bs-btn-hover-bg: #008a37;
-  --bs-btn-hover-border-color: #008a37;
+  --bs-btn-hover-bg: var(--gm-green-dark);
+  --bs-btn-hover-border-color: var(--gm-green-dark);
 }
 
 .btn-warning {
   --bs-btn-bg: var(--gm-yellow);
   --bs-btn-border-color: var(--gm-yellow);
-  --bs-btn-color: #1c1c1a;
+  --bs-btn-color: var(--gm-btn-warning-text);
 }
 
 /* Image cover styling */
@@ -321,14 +326,34 @@ a.badge:hover { filter: brightness(1.15); }
    UTILITY CLASSES - Pour remplacer les styles inline
    ============================================ */
 
+/* Token-based color utilities - REMPLACER bg-dark, bg-light, text-white, text-dark, etc. */
+.bg-gm-dark { background-color: var(--gm-bg); }
+.bg-gm-surface { background-color: var(--gm-surface); }
+.bg-gm-light { background-color: var(--gm-light-gray); }
+.bg-gm-warning { background-color: var(--gm-yellow); }
+.bg-gm-green { background-color: var(--gm-green); }
+.bg-gm-danger { background-color: var(--gm-danger); }
+.bg-gm-info { background-color: var(--gm-info); }
+
+.text-gm-white { color: var(--gm-white); }
+.text-gm-text { color: var(--gm-text); }
+.text-gm-muted { color: var(--gm-gray-400); }
+.text-gm-muted-light { color: var(--gm-gray-300); }
+.text-gm-warning { color: var(--gm-yellow); }
+.text-gm-green { color: var(--gm-green); }
+.text-gm-danger { color: var(--gm-danger); }
+.text-gm-info { color: var(--gm-info); }
+
 /* Width utilities */
 .w-100 { width: 100%; }
 .max-w-800 { max-width: 800px; }
 .max-w-600 { max-width: 600px; }
 .max-w-220 { max-width: 220px; }
+.min-w-200 { min-width: 200px; }
 
 /* Height utilities */
 .h-150 { height: 150px; }
+.max-h-150 { max-height: 150px; }
 .max-h-200 { max-height: 200px; }
 .max-h-400 { max-height: 400px; }
 
@@ -365,9 +390,29 @@ a.badge:hover { filter: brightness(1.15); }
 /* Rounded images */
 .rounded-circle-80 { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; }
 
+/* Avatar for login form */
+.img-avatar { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; }
+
 /* Card border radius */
 .border-radius-15 { border-radius: 15px; }
 .border-radius-8 { border-radius: 8px; }
 
 /* Overflow utilities */
 .overflow-hidden { overflow: hidden; }
+
+/* Admin topbar */
+.admin-topbar {
+    background: var(--gm-surface);
+    border-bottom: 1px solid var(--gm-gray-900);
+    z-index: 1030;
+}
+
+/* Search slot placeholder */
+.search-slot {
+    min-width: 150px;
+}
+
+/* Admin main content */
+.admin-content {
+    padding: 1.5rem;
+}

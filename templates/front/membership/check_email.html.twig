@@ -1,19 +1,20 @@
 {# templates/front/membership/check_email.html.twig #}
-{% extends 'base.html.twig' %}
+{% extends 'front/base.html.twig' %}
 
 {% block title %}Vérifie ton adresse email - GéoMonkey{% endblock %}
 
 {% block body %}
+{% include 'partials/_navbar.html.twig' %}
 <div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
             <div class="card shadow">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-gm-green text-gm-white">
                     <h2 class="card-title mb-0">✉️ Vérifie ton adresse email</h2>
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
-                        <i class="fas fa-envelope fa-4x text-primary mb-3"></i>
+                        <i class="bi bi-envelope fs-1 text-gm-green mb-3"></i>
                     </div>
                     
                     <div class="alert alert-info">
@@ -32,8 +33,8 @@
                     
                     <div class="mt-4">
                         <p class="mb-0">
-                            <a href="{{ path('app_login') }}" class="btn btn-outline-primary">
-                                <i class="fas fa-arrow-left me-2"></i> Retour à la connexion
+                            <a href="{{ path('app_login') }}" class="btn btn-outline-gm-green">
+                                <i class="bi bi-arrow-left me-2"></i> Retour à la connexion
                             </a>
                         </p>
                     </div>

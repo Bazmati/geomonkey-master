@@ -88,7 +88,6 @@ class RegistrationFormType extends AbstractType
             ->add('cf_turnstile_response', CloudflareTurnstileType::class, [
                 'mapped' => false,
                 'label' => false,
-                'error_domain' => 'form',
             ]);
     }
 

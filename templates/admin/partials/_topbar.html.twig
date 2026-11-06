@@ -1,0 +1,34 @@
+{# templates/admin/partials/_topbar.html.twig #}
+{# Topbar sticky pour toutes les pages admin #}
+{# Titres personnalisables via {% set page_title = 'Votre titre' %} dans les templates #}
+{% set route = app.request.attributes.get('_route') %}
+{% set page_title = page_title|default(null) %}
+
+<div class="admin-topbar sticky-top">
+    <div class="d-flex align-items-center justify-content-between p-3">
+        {# gauche : titre + breadcrumb #}
+        <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-warning d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')" 
+                    aria-label="Toggle sidebar" aria-expanded="false">
+                <i class="bi bi-list"></i>
+            </button>
+            <div>
+                {% if page_title %}
+                    <h1 class="h4 mb-0 text-truncate">{{ page_title }}</h1>
+                {% else %}
+                    <h1 class="h4 mb-0 text-truncate">{{ route|replace({'_': ' '})|title }}</h1>
+                {% endif %}
+                {{ breadcrumb() }}
+            </div>
+        </div>
+        
+        {# droite : bouton retour + futur slot recherche #}
+        <div class="d-flex align-items-center gap-2">
+            {# Slot pour future barre de recherche globale (Ctrl+K) #}
+            <div class="search-slot min-w-200"></div>
+            <a href="{{ path('app_home') }}" class="btn btn-warning btn-sm" aria-label="Retour au site public">
+                <i class="bi bi-arrow-left"></i> Site public
+            </a>
+        </div>
+    </div>
+</div>

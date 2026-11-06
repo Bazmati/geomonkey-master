@@ -10,67 +10,68 @@
         <div class="row justify-content-center">
             <div class="col-lg-6 col-md-8">
                 <div class="card shadow-sm border-warning">
-                    <div class="card-header bg-warning text-dark text-center">
+                    <div class="card-header bg-gm-warning text-gm-bg text-center">
                         <h2 class="mb-0"><i class="bi bi-person-plus me-2"></i>Rejoindre GéoMonkey</h2>
                     </div>
                     
-                    <div class="card-body">
+                    <div class="card-body bg-gm-surface text-gm-text">
                         <div class="alert alert-info mb-4">
                             <i class="bi bi-info-circle me-2"></i>
                             <strong>Bienvenue !</strong> L'adhésion annuelle à GéoMonkey coûte 
-                            <strong>{{ "%.2f"|format(membershipFee) }} €</strong>.
+                            <strong class="text-gm-text">{{ "%.2f"|format(membershipFee) }} €</strong>.
                         </div>
 
                         {{ form_start(form) }}
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    {{ form_label(form.firstName) }}
+                                    {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="bi bi-person text-dark"></i>
+                                        <span class="input-group-text bg-gm-light">
+                                            <i class="bi bi-person text-gm-text"></i>
                                         </span>
-                                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control', 'placeholder': 'Prénom'}}) }}
+                                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Prénom'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.firstName) }}
                                     </div>
                                 </div>
                                 
                                 <div class="col-md-6">
-                                    {{ form_label(form.lastName) }}
+                                    {{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="bi bi-person text-dark"></i>
+                                        <span class="input-group-text bg-gm-light">
+                                            <i class="bi bi-person text-gm-text"></i>
                                         </span>
-                                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control', 'placeholder': 'Nom'}}) }}
+                                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Nom'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.lastName) }}
                                     </div>
                                 </div>
                                 
                                 <div class="col-12">
-                                    {{ form_label(form.email) }}
+                                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="bi bi-envelope text-dark"></i>
+                                        <span class="input-group-text bg-gm-light">
+                                            <i class="bi bi-envelope text-gm-text"></i>
                                         </span>
-                                        {{ form_widget(form.email, {'attr': {'class': 'form-control', 'placeholder': 'votre@email.com'}}) }}
+                                        {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'votre@email.com'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.email) }}
                                     </div>
                                 </div>
                                 
                                 <div class="col-12">
-                                    {{ form_label(form.plainPassword) }}
+                                    {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
-                                        <span class="input-group-text bg-light">
-                                            <i class="bi bi-lock text-dark"></i>
+                                        <span class="input-group-text bg-gm-light">
+                                            <i class="bi bi-lock text-gm-text"></i>
                                         </span>
-                                        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control', 'placeholder': 'Mot de passe'}}) }}
+                                        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Mot de passe (min. 12 caractères)'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="form-text">Doit contenir au moins 12 caractères avec majuscules, minuscules, chiffres et symboles</div>
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.plainPassword) }}
                                     </div>
                                 </div>
@@ -78,7 +79,7 @@
                                 <div class="col-12">
                                     {{ form_label(form.requestedFunction) }}
                                     {{ form_widget(form.requestedFunction) }}
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.requestedFunction) }}
                                     </div>
                                 </div>
@@ -88,7 +89,7 @@
                                         {{ form_widget(form.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
                                         {{ form_label(form.agreeTerms, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.agreeTerms) }}
                                     </div>
                                 </div>
@@ -96,15 +97,25 @@
                                 <div class="col-12">
                                     <div class="form-check">
                                         {{ form_widget(form.imageConsent, {'attr': {'class': 'form-check-input'}}) }}
-                                        {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
+                                        {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2 text-gm-muted'}}) }}
                                     </div>
-                                    <div class="text-danger">
+                                    <div class="text-gm-danger">
                                         {{ form_errors(form.imageConsent) }}
                                     </div>
                                 </div>
                                 
                                 <div class="col-12">
-                                    <button type="submit" class="btn btn-warning btn-lg w-100">
+                                    {# Cloudflare Turnstile CAPTCHA #}
+                                    <div class="mb-3">
+                                        {{ form_widget(form.cf_turnstile_response) }}
+                                        <div class="text-danger">
+                                            {{ form_errors(form.cf_turnstile_response) }}
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-12">
+                                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8">
                                         <i class="bi bi-person-plus-fill me-2"></i> S'inscrire
                                     </button>
                                 </div>
@@ -112,8 +123,8 @@
                         {{ form_end(form) }}
 
                         <div class="mt-4 text-center">
-                            <p class="text-muted small">
-                                Déjà un compte ? <a href="{{ path('app_login') }}" class="text-warning">Se connecter</a>
+                            <p class="text-gm-muted small">
+                                Déjà un compte ? <a href="{{ path('app_login') }}" class="text-gm-warning">Se connecter</a>
                             </p>
                         </div>
                     </div>

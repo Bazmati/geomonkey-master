@@ -1,0 +1,82 @@
+{# templates/partials/_picture.html.twig #}
+{#
+ * Partial réutilisable unifiée pour afficher une image de galerie.
+ * Utilisable dans les contextes front ET admin.
+ *
+ * Usage :
+ *   {% include 'partials/_picture.html.twig' with {
+ *       image: galleryImage,
+ *       size: 'medium',
+ *       alt: galleryImage.alt,
+ *       class: 'img-fluid',
+ *       context: 'front'  # ou 'admin'
+ *   } %}
+ *
+ * Paramètres :
+ *   - image : GalleryImage entity ou ImageableInterface (requis)
+ *   - size : taille par défaut (small|medium|large), défaut: medium
+ *   - alt : texte alternatif, défaut: image.alt
+ *   - class : classes CSS supplémentaires
+ *   - title : attribut title, défaut: image.description
+ *   - fallback : afficher une icône si pas d'image, défaut: true
+ *   - context : 'front' ou 'admin' pour adapter le rendu, défaut: 'front'
+ *   - max_height : hauteur max pour admin, défaut: 200px
+ #}
+{% set size = size|default('medium') %}
+{% set alt = alt|default(image.alt) %}
+{% set fallback = fallback|default(true) %}
+{% set context = context|default('front') %}
+{% set max_height = max_height|default(200) %}
+
+{% if context == 'admin' %}
+    {% set url_medium = image_url(image, 'medium') %}
+    
+    {% if url_medium %}
+        <img
+            src="{{ url_medium }}"
+            alt="{{ alt }}"
+            {% if class is defined and class %}class="{{ class }} max-h-{{ max_height }}"{% else %}class="img-fluid rounded max-h-{{ max_height }}"{% endif %}
+            loading="lazy"
+        >
+    {% elseif fallback %}
+        <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted h-150 w-100" 
+             title="Aucune image trouvée">
+            <i class="bi bi-image fs-1" aria-hidden="true"></i>
+            <span class="visually-hidden">Aucune image</span>
+        </div>
+    {% endif %}
+{% else %}
+    {# Front context - with srcset for responsive images #}
+    {% set url_small = image_url(image, 'small') %}
+    {% set url_medium = image_url(image, 'medium') %}
+    {% set url_large = image_url(image, 'large') %}
+
+    {% if url_medium %}
+        <img
+            src="{{ url_medium }}"
+            {% if url_small %}srcset="{{ url_small }} 300w{% if url_medium %}, {{ url_medium }} 800w{% endif %}{% if url_large %}, {{ url_large }} 1200w{% endif %}"{% endif %}
+            sizes="(max-width: 600px) 100vw, (max-width: 1200px) 800px, 1200px"
+            alt="{{ alt }}"
+            {% if image.description %}title="{{ image.description }}"{% endif %}
+            {% if class is defined and class %}class="{{ class }}"{% else %}class="img-fluid"{% endif %}
+            loading="lazy"
+            decoding="async"
+        >
+    {% elseif fallback %}
+        {# Fallback : pas d'image uploadée #}
+        {% if image.defaultImage %}
+            <img 
+                src="{{ image.defaultImage }}" 
+                alt="{{ alt }}" 
+                {% if class is defined and class %}class="{{ class }}"{% else %}class="img-fluid"{% endif %}
+                loading="lazy"
+            >
+        {% else %}
+            <div class="bg-warning bg-opacity-10 rounded d-flex align-items-center justify-content-center text-muted h-150 w-100" 
+                 title="Aucune image trouvée">
+                <i class="bi bi-image fs-1" aria-hidden="true"></i>
+                <span class="visually-hidden">Aucune image</span>
+            </div>
+        {% endif %}
+    {% endif %}
+{% endif %}
