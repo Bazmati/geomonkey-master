@@ -67,6 +67,9 @@
                                         <td>{{ event.image }}</td>
                                         <td>
                                             <div class="d-flex gap-1">
+                                                <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}"class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
+                                                    <i class="bi bi-download"></i>
+                                                </a>
                                                 <a href="{{ path('admin_events_edit', {'id': event.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>

@@ -9,7 +9,13 @@
     
     <h1 class="text-gm-green mb-4"><i class="bi bi-people me-2"></i>Utilisateurs</h1>
 
-    <div class="d-flex justify-content-end mb-3">
+    <div class="d-flex justify-content-end gap-2 mb-3">
+        <a href="{{ path('app_admin_export_users') }}" class="btn btn-gm-yellow" title="Exporter tous les utilisateurs">
+            <i class="bi bi-download"></i> Export CSV
+        </a>
+        <a href="{{ path('app_admin_export_users', {members: 1}) }}" class="btn btn-outline-gm-yellow" title="Uniquement les adhérents avec adhésion active">
+            <i class="bi bi-download"></i> Membres actifs
+        </a>
         <a href="{{ path('app_admin_user_new') }}" class="btn btn-gm-green">
             <i class="bi bi-plus-circle"></i> Nouvel utilisateur
         </a>
