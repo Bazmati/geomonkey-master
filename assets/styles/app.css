@@ -601,3 +601,47 @@ thead.table-light th {
 .table-active-gm {
     background-color: rgba(0, 160, 64, 0.15) !important;
 }
+
+/* ============================================================
+   RECHERCHE GLOBALE CTRL+K (modal admin)
+   ============================================================ */
+
+.gm-search-dialog {
+    max-width: 560px;
+}
+
+.gm-search-group {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--gm-muted);
+    padding: 0.5rem 0.75rem 0.25rem;
+}
+
+.gm-search-item {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.75rem;
+    text-decoration: none;
+    color: var(--bs-body-color);
+    border-radius: 0.375rem;
+}
+
+.gm-search-item:hover,
+.gm-search-item.active {
+    background-color: var(--gm-surface);
+    color: var(--gm-green);
+}
+
+.gm-search-item small {
+    font-size: 0.75rem;
+}
+
+.gm-kbd {
+    font-size: 0.65rem;
+    padding: 0.1rem 0.35rem;
+    border-radius: 0.25rem;
+    border: 1px solid var(--gm-gray-700);
+    background: var(--gm-gray-900);
+    color: var(--gm-muted);
+}

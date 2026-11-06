@@ -1,0 +1,26 @@
+{# templates/admin/partials/_search_modal.html.twig #}
+{# Modal de recherche globale — ouverte par Ctrl/Cmd+K ou le bouton loupe de la topbar #}
+<div class="modal fade" id="gmSearchModal" tabindex="-1" aria-hidden="true"
+     data-controller="admin-search"
+     data-admin-search-url-value="{{ path('app_admin_search') }}">
+    <div class="modal-dialog modal-dialog-centered gm-search-dialog">
+        <div class="modal-content">
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <span class="input-group-text"><i class="bi bi-search"></i></span>
+                    <input type="text"
+                           class="form-control"
+                           placeholder="Rechercher un utilisateur, un événement, un article…"
+                           aria-label="Recherche"
+                           data-admin-search-target="input"
+                           data-action="input->admin-search#search keydown.down->admin-search#down keydown.up->admin-search#up keydown.enter->admin-search#go">
+                </div>
+                <div data-admin-search-target="results">
+                    <p class="text-gm-muted px-1 py-2 mb-0">
+                        <kbd>Ctrl</kbd>+<kbd>K</kbd> pour ouvrir · <kbd>↑</kbd><kbd>↓</kbd> naviguer · <kbd>Entrée</kbd> ouvrir · <kbd>Échap</kbd> fermer
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

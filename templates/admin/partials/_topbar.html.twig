@@ -24,11 +24,20 @@
         
         {# droite : bouton retour + futur slot recherche #}
         <div class="d-flex align-items-center gap-2">
-            {# Slot pour future barre de recherche globale (Ctrl+K) #}
-            <div class="search-slot min-w-200"></div>
+            {# Slot pour barre de recherche globale (Ctrl+K) #}
+            <button type="button"
+                    class="btn btn-outline-gm-yellow btn-sm d-none d-md-inline-flex align-items-center gap-2"
+                    data-bs-toggle="modal"
+                    data-bs-target="#gmSearchModal"
+                    aria-label="Recherche globale (Ctrl+K)">
+                <i class="bi bi-search"></i>
+                <span class="d-none d-lg-inline">Rechercher</span>
+                <kbd class="d-none d-lg-inline gm-kbd">Ctrl K</kbd>
+            </button>
             <a href="{{ path('app_home') }}" class="btn btn-gm-yellow btn-sm" aria-label="Retour au site public">
                 <i class="bi bi-arrow-left"></i> Site public
             </a>
         </div>
     </div>
 </div>
+{% include 'admin/partials/_search_modal.html.twig' %}
