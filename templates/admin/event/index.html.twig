@@ -1,14 +1,16 @@
 {% extends 'admin/base.html.twig' %}
 
+{% set page_title = 'Événements' %}
+
 {% block admin_content %}
     <div class="p-4">
 
         {{ breadcrumb() }}
         
-        <h1 class="text-success mb-4"><i class="bi bi-calendar"></i> Gestion des événements</h1>
+        <h1 class="text-gm-green mb-4"><i class="bi bi-calendar"></i> Gestion des événements</h1>
 
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ path('admin_events_new') }}" class="btn btn-success">
+            <a href="{{ path('admin_events_new') }}" class="btn btn-gm-green">
                 <i class="bi bi-plus-circle"></i> Nouveau événement
             </a>
         </div>
@@ -16,14 +18,14 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 {% if events is empty %}
-                    <div class="text-center py-4 text-muted-light">
+                    <div class="text-center py-4 text-gm-muted-light">
                         <i class="bi bi-calendar-x fs-1"></i>
-                        <p class="mt-2 text-light">Aucun événement trouvé</p>
+                        <p class="mt-2">Aucun événement trouvé</p>
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-striped table-hover table-light">
-                            <thead class="table-dark text-light">
+                        <table class="table table-gm table-striped table-hover">
+                            <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Titre</th>
@@ -39,7 +41,7 @@
                             </thead>
                             <tbody>
                                 {% for event in events %}
-                                    <tr class="text-light">
+                                    <tr>
                                         <td>{{ event.id }}</td>
                                         <td>{{ event.title }}</td>
                                         <td>{{ event.description }}</td>
@@ -47,17 +49,17 @@
                                         <td>{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
                                         <td>{{ event.location }}</td>
                                         <td>
-                                            <span class="badge bg-{{ event.isPublished ? 'success' : 'secondary' }} text-{{ event.isPublished ? 'light' : 'dark' }}">
+                                            <span class="badge bg-{{ event.isPublished ? 'gm-green' : 'secondary' }}">
                                                 {{ event.isPublished ? 'Oui' : 'Non' }}
                                             </span>
                                         </td>
                                         <td>
                                             {% if event.isMembersOnly %}
-                                                <span class="badge bg-warning text-dark" title="Visible uniquement par les membres actifs">
+                                                <span class="badge bg-gm-warning text-gm-bg" title="Visible uniquement par les membres actifs">
                                                     <i class="bi bi-people"></i> Membres
                                                 </span>
                                             {% else %}
-                                                <span class="badge bg-info text-dark" title="Visible par tous">
+                                                <span class="badge bg-gm-info text-gm-bg" title="Visible par tous">
                                                     <i class="bi bi-globe"></i> Public
                                                 </span>
                                             {% endif %}
