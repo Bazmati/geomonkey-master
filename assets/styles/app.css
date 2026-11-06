@@ -12,16 +12,16 @@
   --bs-body-color: var(--gm-text);
   --bs-secondary: var(--gm-surface);
 
-  /* Gray palette */
-  --gm-gray-900: #3a3a38;
-  --gm-gray-800: #333;
-  --gm-gray-700: #444;
-  --gm-gray-600: #666;
-  --gm-gray-500: #888;
-  --gm-gray-400: #999;
-  --gm-gray-300: #c0c0c0;
-  --gm-gray-200: #e0e0e0;
-  --gm-gray-100: #adb5bd;
+  /* Gray palette - aligned with Bootstrap convention (higher number = darker) */
+  --gm-gray-900: #1a1a18;
+  --gm-gray-800: #242422;
+  --gm-gray-700: #333;
+  --gm-gray-600: #444;
+  --gm-gray-500: #666;
+  --gm-gray-400: #888;
+  --gm-gray-300: #999;
+  --gm-gray-200: #adb5bd;
+  --gm-gray-100: #c0c0c0;
   --gm-white: #fff;
   --gm-light-gray: #f8f9fa;
   --gm-danger: #ff6b6b;
