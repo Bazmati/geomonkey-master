@@ -1,0 +1,8 @@
+zmkr_cloudflare_turnstile:
+    captcha:
+        sitekey: "%env(CLOUDFLARE_TURNSTILE_SITEKEY)%"
+        secret_key: "%env(CLOUDFLARE_TURNSTILE_SECRET_KEY)%"
+        # Optionnel : configuration par défaut pour tous les formulaires
+        # timeout: 300 # Timeout en secondes (défaut: 300)
+        # error_domain: "form" # Domaine d'erreur (défaut: "form")
+        # required: true # Si le captcha est requis (défaut: true)

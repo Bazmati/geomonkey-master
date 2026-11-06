@@ -47,7 +47,8 @@
         "symfony/yaml": "8.0.*",
         "twbs/bootstrap": "5.3.8",
         "twig/extra-bundle": "^2.12|^3.29",
-        "twig/twig": "^3.27,<3.29"
+        "twig/twig": "^3.27,<3.29",
+        "zemasterkrom/zmkr-cloudflare-turnstile-bundle": "^2.0"
     },
     "config": {
         "allow-plugins": {

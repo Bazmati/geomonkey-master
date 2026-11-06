@@ -12,7 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Form\Extension\Core\Type\HiddenType;
+use Zemasterkrom\CloudflareTurnstileBundle\Form\Type\CloudflareTurnstileType;
 
 class RegistrationFormType extends AbstractType
 {
@@ -84,13 +84,11 @@ class RegistrationFormType extends AbstractType
                 'required' => false,
                 'attr' => ['class' => 'form-check-input'],
             ])
-            // Champ honeypot anti-bot (ne doit pas être rempli)
-            ->add('honeypot', HiddenType::class, [
+            // Cloudflare Turnstile CAPTCHA
+            ->add('cf_turnstile_response', CloudflareTurnstileType::class, [
                 'mapped' => false,
-                'constraints' => [
-                    new Assert\Blank(message: 'Désolé, il semble que tu sois un bot.')
-                ],
-                'attr' => ['style' => 'display: none;'],
+                'label' => false,
+                'error_domain' => 'form',
             ]);
     }
 

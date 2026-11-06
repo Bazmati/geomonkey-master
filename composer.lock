@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "440e8aa319a310e4f2b5aea2e829f5cd",
+    "content-hash": "e4e7c78a683f2f38cb48c89cfd8d6682",
     "packages": [
         {
             "name": "composer/semver",
@@ -7904,6 +7904,70 @@
                 "source": "https://github.com/webmozarts/assert/tree/2.5.0"
             },
             "time": "2026-10-05T23:14:19+00:00"
+        },
+        {
+            "name": "zemasterkrom/zmkr-cloudflare-turnstile-bundle",
+            "version": "v2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Zemasterkrom/zmkr-cloudflare-turnstile-bundle.git",
+                "reference": "d0db9d32b5bd09d9ec4ad3d582ee08b5b6b07b7a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Zemasterkrom/zmkr-cloudflare-turnstile-bundle/zipball/d0db9d32b5bd09d9ec4ad3d582ee08b5b6b07b7a",
+                "reference": "d0db9d32b5bd09d9ec4ad3d582ee08b5b6b07b7a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.2",
+                "symfony/asset": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/config": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/form": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/framework-bundle": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/http-client": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/translation": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/twig-bundle": "^5.4|^6.0|^7.0|^8.0",
+                "symfony/validator": "^5.4|^6.0|^7.0|^8.0"
+            },
+            "require-dev": {
+                "dbrekelmans/bdi": "^1.0",
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "phpstan/phpstan-symfony": "^2.0",
+                "symfony/panther": "^0.8|^1.0|^2.0",
+                "symfony/phpunit-bridge": "^5.4|^6.0|^7.0|^8.0"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Zemasterkrom\\CloudflareTurnstileBundle\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Zemasterkrom",
+                    "email": "zemasterkrom@outlook.fr"
+                }
+            ],
+            "description": "Extensible and configurable integration of Cloudflare Turnstile with Symfony",
+            "keywords": [
+                "anti-spam",
+                "captcha",
+                "cloudflare",
+                "form",
+                "security",
+                "spam",
+                "turnstile"
+            ],
+            "support": {
+                "issues": "https://github.com/Zemasterkrom/zmkr-cloudflare-turnstile-bundle/issues",
+                "source": "https://github.com/Zemasterkrom/zmkr-cloudflare-turnstile-bundle/tree/v2.0"
+            },
+            "time": "2026-03-13T22:15:50+00:00"
         }
     ],
     "packages-dev": [
