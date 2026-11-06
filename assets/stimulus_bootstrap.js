@@ -1,4 +1,4 @@
-import { startStimulusApp } from '@symfony/stimulus-bundle/loader';
+import { startStimulusApp } from '@symfony/stimulus-bundle';
 
 // Registers Stimulus controllers from Symfony UX packages and your own controllers
 // located in "assets/controllers.json" and "assets/controllers/"
