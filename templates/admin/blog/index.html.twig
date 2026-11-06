@@ -1,15 +1,14 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block admin_content %}
+    {% set page_title = 'Articles de blog' %}
+    
     <div class="p-4">
-
         {{ breadcrumb() }}
         
-        <h1 class="text-success mb-4"><i class="bi bi-newspaper"></i> Articles de blog</h1>
-
         <div class="d-flex justify-content-end mb-3">
             {% if is_granted('ENTITY_CREATE') %}
-                <a href="{{ path('app_admin_blog_new') }}" class="btn btn-success">
+                <a href="{{ path('app_admin_blog_new') }}" class="btn btn-gm-green">
                     <i class="bi bi-plus-circle"></i> Nouvel article
                 </a>
             {% endif %}
@@ -22,7 +21,7 @@
                         <i class="bi bi-newspaper fs-1"></i>
                         <p class="mt-2">Aucun article</p>
                         {% if is_granted('ENTITY_CREATE') %}
-                            <a href="{{ path('app_admin_blog_new') }}" class="btn btn-primary">
+                            <a href="{{ path('app_admin_blog_new') }}" class="btn btn-gm-green">
                                 <i class="bi bi-plus-circle"></i> Créer le premier article
                             </a>
                         {% endif %}
@@ -48,7 +47,7 @@
                                         <td><code>{{ post.slug }}</code></td>
                                         <td>{{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : '—' }}</td>
                                         <td>
-                                            <span class="badge bg-{{ post.isPublished ? 'success' : 'secondary' }}">
+                                            <span class="badge bg-{{ post.isPublished ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                                 {{ post.isPublished ? 'En ligne' : 'Brouillon' }}
                                             </span>
                                         </td>
@@ -64,7 +63,7 @@
                                                 {% endif %}
                                                 {% if is_granted('ENTITY_EDIT') %}
                                                     <a href="{{ path('app_admin_blog_edit', {'id': post.id}) }}"
-                                                       class="btn btn-sm btn-warning" title="Modifier">
+                                                       class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                         <i class="bi bi-pencil-fill"></i>
                                                     </a>
                                                 {% endif %}
@@ -76,7 +75,7 @@
                                                           class="d-inline">
                                                         <input type="hidden" name="_token"
                                                                value="{{ csrf_token('publish' ~ post.id) }}">
-                                                        <button class="btn btn-sm btn-{{ post.isPublished ? 'outline-secondary' : 'outline-success' }}"
+                                                        <button class="btn btn-sm btn-{{ post.isPublished ? 'outline-gm-gray' : 'outline-gm-green' }}"
                                                                 type="submit"
                                                                 title="{{ post.isPublished ? 'Retirer de la ligne' : 'Mettre en ligne' }}"
                                                                 {% if not post.isPublished %}data-bs-toggle="tooltip" data-bs-title="Visibilité publique immédiate"{% endif %}>

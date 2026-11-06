@@ -49,7 +49,7 @@
                                         <td>{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
                                         <td>{{ event.location }}</td>
                                         <td>
-                                            <span class="badge bg-{{ event.isPublished ? 'gm-green' : 'secondary' }}">
+                                            <span class="badge bg-{{ event.isPublished ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                                 {{ event.isPublished ? 'Oui' : 'Non' }}
                                             </span>
                                         </td>
@@ -67,7 +67,7 @@
                                         <td>{{ event.image }}</td>
                                         <td>
                                             <div class="d-flex gap-1">
-                                                <a href="{{ path('admin_events_edit', {'id': event.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                                <a href="{{ path('admin_events_edit', {'id': event.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
                                                 {% include 'front/partials/_delete_button.html.twig' with {

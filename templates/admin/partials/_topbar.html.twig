@@ -8,7 +8,7 @@
     <div class="d-flex align-items-center justify-content-between p-3">
         {# gauche : titre + breadcrumb #}
         <div class="d-flex align-items-center gap-3">
-            <button class="btn btn-outline-warning d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')" 
+            <button class="btn btn-outline-gm-yellow d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')" 
                     aria-label="Toggle sidebar" aria-expanded="false">
                 <i class="bi bi-list"></i>
             </button>
@@ -26,7 +26,7 @@
         <div class="d-flex align-items-center gap-2">
             {# Slot pour future barre de recherche globale (Ctrl+K) #}
             <div class="search-slot min-w-200"></div>
-            <a href="{{ path('app_home') }}" class="btn btn-warning btn-sm" aria-label="Retour au site public">
+            <a href="{{ path('app_home') }}" class="btn btn-gm-yellow btn-sm" aria-label="Retour au site public">
                 <i class="bi bi-arrow-left"></i> Site public
             </a>
         </div>

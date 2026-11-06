@@ -262,6 +262,7 @@ a.badge:hover { filter: brightness(1.15); }
     border-right: 1px solid var(--gm-gray-900);
     scrollbar-width: thin;      /* Firefox */
     overscroll-behavior: contain;
+    z-index: 1020;
 }
 .admin-sidebar::-webkit-scrollbar { width: 6px; }
 .admin-sidebar::-webkit-scrollbar-thumb { background: var(--gm-gray-700); border-radius: 3px; }
@@ -419,7 +420,12 @@ a.badge:hover { filter: brightness(1.15); }
     background-color: var(--gm-light-gray);
 }
 
-/* Nav link hover for admin sidebar (moved from admin/partials/_sidebar.html.twig) */
+/* Nav link colors for admin sidebar - override Bootstrap defaults */
+.admin-sidebar .nav-link {
+    color: var(--gm-warning);
+}
+
+/* Nav link hover for admin sidebar */
 .admin-sidebar .nav-link:hover {
     background-color: rgba(255, 193, 7, 0.2);
 }
@@ -447,6 +453,7 @@ a.badge:hover { filter: brightness(1.15); }
     min-height: 64px;
     display: flex;
     align-items: center;
+    margin-left: -1px; /* Compense la bordure de la sidebar */
 }
 
 /* Flashs : centrés sur la zone de contenu */
@@ -454,5 +461,120 @@ a.badge:hover { filter: brightness(1.15); }
     max-width: 1140px;
     margin: 0 auto;
     padding: 0 1.5rem;
+}
+
+/* Token-based alert classes */
+.alert-gm-warning {
+    background-color: rgba(224, 192, 32, 0.15);
+    border-color: var(--gm-yellow);
+    color: var(--gm-yellow);
+}
+
+.alert-gm-warning .alert-link {
+    color: var(--gm-yellow);
+}
+
+/* Token-based table active */
+.table-active-gm {
+    background-color: rgba(0, 160, 64, 0.15) !important;
+}
+
+/* Token-based button colors */
+.btn-gm-green {
+    --bs-btn-bg: var(--gm-green);
+    --bs-btn-border-color: var(--gm-green);
+    --bs-btn-hover-bg: var(--gm-green-dark);
+    --bs-btn-hover-border-color: var(--gm-green-dark);
+    --bs-btn-color: var(--gm-bg);
+}
+
+.btn-gm-yellow {
+    --bs-btn-bg: var(--gm-yellow);
+    --bs-btn-border-color: var(--gm-yellow);
+    --bs-btn-color: var(--gm-bg);
+    --bs-btn-hover-bg: var(--gm-yellow);
+    --bs-btn-hover-border-color: var(--gm-yellow);
+    --bs-btn-active-bg: var(--gm-yellow);
+}
+
+.btn-gm-surface {
+    --bs-btn-bg: var(--gm-surface);
+    --bs-btn-border-color: var(--gm-gray-700);
+    --bs-btn-color: var(--gm-text);
+    --bs-btn-hover-bg: var(--gm-gray-800);
+    --bs-btn-hover-border-color: var(--gm-gray-600);
+}
+
+.btn-outline-gm-green {
+    --bs-btn-color: var(--gm-green);
+    --bs-btn-border-color: var(--gm-green);
+    --bs-btn-hover-bg: var(--gm-green);
+    --bs-btn-hover-border-color: var(--gm-green);
+}
+
+.btn-outline-gm-danger {
+    --bs-btn-color: var(--gm-danger);
+    --bs-btn-border-color: var(--gm-danger);
+    --bs-btn-hover-bg: var(--gm-danger);
+    --bs-btn-hover-border-color: var(--gm-danger);
+}
+
+.btn-outline-gm-gray {
+    --bs-btn-color: var(--gm-gray-300);
+    --bs-btn-border-color: var(--gm-gray-500);
+    --bs-btn-hover-bg: var(--gm-gray-500);
+    --bs-btn-hover-border-color: var(--gm-gray-400);
+}
+
+/* Token-based badge colors */
+.bg-gm-green { background-color: var(--gm-green); }
+.bg-gm-yellow { background-color: var(--gm-yellow); }
+.bg-gm-danger { background-color: var(--gm-danger); }
+.bg-gm-gray-600 { background-color: var(--gm-gray-600); }
+.bg-gm-white { background-color: var(--gm-white); }
+
+/* Token-based outline button colors */
+.btn-outline-gm-yellow {
+    --bs-btn-color: var(--gm-yellow);
+    --bs-btn-border-color: var(--gm-yellow);
+    --bs-btn-hover-bg: var(--gm-yellow);
+    --bs-btn-hover-border-color: var(--gm-yellow);
+}
+
+.btn-outline-gm-green {
+    --bs-btn-color: var(--gm-green);
+    --bs-btn-border-color: var(--gm-green);
+    --bs-btn-hover-bg: var(--gm-green);
+    --bs-btn-hover-border-color: var(--gm-green);
+}
+
+.btn-outline-gm-danger {
+    --bs-btn-color: var(--gm-danger);
+    --bs-btn-border-color: var(--gm-danger);
+    --bs-btn-hover-bg: var(--gm-danger);
+    --bs-btn-hover-border-color: var(--gm-danger);
+}
+
+.btn-outline-gm-gray {
+    --bs-btn-color: var(--gm-gray-300);
+    --bs-btn-border-color: var(--gm-gray-500);
+    --bs-btn-hover-bg: var(--gm-gray-500);
+    --bs-btn-hover-border-color: var(--gm-gray-400);
+}
+
+/* Token-based alert colors */
+.alert-gm-info {
+    background-color: rgba(13, 202, 240, 0.15);
+    border-color: var(--gm-info);
+    color: var(--gm-info);
+}
+
+/* Token-based text colors for alerts */
+.text-gm-white {
+    color: var(--gm-white) !important;
+}
+
+.text-gm-bg {
+    color: var(--gm-bg) !important;
 }
 

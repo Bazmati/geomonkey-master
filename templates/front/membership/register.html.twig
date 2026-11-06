@@ -23,7 +23,7 @@
 
                         {{ form_start(form) }}
                             <div class="row g-3">
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3">
                                     {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text bg-gm-light">
@@ -36,7 +36,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-md-6">
+                                <div class="col-md-6 mb-3">
                                     {{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text bg-gm-light">
@@ -49,7 +49,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-3">
                                     {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text bg-gm-light">
@@ -62,7 +62,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-3">
                                     {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                     <div class="input-group">
                                         <span class="input-group-text bg-gm-light">
@@ -76,7 +76,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-3">
                                     {{ form_label(form.requestedFunction) }}
                                     {{ form_widget(form.requestedFunction) }}
                                     <div class="text-gm-danger">
@@ -84,7 +84,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-3">
                                     <div class="form-check">
                                         {{ form_widget(form.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
                                         {{ form_label(form.agreeTerms, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
@@ -94,7 +94,7 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-3">
                                     <div class="form-check">
                                         {{ form_widget(form.imageConsent, {'attr': {'class': 'form-check-input'}}) }}
                                         {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2 text-gm-muted'}}) }}
@@ -104,13 +104,11 @@
                                     </div>
                                 </div>
                                 
-                                <div class="col-12">
+                                <div class="col-12 mb-4">
                                     {# Cloudflare Turnstile CAPTCHA #}
-                                    <div class="mb-3">
-                                        {{ form_widget(form.cf_turnstile_response) }}
-                                        <div class="text-danger">
-                                            {{ form_errors(form.cf_turnstile_response) }}
-                                        </div>
+                                    {{ form_widget(form.cf_turnstile_response) }}
+                                    <div class="text-gm-danger">
+                                        {{ form_errors(form.cf_turnstile_response) }}
                                     </div>
                                 </div>
                                 

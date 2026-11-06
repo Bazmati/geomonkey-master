@@ -1,184 +1,192 @@
-# GéoMonkey Style Guide
+# GéoMonkey - Style Guide
 
 ## 🎨 Design System
 
-**Theme**: Dark theme mandatory everywhere
-- Background: `--gm-bg` (#1C1C1A)
-- Surface: `--gm-surface` (#242422)
-- Text: `--gm-text` (#F5F0D0)
-- Primary: `--gm-green` (#00A040)
-- Warning: `--gm-yellow` (#E0C020)
+### Tokens CSS
 
-## 📜 Rules
+**Toute couleur passe par un token `--gm-*`** défini dans `:root` de `assets/styles/app.css`.
 
-### 1. **Colors - Token First**
-✅ **DO**: Use CSS custom properties (tokens) for ALL colors
+#### Couleurs principales
+- `--gm-green`: #00A040 (couleur primaire)
+- `--gm-green-dark`: #008a37 (survol, déclinaison)
+- `--gm-yellow`: #E0C020 (couleur secondaire/warning)
+- `--gm-bg`: #1C1C1A (fond sombre)
+- `--gm-surface`: #242422 (surface, cards)
+- `--gm-text`: #F5F0D0 (texte principal)
+- `--gm-white`: #FFFFFF
+
+#### Palette de gris (higher number = darker)
+- `--gm-gray-900`: #1a1a18
+- `--gm-gray-800`: #242422
+- `--gm-gray-700`: #333
+- `--gm-gray-600`: #444
+- `--gm-gray-500`: #666
+- `--gm-gray-400`: #888
+- `--gm-gray-300`: #999
+- `--gm-gray-200`: #adb5bd
+- `--gm-gray-100`: #c0c0c0
+
+#### Surcharge Bootstrap
+Toutes les variables Bootstrap sont surchargées via les tokens:
 ```css
-/* In app.css :root */
---gm-bg: #1C1C1A;
---gm-surface: #242422;
---gm-text: #F5F0D0;
-
-/* In HTML/Twig */
-<div class="bg-gm-surface text-gm-text">...</div>
+--bs-primary: var(--gm-green);
+--bs-primary-rgb: 0, 160, 64;
+--bs-warning: var(--gm-yellow);
+--bs-warning-rgb: 224, 192, 32;
+--bs-body-bg: var(--gm-bg);
+--bs-body-color: var(--gm-text);
 ```
 
-❌ **DON'T**: Use hardcoded hex colors or Bootstrap color classes
-```css
-/* BAD - Hardcoded hex */
-color: #333;
+## 🚫 Interdictions
 
-/* BAD - Bootstrap color classes */
-<div class="bg-dark text-white">...</div>
-```
+1. **Pas de couleurs hexadécimales en dur** dans les templates ou app.css (hors :root)
+2. **Pas de `style="..."` inline** dans les templates
+3. **Pas de blocs `<style>`** dans les templates (sauf dépendance Twig documentée)
+4. **Pas de classes Bootstrap non tokenisées** (btn-primary, btn-success, bg-light, etc.)
 
-### 2. **Styles - Classes Only**
-✅ **DO**: Use utility classes from app.css
-```html
-<div class="max-w-800 max-h-150 rounded-circle-80">...</div>
-```
+## ✅ Bonnes pratiques
 
-❌ **DON'T**: Use inline styles
-```html
-<!-- BAD -->
-<div style="max-width: 800px; height: 150px;">...</div>
-```
+### boutons
+- Utiliser les classes tokenisées : `btn-gm-green`, `btn-gm-yellow`, `btn-gm-surface`
+- Pour les boutons outline : `btn-outline-gm-green`, `btn-outline-gm-yellow`, `btn-outline-gm-gray`
 
-### 3. **Exceptions**
-✅ **ALLOWED**: `<style>` blocks in templates ONLY when they require Twig variables
+### Badges
+- Utiliser : `badge bg-gm-green text-gm-white`, `badge bg-gm-yellow text-gm-bg`, `badge bg-gm-danger text-gm-white`
+
+### Alertes
+- Utiliser : `alert alert-gm-info`, `alert alert-gm-warning`, `alert alert-gm-success`
+
+### Tableaux
+- Toujours utiliser `table table-gm table-striped table-hover` pour les tableaux admin
+- Ne jamais utiliser `table-light`, `table-dark`, `text-light`, `text-dark`
+
+### Cartes
+- Fond : `bg-gm-surface`
+- En-tête : `card-header bg-gm-surface`
+- Texte : `text-gm-text`
+
+### Formulaires
+- Fond des champs : déjà géré par le CSS global
+- Texte : `text-gm-text`, `text-gm-muted`
+- Badges de statut : utiliser les classes tokenisées
+
+## 📁 Structure des templates
+
+### Layout Admin
 ```twig
-{# front/base.html.twig - Hero background image #}
-<style>
-    .hero-section {
-        background-image: url('{{ asset("images/background.jpg") }}');
-    }
-</style>
-```
+{% extends 'admin/base.html.twig' %}
 
-### 4. **Bootstrap Overrides**
-✅ **DO**: Customize Bootstrap via CSS variables
-```css
-:root {
-    --bs-primary: var(--gm-green);
-    --bs-warning: var(--gm-yellow);
-    --bs-body-bg: var(--gm-bg);
-    --bs-body-color: var(--gm-text);
-}
-```
-
-❌ **DON'T**: Override Bootstrap with !important or inline styles
-
-## 🗂️ File Structure
-
-```
-assets/styles/
-├── app.css          # All design tokens and utility classes
-
-templates/
-├── partials/        # Reusable components (_picture.html.twig, etc.)
-│
-├── front/           # Public-facing templates
-│   ├── base.html.twig
-│   ├── security/     # Login, registration, password reset
-│   ├── membership/   # Membership flows
-│   └── ...
-│
-└── admin/           # Admin templates
-    ├── base.html.twig    # Autonomous (no front/ inheritance)
-    ├── partials/
-    │   ├── _sidebar.html.twig  # Dynamic menu with route matching
-    │   ├── _topbar.html.twig   # Sticky: title + breadcrumb + back button
-    │   └── _footer.html.twig
-    └── ...
-```
-
-## 🏗️ Component Patterns
-
-### Admin Layout (All Pages)
-```twig
-{# templates/admin/base.html.twig #}
-<div class="admin-shell">
-    <aside class="admin-sidebar">
-        {% include 'admin/partials/_sidebar.html.twig' %}
-    </aside>
-    <div class="admin-main">
-        {% include 'admin/partials/_topbar.html.twig' %}
-        <div class="admin-content">
-            {% block admin_content %}{% endblock %}
-        </div>
-        {% include 'admin/partials/_footer.html.twig' %}
+{% block admin_content %}
+    {% set page_title = 'Votre titre' %}
+    <div class="p-4">
+        {{ breadcrumb() }}
+        {# Contenu #}
     </div>
-</div>
+{% endblock %}
 ```
 
-### Sidebar Menu
-Dynamic active state based on current route:
+### Composants réutilisables
+- Toutes les partielles vont dans `templates/partials/`
+- Nommage : `_nom.html.twig`
+- Exemple : `_picture.html.twig` pour les images de galerie
+
+## 🎯 Menu Admin
+
+Structure dynamique via tableau Twig dans `_sidebar.html.twig`:
 ```twig
-{% set route = app.request.attributes.get('_route') %}
 {% set menu = [
     {label: 'Tableau de bord', icon: 'house', route: 'app_admin_dashboard', match: 'app_admin_dashboard'},
-    {label: 'Blog', icon: 'newspaper', route: 'app_admin_blog_index', match: 'app_admin_blog'},
-    # Future modules (commented):
-    {# {label: 'Boutique', icon: 'shop', route: '#', match: 'app_admin_shop'} #}
+    {label: 'Présentation', icon: 'newspaper', route: 'app_admin_presentation_index', match: 'app_admin_presentation'},
+    # ...
 ] %}
 {% for item in menu %}
-    <a class="nav-link {{ route starts with item.match ? 'active bg-gm-warning text-gm-bg' : 'text-gm-warning' }}"
+    <a class="nav-link {{ route starts with item.match ? 'active' : '' }}"
        href="{{ path(item.route) }}">
         <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
     </a>
 {% endfor %}
 ```
 
-### Forms
-- Use `form-control` classes (already styled for dark theme in app.css)
-- Input groups with icons: use `bg-gm-light text-gm-text` for the icon container
-- Error messages: use `text-gm-danger`
-
-## 📝 Naming Conventions
+## 🔧 Conventions de nommage
 
 ### Routes
-**Current inconsistency**: `app_admin_*` vs `admin_*`
-- **New modules**: Use `app_admin_*` prefix for consistency
-- **Existing**: Document both patterns, prefer `app_admin_*` for new code
+- **Incohérence actuelle** : Mix de `app_admin_*` et `admin_*`
+- **Nouveaux modules** : Utiliser `app_admin_*` pour homogénéité
 
-### CSS Classes
-- **Tokens**: `--gm-*` (colors, spacing)
-- **Utilities**: `.max-w-800`, `.min-w-200`, `.h-150`, `.rounded-circle-80`
-- **Components**: `.admin-shell`, `.admin-sidebar`, `.admin-topbar`, `.admin-content`
-- **Bootstrap**: Keep standard Bootstrap classes (btn, card, etc.)
+### CSS
+- Classes utilitaires : préfixer par `gm-` (ex: `text-gm-muted`)
+- Noms descriptifs : `admin-shell`, `admin-sidebar`, `admin-nav`, `admin-topbar`, `admin-content`
 
-### Images
-- **Avatar/logo**: Use `.img-avatar` (60x60px, rounded)
-- **Cover images**: Use `.img-cover` (object-fit: cover)
-- **Thumbnails**: Use `.rounded-circle-80` (80x80px, rounded)
+## 📱 Responsive
 
-## 🔮 Future Modules
+- Mobile-first
+- Breakpoint Bootstrap : `lg` (992px) pour la sidebar
+- Sidebar devient un drawer coulissant en dessous de `lg`
 
-### Menu Placement
-Add new admin modules to `_sidebar.html.twig` menu array:
+## ♿ Accessibilité
+
+- Toujours fournir des attributs `aria-label` pour les icônes seules
+- Contraste suffisant : fond sombre + texte clair
+- Navigation clavier : tous les éléments interactifs sont accessibles
+- Focus visibles : gérés par Bootstrap
+
+## 🔄 Maintenance
+
+Pour ajouter un nouveau module :
+1. Créer le controller et les templates dans `templates/admin/nom_module/`
+2. Ajouter l'entrée dans le menu de `_sidebar.html.twig`
+3. Utiliser uniquement les tokens et classes existants
+4. Respecter la structure `{% extends 'admin/base.html.twig' %}`
+5. Définir `{% set page_title = '...' %}`
+
+## 🎨 Exemples
+
+### Card avec tableau
 ```twig
-{label: 'Boutique', icon: 'shop', route: 'app_admin_shop_index', match: 'app_admin_shop'},
-{label: 'Billetterie', icon: 'ticket-perforated', route: 'app_admin_ticket_index', match: 'app_admin_ticket'},
+<div class="card shadow-sm">
+    <div class="card-header bg-gm-surface">
+        <h5 class="mb-0"><i class="bi bi-table"></i> Liste</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-gm table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>Colonne 1</th>
+                        <th>Colonne 2</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Valeur 1</td>
+                        <td><span class="badge bg-gm-green text-gm-white">Actif</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 ```
 
-### Search Slot
-Reserved in `_topbar.html.twig` for future global search (Ctrl+K):
+### Formulaire
 ```twig
-<div class="search-slot min-w-200"></div>
+<div class="card shadow-sm">
+    <div class="card-body">
+        {{ form_start(form) }}
+        <div class="mb-3">
+            {{ form_label(form.field) }}
+            {{ form_widget(form.field, {'attr': {'class': 'form-control'}}) }}
+            <div class="text-gm-danger">{{ form_errors(form.field) }}</div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn btn-gm-green">
+                <i class="bi bi-check-lg"></i> Enregistrer
+            </button>
+            <a href="{{ path('app_admin_module_index') }}" class="btn btn-gm-surface">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
 ```
-
-### Reusable Components
-- **Tables**: See `admin/gallery_image/index.html.twig` for canonical pattern
-- **Cards**: Consistent styling across all list views
-- **Buttons**: Use Bootstrap button classes with token colors
-
-## ✅ Checklist Before PR
-
-- [ ] No hardcoded hex colors outside `:root` in app.css
-- [ ] No inline `style="..."` attributes in templates
-- [ ] No `bg-dark`, `bg-light`, `text-white`, `text-dark`, `text-muted` (use token classes)
-- [ ] All form controls use dark theme styles from app.css
-- [ ] Admin pages extend `admin/base.html.twig`
-- [ ] Public pages extend `front/base.html.twig`
-- [ ] New reusable partials go in `templates/partials/`
-- [ ] Future modules added as commented entries in sidebar menu

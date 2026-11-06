@@ -43,7 +43,7 @@
                                         <td>{{ category.posts|length }}</td>
                                         <td>
                                             <div class="d-flex gap-1">
-                                                <a href="{{ path('admin_blog_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                                <a href="{{ path('admin_blog_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
                                                 {% include 'front/partials/_delete_button.html.twig' with {

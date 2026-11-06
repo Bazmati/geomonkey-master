@@ -1,27 +1,28 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block admin_content %}
+    {% set page_title = 'Modifier l\'événement' %}
+    
     <div class="p-4">
-
         {{ breadcrumb() }}
         
         <div class="card shadow-sm">
             {# === EN-TÊTE AVEC BOUTON RETOUR À DROITE === #}
-            <div class="card-header bg-light d-flex justify-content-end">
-                <a href="{{ path('admin_events_index') }}" class="btn btn-secondary btn-sm">
+            <div class="card-header bg-gm-surface d-flex justify-content-end">
+                <a href="{{ path('admin_events_index') }}" class="btn btn-gm-surface btn-sm">
                     <i class="bi bi-arrow-left"></i> Retour à la liste
                 </a>
             </div>
 
             {# === CORPS DE LA CARD === #}
             <div class="card-body">
-                <h1 class="text-success mb-4">Modifier l'événement</h1>
+                <h1 class="text-gm-green mb-4">Modifier l'événement</h1>
                 {{ include('admin/event/_form.html.twig', {'button_label': 'Mettre à jour', 'event': event}) }}
             </div>
 
             {# === PIED DE CARD AVEC BOUTONS MODIFIER ET SUPPRIMER À DROITE === #}
-            <div class="card-footer bg-light d-flex justify-content-end gap-2">
-                <button type="submit" form="event-form" class="btn btn-primary">
+            <div class="card-footer bg-gm-surface d-flex justify-content-end gap-2">
+                <button type="submit" form="event-form" class="btn btn-gm-green">
                     <i class="bi bi-pencil-square"></i> Mettre à jour
                 </button>
                 {{ include('admin/event/_delete_form.html.twig', {'event': event}) }}

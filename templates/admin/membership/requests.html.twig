@@ -4,17 +4,14 @@
 {% block title %}Demandes d'adhésion en attente - GéoMonkey{% endblock %}
 
 {% block admin_content %}
+    {% set page_title = 'Demandes d\'adhésion en attente' %}
+    
     <div class="p-4">
-
         {{ breadcrumb() }}
         
-        <h1 class="mb-4">
-            <i class="bi bi-people me-2"></i>Demandes d'adhésion en attente
-        </h1>
-
         {% if pendingUsers|length > 0 %}
             <div class="card shadow-sm">
-                <div class="card-header bg-light d-flex justify-content-between align-items-center">
+                <div class="card-header bg-gm-surface d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">
                         <i class="bi bi-clock-history me-2"></i>
                         {{ pendingUsers|length }} demande(s) en attente de validation
@@ -22,8 +19,8 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead class="table-light">
+                        <table class="table table-gm table-hover mb-0">
+                            <thead>
                                 <tr>
                                     <th>Nom</th>
                                     <th>Email</th>
@@ -44,7 +41,7 @@
                                                   action="{{ path('app_admin_membership_validate', {'id': user.id}) }}"
                                                   class="d-inline">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('validate' ~ user.id) }}">
-                                                <button type="submit" class="btn btn-sm btn-success" 
+                                                <button type="submit" class="btn btn-sm btn-gm-green" 
                                                         title="Valider la demande">
                                                     <i class="bi bi-check-lg me-1"></i> Valider
                                                 </button>
@@ -58,7 +55,7 @@
                 </div>
             </div>
         {% else %}
-            <div class="alert alert-info">
+            <div class="alert alert-gm-info">
                 <i class="bi bi-check-circle me-2"></i>
                 Aucune demande d'adhésion en attente de validation.
             </div>

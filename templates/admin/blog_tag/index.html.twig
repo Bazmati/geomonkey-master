@@ -1,14 +1,13 @@
 {% extends 'admin/base.html.twig' %}
 
 {% block admin_content %}
+    {% set page_title = 'Catégories du blog' %}
+    
     <div class="p-4">
-
         {{ breadcrumb() }}
         
-        <h1 class="text-success mb-4"><i class="bi bi-tag"></i> Catégories du blog</h1>
-
         <div class="d-flex justify-content-end mb-3">
-            <a href="{{ path('admin_blog_tag_new') }}" class="btn btn-success">
+            <a href="{{ path('admin_blog_tag_new') }}" class="btn btn-gm-green">
                 <i class="bi bi-plus-circle"></i> Nouvelle catégorie
             </a>
         </div>
@@ -41,7 +40,7 @@
                                         <td>{{ tag.posts|length }}</td>
                                         <td>
                                             <div class="d-flex gap-1">
-                                                <a href="{{ path('admin_blog_tag_edit', {'id': tag.id}) }}" class="btn btn-sm btn-warning" title="Modifier">
+                                                <a href="{{ path('admin_blog_tag_edit', {'id': tag.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
                                                 {% include 'front/partials/_delete_button.html.twig' with {

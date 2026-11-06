@@ -1,13 +1,15 @@
 {% extends 'admin/base.html.twig' %}
 
+{% set page_title = title ~ ' - Blog' %}
+
 {% block admin_content %}
     <div class="p-4">
         
         {{ breadcrumb() }}
 
-        <h1 class="text-success mb-4"><i class="bi bi-newspaper"></i> {{ title }}</h1>
+        <h1 class="text-gm-green mb-4"><i class="bi bi-newspaper"></i> {{ title }}</h1>
 
-        <div class="alert alert-info" role="alert">
+        <div class="alert alert-gm-info" role="alert">
             <i class="bi bi-info-circle"></i>
             L'article sera enregistré en <strong>brouillon</strong>. La mise en ligne publique
             est réservée au <strong>président</strong> (bouton « Mettre en ligne » dans la liste).
@@ -28,7 +30,7 @@
                 <div class="col-12">
                     {{ form_row(form.summary, {'attr': {'class': 'form-control', 'data-summary-counter': 'summaryCounter'}}) }}
                     <div class="d-flex justify-content-end">
-                        <small id="summaryCounter" class="form-text text-muted"></small>
+                        <small id="summaryCounter" class="form-text text-gm-muted"></small>
                     </div>
                 </div>
 
@@ -37,7 +39,7 @@
                                         <div class="accordion accordion-flush mt-2" id="formatHelp">
                         <div class="accordion-item border-0">
                             <h2 class="accordion-header">
-                                <button class="accordion-button collapsed ps-0 bg-transparent fw-normal text-info"
+                                <button class="accordion-button collapsed ps-0 bg-transparent fw-normal text-gm-info"
                                         type="button" data-bs-toggle="collapse"
                                         data-bs-target="#formatHelpBody" aria-expanded="false"
                                         aria-controls="formatHelpBody">
@@ -47,10 +49,10 @@
                             </h2>
                             <div id="formatHelpBody" class="accordion-collapse collapse"
                                  data-bs-parent="#formatHelp">
-                                <div class="accordion-body px-0 text-muted small">
+                                <div class="accordion-body px-0 text-gm-muted small">
                                     <p class="mb-2">Laissez une <strong>ligne vide</strong> entre chaque bloc pour créer un nouveau paragraphe. Syntaxe disponible :</p>
                                     <div class="table-responsive">
-                                        <table class="table table-sm table-striped table-light align-middle">
+                                        <table class="table table-gm table-sm table-striped align-middle">
                                             <thead>
                                                 <tr>
                                                     <th>Vous écrivez</th>
@@ -90,8 +92,8 @@
 
                 {# Image de couverture : upload #}
                 <div class="col-12">
-                    <div class="card bg-light p-4 mb-4">
-                        <h5 class="card-title text-primary mb-3">
+                    <div class="card bg-gm-surface p-4 mb-4">
+                        <h5 class="card-title text-gm-green mb-3">
                             <i class="bi bi-image"></i> Image de couverture
                         </h5>
 
@@ -127,10 +129,10 @@
 
                 <div class="col-12">
                     <div class="d-flex justify-content-end gap-2">
-                        <a href="{{ path('app_admin_blog_index') }}" class="btn btn-secondary">
+                        <a href="{{ path('app_admin_blog_index') }}" class="btn btn-gm-surface">
                             <i class="bi bi-arrow-left"></i> Annuler
                         </a>
-                        <button type="submit" class="btn btn-success">
+                        <button type="submit" class="btn btn-gm-green">
                             <i class="bi bi-check-lg"></i> {{ title == 'Nouvel article' ? 'Créer' : 'Enregistrer' }}
                         </button>
                     </div>
