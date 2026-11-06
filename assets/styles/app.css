@@ -1,12 +1,43 @@
-:root {
-  --gm-green: #00A040;
-  --gm-green-dark: #008a37;
-  --gm-yellow: #E0C020;
-  --gm-bg: #1C1C1A;
-  --gm-surface: #242422;
-  --gm-text: #F5F0D0;
+/* ============================================================
+   GéoMonkey — app.css (version corrigée, à coller telle quelle)
+   Palette : noir + blanc + vert + jaune (+ rouge réservé au danger)
+   Remplace TOUT le contenu de assets/styles/app.css par ce fichier.
+   Correctifs : variables --gm-warning / --gm-muted indéfinies, beige → blanc,
+   tableaux sombres lisibles SANS toucher aux templates, fil d'Ariane gris/blanc,
+   cyan supprimé, text-muted Bootstrap re-tokenisé.
+   ============================================================ */
 
-  /* --- Surcharge Bootstrap : primaire + déclinaisons -rgb (sinon le bleu #0d6efd revient) --- */
+:root {
+  /* ===== Palette : 5 couleurs, point final ===== */
+  --gm-bg: #1C1C1A;            /* fond noir */
+  --gm-surface: #242422;       /* surface : cards, sidebar, topbar, footer */
+  --gm-green: #00A040;        /* primaire : créer, valider */
+  --gm-green-dark: #008a37;   /* hover du vert */
+  --gm-yellow: #E0C020;       /* accent : modifier, attirer l'œil */
+  --gm-text: #ffffff;          /* texte = BLANC pur (plus de beige) */
+  --gm-danger: #e5484d;        /* rouge : supprimer / erreur uniquement */
+
+  /* ===== Neutres : 4 valeurs réelles, noms historiques conservés ===== */
+  --gm-gray-900: #3a3a38;      /* bordures */
+  --gm-gray-800: #242422;      /* = surface */
+  --gm-gray-700: #2c2c2a;      /* hover de surface */
+  --gm-gray-600: #3a3a38;      /* = bordure */
+  --gm-gray-500: #8a8a86;      /* désactivé, placeholder */
+  --gm-gray-400: #8a8a86;
+  --gm-gray-300: #a8a8a5;      /* texte secondaire LE gris à utiliser */
+  --gm-gray-200: #cfcfc9;
+  --gm-gray-100: #e8e8e4;
+  --gm-white: #ffffff;
+  --gm-light-gray: #f8f9fa;
+
+  /* Alias de compat : corrige les variables indéfinies du code précédent */
+  --gm-warning: var(--gm-yellow);
+  --gm-muted: var(--gm-gray-300);
+  --gm-info: var(--gm-yellow);        /* le cyan disparaît */
+
+  --gm-btn-warning-text: #1C1C1A;     /* texte noir sur bouton jaune */
+
+  /* ===== Surcharge Bootstrap : primaire + déclinaisons -rgb ===== */
   --bs-primary: var(--gm-green);
   --bs-primary-rgb: 0, 160, 64;
   --bs-primary-text-emphasis: var(--gm-green);
@@ -21,31 +52,15 @@
   --bs-secondary: var(--gm-surface);
   --bs-secondary-rgb: 36, 36, 34;
 
-  --bs-link-color: var(--gm-green);
-  --bs-link-color-rgb: 0, 160, 64;
-  --bs-link-hover-color: var(--gm-green-dark);
-  --bs-link-hover-color-rgb: 0, 138, 55;
+  --bs-link-color: var(--gm-white);             /* liens du texte : blancs */
+  --bs-link-color-rgb: 255, 255, 255;
+  --bs-link-hover-color: var(--gm-green);        /* hover vert = signal d'action */
+  --bs-link-hover-color-rgb: 0, 160, 64;
 
   --bs-focus-ring-color: rgba(0, 160, 64, 0.25);
   --bs-border-color: var(--gm-gray-900);
 
-  /* Gray palette - aligned with Bootstrap convention (higher number = darker) */
-  --gm-gray-900: #1a1a18;
-  --gm-gray-800: #242422;
-  --gm-gray-700: #333;
-  --gm-gray-600: #444;
-  --gm-gray-500: #666;
-  --gm-gray-400: #888;
-  --gm-gray-300: #999;
-  --gm-gray-200: #adb5bd;
-  --gm-gray-100: #c0c0c0;
-  --gm-white: #fff;
-  --gm-light-gray: #f8f9fa;
-  --gm-danger: #ff6b6b;
-  --gm-info: #0dcaf0;
-  
-  /* Button colors */
-  --gm-btn-warning-text: var(--gm-bg);
+  color-scheme: dark;   /* contrôles natifs (date pickers, scrollbars) en sombre */
 }
 
 body {
@@ -64,12 +79,17 @@ footer {
   --bs-btn-border-color: var(--gm-green);
   --bs-btn-hover-bg: var(--gm-green-dark);
   --bs-btn-hover-border-color: var(--gm-green-dark);
+  --bs-btn-color: #ffffff;
+  --bs-btn-hover-color: #ffffff;
 }
 
 .btn-warning {
   --bs-btn-bg: var(--gm-yellow);
   --bs-btn-border-color: var(--gm-yellow);
   --bs-btn-color: var(--gm-btn-warning-text);
+  --bs-btn-hover-bg: #d4b017;
+  --bs-btn-hover-border-color: #d4b017;
+  --bs-btn-hover-color: var(--gm-btn-warning-text);
 }
 
 /* Image cover styling */
@@ -94,16 +114,14 @@ footer {
 }
 
 /* ============================================
-   Form Styles - Dark Theme Contrast Fix
+   FORMULAIRES — thème sombre
    ============================================ */
 
-/* Card background for forms */
 .card {
     background: var(--gm-surface);
     border-color: var(--gm-gray-900);
 }
 
-/* Form control styling for dark theme */
 .form-control,
 .form-select {
     background: var(--gm-gray-800);
@@ -123,26 +141,22 @@ footer {
     color: var(--gm-gray-500);
 }
 
-/* File input styling */
 .form-control[type="file"] {
     background: var(--gm-gray-800);
     border-color: var(--gm-gray-700);
     color: var(--gm-white);
 }
 
-/* Form labels */
 .form-label,
 .label {
-    color: var(--gm-gray-200);
+    color: var(--gm-gray-100);
     font-weight: 500;
 }
 
-/* Form text (help text) */
 .form-text {
-    color: var(--gm-gray-400);
+    color: var(--gm-gray-300);
 }
 
-/* Form check (checkbox/radio) */
 .form-check-input {
     background: var(--gm-gray-800);
     border-color: var(--gm-gray-600);
@@ -154,21 +168,18 @@ footer {
 }
 
 .form-check-label {
-    color: var(--gm-gray-200);
+    color: var(--gm-gray-100);
 }
 
-/* Error messages */
 .text-danger,
 .form-error {
     color: var(--gm-danger) !important;
 }
 
-/* Image preview container - adjust for dark theme */
 .border {
     border-color: var(--gm-gray-700) !important;
 }
 
-/* Form field container */
 .mb-3 > .form-control,
 .mb-3 > .form-select {
     background: var(--gm-gray-800);
@@ -176,7 +187,6 @@ footer {
     color: var(--gm-white);
 }
 
-/* File input button text - make it visible */
 .form-control[type="file"]::file-selector-button {
     background: var(--gm-gray-700);
     border-color: var(--gm-gray-600);
@@ -189,7 +199,6 @@ footer {
     border-color: var(--gm-gray-500);
 }
 
-/* Date input styling */
 .form-control[type="date"],
 .form-control[type="datetime-local"] {
     background: var(--gm-gray-800);
@@ -197,7 +206,6 @@ footer {
     color: var(--gm-white);
 }
 
-/* Date picker icon (calendar icon) - make it white */
 .form-control[type="date"]::-webkit-calendar-picker-indicator,
 .form-control[type="datetime-local"]::-webkit-calendar-picker-indicator {
     filter: invert(1) brightness(1.5);
@@ -209,19 +217,15 @@ footer {
     filter: invert(1) brightness(2);
 }
 
-/* Firefox date picker icon */
-.form-control[type="date"]::-moz-calendar-picker-indicator,
-.form-control[type="datetime-local"]::-moz-calendar-picker-indicator {
-    filter: invert(1) brightness(1.5);
-}
-
-/* For Bootstrap date inputs specifically */
 input[type="date"],
 input[type="datetime-local"] {
     color-scheme: dark;
 }
 
-/* Blog content*/
+/* ============================================
+   CONTENU ARTICLES
+   ============================================ */
+
 .article-content p { margin-bottom: 1rem; line-height: 1.7; }
 .article-content h2 { font-size: 1.5rem; margin: 2rem 0 .75rem; }
 .article-content h3 { font-size: 1.25rem; margin: 1.5rem 0 .5rem; }
@@ -235,14 +239,12 @@ input[type="datetime-local"] {
     margin: 1.5rem 0;
 }
 
-/* Figures dans les articles */
 .article-figure figcaption { font-style: italic; }
 
-/* Tags cliquables */
 a.badge:hover { filter: brightness(1.15); }
 
 /* ============================================
-   BACKOFFICE — Layout pro : sidebar fixe, footer sticky
+   BACKOFFICE — dashboard : sidebar fixe, topbar sticky, footer sticky
    ============================================ */
 
 .admin-shell {
@@ -251,23 +253,28 @@ a.badge:hover { filter: brightness(1.15); }
     min-height: 100vh;
 }
 
-/* --- Sidebar : fixe, hauteur viewport, ne scrolle JAMAIS avec la page.
-       Si le menu déborde (petit écran), c'est le menu seul qui défile en interne. --- */
+/* Sidebar : fixe, hauteur viewport, scroll interne si besoin */
 .admin-sidebar {
     position: sticky;
     top: 0;
     height: 100vh;
-    overflow-y: auto;           /* filet de sécurité, invisible sur desktop */
+    overflow-y: auto;
     background: var(--gm-surface);
     border-right: 1px solid var(--gm-gray-900);
-    scrollbar-width: thin;      /* Firefox */
+    scrollbar-width: thin;
     overscroll-behavior: contain;
     z-index: 1020;
 }
 .admin-sidebar::-webkit-scrollbar { width: 6px; }
-.admin-sidebar::-webkit-scrollbar-thumb { background: var(--gm-gray-700); border-radius: 3px; }
+.admin-sidebar::-webkit-scrollbar-thumb { background: var(--gm-gray-600); border-radius: 3px; }
 
-/* --- Zone principale : c'est ELLE qui scrolle, la sidebar reste immobile --- */
+/* Marque "Admin Panel" : blanc, lisible, quelle que soit la classe du template */
+.admin-sidebar .navbar-brand,
+.admin-sidebar .navbar-brand span {
+    color: var(--gm-white);
+}
+
+/* Zone principale : c'est elle qui scrolle */
 .admin-main {
     display: flex;
     flex-direction: column;
@@ -275,11 +282,11 @@ a.badge:hover { filter: brightness(1.15); }
 }
 
 .admin-content {
-    flex: 1 1 auto;            /* pousse le footer vers le bas quand le contenu est court */
+    flex: 1 1 auto;
     padding: 1.5rem;
 }
 
-/* --- Footer : toujours visible en bas du viewport --- */
+/* Footer admin : toujours visible en bas */
 .admin-footer {
     display: flex;
     align-items: center;
@@ -287,27 +294,131 @@ a.badge:hover { filter: brightness(1.15); }
     padding: 0.75rem 1.5rem;
     background: var(--gm-surface);
     border-top: 1px solid var(--gm-gray-900);
-    color: var(--gm-gray-100);
+    color: var(--gm-gray-300);
     font-size: 0.875rem;
     position: sticky;
     bottom: 0;
     z-index: 10;
 }
+.admin-footer a { color: var(--gm-gray-200); }
+.admin-footer a:hover { color: var(--gm-white); }
 
-/* --- Sidebar interne : menu structuré en sections --- */
+/* Topbar sticky : titre + fil d'Ariane */
+.admin-topbar {
+    background: var(--gm-surface);
+    border-bottom: 1px solid var(--gm-gray-900);
+    position: sticky;
+    top: 0;
+    z-index: 1030;
+    min-height: 64px;
+    display: flex;
+    align-items: center;
+    margin-left: -1px;
+}
+
+/* Flashs : centrés sur la zone de contenu */
+.admin-flash {
+    max-width: 1140px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+/* ============================================
+   FIL D'ARIANE — métadonnée discrète (gris → blanc)
+   ============================================ */
+
+.breadcrumb {
+  --bs-breadcrumb-divider-color: var(--gm-gray-300);
+  margin-bottom: 0;
+}
+.breadcrumb-item a {
+  color: var(--gm-gray-300);
+  text-decoration: none;
+}
+.breadcrumb-item a:hover {
+  color: var(--gm-white);
+}
+.breadcrumb-item.active {
+  color: var(--gm-white);
+}
+
+/* ============================================
+   TABLEAUX — sombres et lisibles
+   .table-gm : la classe propre.
+   .table-light/.table-dark : rattrapage SANS toucher aux templates.
+   ============================================ */
+
+.table-gm {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--gm-text);
+  --bs-table-border-color: var(--gm-gray-900);
+  --bs-table-striped-color: var(--gm-text);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-color: var(--gm-white);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
+  color: var(--gm-text);
+}
+.table-gm thead th {
+  background: var(--gm-gray-900);
+  color: var(--gm-text);
+}
+
+/* Rattrapage : les vieux table-light deviennent sombres automatiquement */
+.table-light {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--gm-text);
+  --bs-table-border-color: var(--gm-gray-900);
+  --bs-table-striped-color: var(--gm-text);
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
+  --bs-table-hover-color: var(--gm-white);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
+  --bs-table-bg-type: transparent;
+  color: var(--gm-text);
+  border-color: var(--gm-gray-900);
+}
+.table-light th,
+.table-light td,
+.table-light thead th {
+  background-color: transparent;
+  color: var(--gm-text);
+  border-color: var(--gm-gray-900);
+}
+.table-light thead th,
+thead.table-light th {
+  background: var(--gm-gray-900);
+}
+.table-light .text-dark,
+.table-light .text-body {
+  color: var(--gm-text) !important;
+}
+
+/* Tableaux table-dark : idem, dans la palette */
+.table-dark {
+  --bs-table-bg: transparent;
+  --bs-table-color: var(--gm-text);
+  --bs-table-border-color: var(--gm-gray-900);
+}
+
+/* text-muted Bootstrap : gris de la palette, lisible sur sombre */
+.text-muted { color: var(--gm-gray-300) !important; }
+
+/* ============================================
+   MENU ADMIN (nav structurée)
+   ============================================ */
+
 .admin-nav { display: flex; flex-direction: column; height: 100%; padding: 1rem 0.75rem; }
 
 .admin-nav .nav-section {
     font-size: 0.7rem;
     letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: var(--gm-gray-100);
+    color: var(--gm-gray-300);
     padding: 0.75rem 0.75rem 0.35rem;
     margin-bottom: 0.15rem;
 }
 
 .admin-nav .nav-link {
-    color: var(--gm-warning);
+    color: var(--gm-yellow);       /* défini : --gm-warning n'existe plus */
     border-radius: 0.5rem;
     padding: 0.5rem 0.75rem;
     margin-bottom: 2px;
@@ -324,11 +435,18 @@ a.badge:hover { filter: brightness(1.15); }
     font-weight: 600;
 }
 .admin-nav .nav-link.disabled {
-    color: var(--gm-muted);
+    color: var(--gm-gray-300);     /* défini : --gm-muted n'existe plus */
     opacity: 0.6;
 }
 
-/* --- Responsive : < lg, la sidebar devient un drawer coulissant --- */
+/* Compat : les nav-link de la sidebar hors .admin-nav suivent la même règle */
+.admin-sidebar .nav-link { color: var(--gm-yellow); }
+.admin-sidebar .nav-link:hover { background-color: rgba(224, 192, 32, 0.15); color: var(--gm-white); }
+
+/* ============================================
+   RESPONSIVE — < lg : la sidebar devient un drawer
+   ============================================ */
+
 @media (max-width: 991.98px) {
     .admin-shell { grid-template-columns: 1fr; }
     .admin-sidebar {
@@ -344,164 +462,94 @@ a.badge:hover { filter: brightness(1.15); }
     .admin-main { min-height: 100vh; }
 }
 
-/* Tableaux admin sur thème sombre */
-.table-gm {
-  --bs-table-bg: transparent;
-  --bs-table-color: var(--gm-text);
-  --bs-table-border-color: var(--gm-gray-900);
-  --bs-table-striped-color: var(--gm-text);
-  --bs-table-striped-bg: rgba(255, 255, 255, 0.03);
-  --bs-table-hover-color: var(--gm-text);
-  --bs-table-hover-bg: rgba(255, 255, 255, 0.06);
-  color: var(--gm-text);
-}
-.table-gm thead th {
-  background: var(--gm-gray-900);
-  color: var(--gm-text);
-}
-
 /* ============================================
-   UTILITY CLASSES - Pour remplacer les styles inline
+   CLASSES UTILITAIRES
    ============================================ */
 
-/* Token-based color utilities - REMPLACER bg-dark, bg-light, text-white, text-dark, etc. */
+/* Couleurs */
 .bg-gm-dark { background-color: var(--gm-bg); }
 .bg-gm-surface { background-color: var(--gm-surface); }
 .bg-gm-light { background-color: var(--gm-light-gray); }
 .bg-gm-warning { background-color: var(--gm-yellow); }
 .bg-gm-green { background-color: var(--gm-green); }
 .bg-gm-danger { background-color: var(--gm-danger); }
-.bg-gm-info { background-color: var(--gm-info); }
+.bg-gm-info { background-color: var(--gm-yellow); }
+.bg-gm-gray-600 { background-color: var(--gm-gray-600); }
+.bg-gm-white { background-color: var(--gm-white); }
+.bg-gm-yellow { background-color: var(--gm-yellow); }
 
 .text-gm-white { color: var(--gm-white); }
 .text-gm-text { color: var(--gm-text); }
-.text-gm-muted { color: var(--gm-gray-400); }
-.text-gm-muted-light { color: var(--gm-gray-300); }
+.text-gm-muted { color: var(--gm-gray-300); }
+.text-gm-muted-light { color: var(--gm-gray-200); }
 .text-gm-warning { color: var(--gm-yellow); }
 .text-gm-green { color: var(--gm-green); }
 .text-gm-danger { color: var(--gm-danger); }
-.text-gm-info { color: var(--gm-info); }
+.text-gm-info { color: var(--gm-yellow); }
+.text-gm-white { color: var(--gm-white) !important; }
+.text-gm-bg { color: var(--gm-bg) !important; }
+.text-muted-light { color: var(--gm-gray-200); }
 
-/* Width utilities */
+/* Largeurs */
 .w-100 { width: 100%; }
 .max-w-800 { max-width: 800px; }
 .max-w-600 { max-width: 600px; }
 .max-w-220 { max-width: 220px; }
 .min-w-200 { min-width: 200px; }
+.container-800 { max-width: 800px; margin-left: auto; margin-right: auto; }
 
-/* Height utilities */
+/* Hauteurs */
 .h-150 { height: 150px; }
 .max-h-150 { max-height: 150px; }
 .max-h-200 { max-height: 200px; }
 .max-h-400 { max-height: 400px; }
 
-/* Image utilities */
+/* Images */
 .img-fit-cover { object-fit: cover; }
+.rounded-circle-80 { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; }
+.img-avatar { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; }
 
-/* Text utilities */
+/* Divers */
 .pre-line { white-space: pre-line; }
-.text-muted-light { color: var(--gm-gray-300); }
+.border-radius-15 { border-radius: 15px; }
+.border-radius-8 { border-radius: 8px; }
+.overflow-hidden { overflow: hidden; }
 
-/* Container utilities */
-.container-800 { max-width: 800px; margin-left: auto; margin-right: auto; }
-
-/* Hero section styles (moved from front/base.html.twig) */
+/* Hero (front) */
 .hero-section {
     min-height: 70vh;
     background: linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.6) 100%);
 }
-.hero-logo {
-    max-width: 100%;
-    height: auto;
-}
+.hero-logo { max-width: 100%; height: auto; }
+.bg-surface { background-color: var(--gm-light-gray); }
 
-/* Background surface (moved from front/base.html.twig) */
-.bg-surface {
-    background-color: var(--gm-light-gray);
-}
+/* ============================================
+   BOUTONS & ALERTES tokenisés
+   ============================================ */
 
-/* Nav link colors for admin sidebar - override Bootstrap defaults */
-.admin-sidebar .nav-link {
-    color: var(--gm-warning);
-}
-
-/* Nav link hover for admin sidebar */
-.admin-sidebar .nav-link:hover {
-    background-color: rgba(255, 193, 7, 0.2);
-}
-
-/* Rounded images */
-.rounded-circle-80 { width: 80px; height: 80px; object-fit: cover; border-radius: 50%; }
-
-/* Avatar for login form */
-.img-avatar { width: 60px; height: 60px; object-fit: cover; border-radius: 50%; }
-
-/* Card border radius */
-.border-radius-15 { border-radius: 15px; }
-.border-radius-8 { border-radius: 8px; }
-
-/* Overflow utilities */
-.overflow-hidden { overflow: hidden; }
-
-/* Admin topbar */
-.admin-topbar {
-    background: var(--gm-surface);
-    border-bottom: 1px solid var(--gm-gray-900);
-    position: sticky;
-    top: 0;
-    z-index: 1030;
-    min-height: 64px;
-    display: flex;
-    align-items: center;
-    margin-left: -1px; /* Compense la bordure de la sidebar */
-}
-
-/* Flashs : centrés sur la zone de contenu */
-.admin-flash {
-    max-width: 1140px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
-}
-
-/* Token-based alert classes */
-.alert-gm-warning {
-    background-color: rgba(224, 192, 32, 0.15);
-    border-color: var(--gm-yellow);
-    color: var(--gm-yellow);
-}
-
-.alert-gm-warning .alert-link {
-    color: var(--gm-yellow);
-}
-
-/* Token-based table active */
-.table-active-gm {
-    background-color: rgba(0, 160, 64, 0.15) !important;
-}
-
-/* Token-based button colors */
 .btn-gm-green {
     --bs-btn-bg: var(--gm-green);
     --bs-btn-border-color: var(--gm-green);
     --bs-btn-hover-bg: var(--gm-green-dark);
     --bs-btn-hover-border-color: var(--gm-green-dark);
-    --bs-btn-color: var(--gm-bg);
+    --bs-btn-color: #ffffff;
+    --bs-btn-hover-color: #ffffff;
 }
 
 .btn-gm-yellow {
     --bs-btn-bg: var(--gm-yellow);
     --bs-btn-border-color: var(--gm-yellow);
     --bs-btn-color: var(--gm-bg);
-    --bs-btn-hover-bg: var(--gm-yellow);
-    --bs-btn-hover-border-color: var(--gm-yellow);
-    --bs-btn-active-bg: var(--gm-yellow);
+    --bs-btn-hover-bg: #d4b017;
+    --bs-btn-hover-border-color: #d4b017;
+    --bs-btn-active-bg: #d4b017;
 }
 
 .btn-gm-surface {
     --bs-btn-bg: var(--gm-surface);
     --bs-btn-border-color: var(--gm-gray-700);
     --bs-btn-color: var(--gm-text);
-    --bs-btn-hover-bg: var(--gm-gray-800);
+    --bs-btn-hover-bg: var(--gm-gray-700);
     --bs-btn-hover-border-color: var(--gm-gray-600);
 }
 
@@ -510,6 +558,7 @@ a.badge:hover { filter: brightness(1.15); }
     --bs-btn-border-color: var(--gm-green);
     --bs-btn-hover-bg: var(--gm-green);
     --bs-btn-hover-border-color: var(--gm-green);
+    --bs-btn-hover-color: #ffffff;
 }
 
 .btn-outline-gm-danger {
@@ -517,64 +566,38 @@ a.badge:hover { filter: brightness(1.15); }
     --bs-btn-border-color: var(--gm-danger);
     --bs-btn-hover-bg: var(--gm-danger);
     --bs-btn-hover-border-color: var(--gm-danger);
+    --bs-btn-hover-color: #ffffff;
 }
 
 .btn-outline-gm-gray {
-    --bs-btn-color: var(--gm-gray-300);
+    --bs-btn-color: var(--gm-gray-200);
     --bs-btn-border-color: var(--gm-gray-500);
     --bs-btn-hover-bg: var(--gm-gray-500);
     --bs-btn-hover-border-color: var(--gm-gray-400);
+    --bs-btn-hover-color: var(--gm-bg);
 }
 
-/* Token-based badge colors */
-.bg-gm-green { background-color: var(--gm-green); }
-.bg-gm-yellow { background-color: var(--gm-yellow); }
-.bg-gm-danger { background-color: var(--gm-danger); }
-.bg-gm-gray-600 { background-color: var(--gm-gray-600); }
-.bg-gm-white { background-color: var(--gm-white); }
-
-/* Token-based outline button colors */
 .btn-outline-gm-yellow {
     --bs-btn-color: var(--gm-yellow);
     --bs-btn-border-color: var(--gm-yellow);
     --bs-btn-hover-bg: var(--gm-yellow);
     --bs-btn-hover-border-color: var(--gm-yellow);
+    --bs-btn-hover-color: var(--gm-bg);
 }
 
-.btn-outline-gm-green {
-    --bs-btn-color: var(--gm-green);
-    --bs-btn-border-color: var(--gm-green);
-    --bs-btn-hover-bg: var(--gm-green);
-    --bs-btn-hover-border-color: var(--gm-green);
+.alert-gm-warning {
+    background-color: rgba(224, 192, 32, 0.15);
+    border-color: var(--gm-yellow);
+    color: var(--gm-yellow);
 }
+.alert-gm-warning .alert-link { color: var(--gm-white); }
 
-.btn-outline-gm-danger {
-    --bs-btn-color: var(--gm-danger);
-    --bs-btn-border-color: var(--gm-danger);
-    --bs-btn-hover-bg: var(--gm-danger);
-    --bs-btn-hover-border-color: var(--gm-danger);
-}
-
-.btn-outline-gm-gray {
-    --bs-btn-color: var(--gm-gray-300);
-    --bs-btn-border-color: var(--gm-gray-500);
-    --bs-btn-hover-bg: var(--gm-gray-500);
-    --bs-btn-hover-border-color: var(--gm-gray-400);
-}
-
-/* Token-based alert colors */
 .alert-gm-info {
-    background-color: rgba(13, 202, 240, 0.15);
-    border-color: var(--gm-info);
-    color: var(--gm-info);
+    background-color: rgba(224, 192, 32, 0.12);
+    border-color: var(--gm-yellow);
+    color: var(--gm-gray-100);
 }
 
-/* Token-based text colors for alerts */
-.text-gm-white {
-    color: var(--gm-white) !important;
+.table-active-gm {
+    background-color: rgba(0, 160, 64, 0.15) !important;
 }
-
-.text-gm-bg {
-    color: var(--gm-bg) !important;
-}
-
