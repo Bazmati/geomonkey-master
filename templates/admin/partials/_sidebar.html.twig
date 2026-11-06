@@ -14,17 +14,16 @@
         {label: 'Tags blog', icon: 'tag', route: 'admin_blog_tag_index', match: 'admin_blog_tag'},
         {label: 'Événements', icon: 'calendar', route: 'admin_events_index', match: 'admin_events'},
         {label: 'Galerie', icon: 'images', route: 'app_admin_gallery_image_index', match: 'app_admin_gallery_image'},
-        {# Futurs modules #}
         {label: 'Projets', icon: 'folder', route: '#', match: 'app_admin_project'},
         {label: 'Boutique', icon: 'shop', route: '#', match: 'app_admin_shop'},
         {label: 'Billetterie', icon: 'ticket-perforated', route: '#', match: 'app_admin_ticket'},
-        {# Fin futurs modules #}
         {label: 'Utilisateurs', icon: 'people', route: 'app_admin_user_index', match: 'app_admin_user'},
         {label: 'Adhésions', icon: 'person-plus', route: 'app_admin_membership_requests', match: 'app_admin_membership'},
         {label: 'Tarif adhésion', icon: 'currency-euro', route: 'app_admin_membership_fee_index', match: 'app_admin_membership_fee'},
         {label: 'Messages', icon: 'envelope', route: '#', match: 'app_admin_message'},
         {label: 'Paramètres', icon: 'gear', route: '#', match: 'app_admin_settings'},
     ] %}
+    {# Fin du menu - les entrées avec route='#' sont des placeholders pour modules futurs #}
     
     <ul class="nav nav-pills flex-column">
         {% for item in menu %}
