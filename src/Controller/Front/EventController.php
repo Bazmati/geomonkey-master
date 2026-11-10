@@ -58,7 +58,7 @@ class EventController extends AbstractController
                 'start' => $event->getStartDate()?->format(\DateTimeInterface::ATOM),
                 'end' => $event->getEndDate()?->format(\DateTimeInterface::ATOM),
                 'url' => $this->generateUrl('app_event_show', ['id' => $event->getId()]),
-                'membersOnly' => (bool) $event->getIsMembersOnly(),
+                'membersOnly' => (bool) $event->isMembersOnly(),
                 'location' => $event->getLocation(),
                 'past' => $event->getEndDate() !== null && $event->getEndDate()->getTimestamp() < $now,
             ];

@@ -54,8 +54,19 @@
             "description": "Association culturelle et conviviale : événements, ateliers et rencontres."
         }
         </script>
+        {# FullCalendar CSS #}
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/index.min.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6/index.min.css">
+        
+        {# FullCalendar JS (ordre critique : DayGrid AVANT Core) #}
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6/index.global.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/index.global.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/locales/fr.global.min.js"></script>
+        
+        {# Importmap chargé dans HEAD pour éviter les conflits #}
+        {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
-    <body>
+    <body data-turbo="false">
         {# Messages flash #}
         <div class="container mt-3">
             {% for type, messages in app.flashes %}
@@ -69,7 +80,7 @@
         </div>
 
         {% block body %}{% endblock %}
-        <footer class="bg-gm-surface text-center text-gm-warning py-3">
+        <footer class="bg-gm-surface text-center text-gm-warning py-3 mt-5">
             <div class="container">
                 <p class="mb-1">&copy; {{ 'now'|date('Y') }} GéoMonkey - Tous droits réservés</p>
                 <p class="mb-0 small">
@@ -81,7 +92,6 @@
         </footer>
 
         {% block javascripts %}
-            {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
     </body>
 </html>

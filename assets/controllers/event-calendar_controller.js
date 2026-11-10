@@ -1,24 +1,14 @@
 import { Controller } from '@hotwired/stimulus';
-import { Calendar } from '@fullcalendar/core';
-import dayGridPlugin from '@fullcalendar/daygrid';
-import frLocale from '@fullcalendar/core/locales.fr';
 
-/*
- * Contrôleur Stimulus : calendrier des événements (desktop)
- *
- * Usage : <div data-controller="event-calendar" data-event-calendar-feed-url-value="{{ path('app_event_data') }}"></div>
- * Le feed JSON renvoie {id, title, start, end, url, membersOnly, location}.
- */
 export default class extends Controller {
     static values = {
         feedUrl: String,
     };
 
     connect() {
-        this.calendar = new Calendar(this.element, {
-            plugins: [dayGridPlugin],
-            locale: frLocale,
-            initialView: 'dayGridMonth',
+        this.calendar = new window.FullCalendar.Calendar(this.element, {
+            plugins: [window.FullCalendar.DayGrid],
+            locale: 'fr',
             height: 'auto',
             headerToolbar: {
                 left: 'prev,next today',

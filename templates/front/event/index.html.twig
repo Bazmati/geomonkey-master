@@ -4,6 +4,14 @@
 
 {% block meta_description %}Découvrez les événements de l'association GéoMonkey : ateliers, constructions, festivals et rencontres.{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+{% endblock %}
+
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
 <section class="py-5 bg-surface">
@@ -29,7 +37,7 @@
         {# ============================================================
            DESKTOP (>= lg) : calendrier FullCalendar alimenté par le feed JSON
            ============================================================ #}
-        <div class="d-none d-lg-block"
+        <div class="d-none d-lg-block gm-calendar-container"
              data-controller="event-calendar"
              data-event-calendar-feed-url-value="{{ path('app_event_data') }}"></div>
 

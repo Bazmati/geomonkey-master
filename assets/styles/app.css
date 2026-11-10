@@ -697,3 +697,11 @@ body.admin-body > .container.mt-3:empty {
     margin-top: 0.3rem;      /* alignée sur la 1re ligne de texte */
     float: none;             /* neutralise le float Bootstrap */
 }
+
+/* ============================================================
+   CALENDRIER FULLCALENDAR
+   ============================================================ */
+.gm-calendar-container {
+    min-height: 600px;
+    margin: 20px 0;
+}
