@@ -645,3 +645,55 @@ thead.table-light th {
     background: var(--gm-gray-900);
     color: var(--gm-muted);
 }
+
+/* ============================================================
+   RESPONSIVE PATCH — à COLLER À LA FIN de assets/styles/app.css
+   Correctifs : footer en bas de page (front + admin),
+   chevauchement radios/checks du formulaire d'inscription,
+   tableaux admin lisibles sur mobile.
+   ============================================================ */
+
+/* --------------------------------------------
+   1. FOOTER TOUJOURS EN BAS DE L'ÉCRAN
+   Le body devient une colonne flex pleine hauteur :
+   sur une page courte, le footer est poussé vers le bas
+   au lieu de s'arrêter après le contenu.
+   -------------------------------------------- */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+/* Le footer (front et admin) colle au bas du flux */
+body > footer,
+.admin-footer {
+    margin-top: auto;
+}
+
+/* Admin : le shell absorbe déjà toute la hauteur ;
+   on neutralise la marge du conteneur de flashs qui
+   créait un scroll parasite de quelques pixels.
+   (le conteneur est vide quand il n'y a pas de message) */
+body.admin-body > .container.mt-3:empty {
+    display: none;
+    margin: 0;
+}
+
+/* --------------------------------------------
+   2. RADIOS / CHECKBOX : PLUS DE CHEVAUCHEMENT
+   Chaque .form-check devient un flex : la case reste à
+   gauche, le texte LONG (statuts, CGU) se met à côté
+   et revient à la ligne SOUS le texte, jamais sous la case.
+   -------------------------------------------- */
+.form-check {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.form-check > .form-check-input {
+    flex-shrink: 0;          /* la case ne rétrécit jamais */
+    margin-top: 0.3rem;      /* alignée sur la 1re ligne de texte */
+    float: none;             /* neutralise le float Bootstrap */
+}
