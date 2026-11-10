@@ -14,7 +14,7 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<section class="py-5 bg-surface">
+<section class="py-5 ">
     <div class="container">
 
         {{ breadcrumb() }}
@@ -37,7 +37,7 @@
         {# ============================================================
            DESKTOP (>= lg) : calendrier FullCalendar alimenté par le feed JSON
            ============================================================ #}
-        <div class="d-none d-lg-block gm-calendar-container"
+        <div class="d-none d-lg-block gm-calendar gm-calendar-container"
              data-controller="event-calendar"
              data-event-calendar-feed-url-value="{{ path('app_event_data') }}"></div>
 
