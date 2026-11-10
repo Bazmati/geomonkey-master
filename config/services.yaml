@@ -49,11 +49,14 @@ services:
     App\Factory\UserFactory:
 
     # StripeService - configuration des clés depuis .env
+        # StripeService - configuration des clés depuis .env
     App\Service\StripeService:
         arguments:
             $stripeSecretKey: '%env(STRIPE_SECRET_KEY)%'
             $successUrl: '%env(STRIPE_SUCCESS_URL)%'
             $cancelUrl: '%env(STRIPE_CANCEL_URL)%'
+            $donationSuccessUrl: '%env(STRIPE_DONATION_SUCCESS_URL)%'
+            $donationCancelUrl: '%env(STRIPE_DONATION_CANCEL_URL)%'
             $webhookSecret: '%env(STRIPE_WEBHOOK_SECRET)%'
 
     # MailService - service d'envoi d'emails

@@ -1,0 +1,9 @@
+# robots.txt — GéoMonkey
+User-agent: *
+Disallow: /admin
+Disallow: /webhook
+Disallow: /profile
+Disallow: /_profiler
+Disallow: /_wdt
+
+Sitemap: https://www.geomonkey.fr/sitemap.xml

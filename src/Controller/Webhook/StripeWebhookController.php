@@ -2,8 +2,10 @@
 
 namespace App\Controller\Webhook;
 
+use App\Entity\Donation;
 use App\Entity\Membership;
 use App\Entity\User;
+use App\Repository\DonationRepository;
 use App\Repository\UserRepository;
 use App\Service\MailService;
 use App\Service\MembershipFeeService;
@@ -20,8 +22,10 @@ use Symfony\Component\Routing\Attribute\Route;
  * Contrôleur pour gérer les webhooks Stripe
  * 
  * Ce contrôleur écoute les événements Stripe, notamment :
- * - checkout.session.completed : Paiement réussi → M4 (Félicitations)
- * - payment_intent.succeeded : Alternative pour confirmer le paiement
+ * - checkout.session.completed : Paiement réussi
+ *   → metadata.type = 'donation' : enregistrement du don + M8/M9
+ *   → sinon : adhésion (M4 Félicitations)
+ * - payment_intent.succeeded : Alternative pour confirmer le paiement (adhésion)
  * 
  * POUR TESTER EN LOCAL :
  * 1. Lancer ngrok : ngrok http 8000
@@ -34,6 +38,7 @@ class StripeWebhookController extends AbstractController
 {
     public function __construct(
         private UserRepository $userRepository,
+        private DonationRepository $donationRepository,
         private EntityManagerInterface $em,
         private MailService $mailService,
         private MembershipFeeService $feeService,
@@ -61,6 +66,13 @@ class StripeWebhookController extends AbstractController
         // Gérer l'événement
         switch ($event->type) {
             case 'checkout.session.completed':
+                $session = $event->data->object;
+
+                // Distinction don / adhésion via le metadata posé à la création de session
+                if (($session->metadata->type ?? null) === 'donation') {
+                    return $this->handleDonationSessionCompleted($session);
+                }
+
                 return $this->handleCheckoutSessionCompleted($event);
 
             case 'payment_intent.succeeded':
@@ -73,7 +85,59 @@ class StripeWebhookController extends AbstractController
     }
 
     /**
-     * Traite l'événement checkout.session.completed
+     * Traite un paiement de don réussi
+     * Enregistre le don en "paid" et déclenche :
+     * - M8: email de remerciement au donateur (si email fourni)
+     * - M9: alerte trésorerie à CONTACT_EMAIL
+     */
+    private function handleDonationSessionCompleted(object $session): Response
+    {
+        // Rapprocher le don créé au moment du formulaire (via metadata donation_id)
+        $donationId = (int) ($session->metadata->donation_id ?? 0);
+        $donation = $donationId ? $this->donationRepository->find($donationId) : null;
+
+        if (!$donation) {
+            // Session créée hors plateforme (ex: lien Stripe direct) :
+            // on enregistre quand même le don pour la comptabilité
+            $donation = new Donation();
+            $donation->setDonorName($session->metadata->donor_name ?? null);
+            $donation->setDonorEmail($session->metadata->donor_email ?? null);
+        }
+
+        // Idempotence : ne pas retraiter un don déjà enregistré (Stripe renvoie parfois
+        // le même événement plusieurs fois)
+        if ($donation->getPaymentStatus() === Donation::STATUS_PAID) {
+            return new Response('Donation already processed', 200);
+        }
+
+        $donation->setAmount($session->amount_total ?? $donation->getAmount());
+        $donation->setStripeSessionId($session->id);
+        $donation->setPaymentStatus(Donation::STATUS_PAID);
+
+        $this->em->persist($donation);
+        $this->em->flush();
+
+        // M8: remerciement au donateur (uniquement si un email a été fourni)
+        if ($donation->getDonorEmail()) {
+            try {
+                $this->mailService->sendDonationThankYouEmail($donation);
+            } catch (\Throwable $e) {
+                // Un échec d'email ne doit pas faire échouer le webhook (Stripe retryerait)
+            }
+        }
+
+        // M9: alerte trésorerie
+        try {
+            $this->mailService->sendDonationAlert($donation);
+        } catch (\Throwable $e) {
+            // idem
+        }
+
+        return new Response('Donation session completed handled', 200);
+    }
+
+    /**
+     * Traite l'événement checkout.session.completed (adhésion)
      * Declenche l'envoi du mail M4 : Félicitations + invitation WhatsApp + assurance
      */
     private function handleCheckoutSessionCompleted(Event $event): Response

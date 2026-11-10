@@ -1,0 +1,82 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Faire un don - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-7 col-md-9">
+                <div class="card shadow-sm border-gm-green">
+                    <div class="card-header bg-gm-green text-gm-white text-center">
+                        <h2 class="mb-0"><i class="bi bi-heart-fill me-2"></i>Soutenir GéoMonkey</h2>
+                    </div>
+                    <div class="card-body">
+                        <p class="text-gm-muted text-center">
+                            GéoMonkey est une association à but non lucratif : les dons financent
+                            directement nos événements et nos projets. Merci ! 🐒
+                        </p>
+                        <p class="text-center small text-gm-muted mt-2">
+                            <i class="bi bi-info-circle me-1"></i>
+                            GéoMonkey n'étant pas un organisme d'intérêt général,
+                            les dons n'ouvrent pas droit à une réduction d'impôt.
+                            Un accusé de réception vous est délivré pour votre comptabilité.
+                        </p>
+
+                        {# Montants suggérés : remplissent le champ montant #}
+                        <div class="d-flex justify-content-center gap-2 mb-4 flex-wrap">
+                            {% for preset in [5, 10, 20, 50] %}
+                                <button type="button"
+                                        class="btn btn-outline-gm-green donation-preset"
+                                        data-amount="{{ preset }}">
+                                    {{ preset }}€
+                                </button>
+                            {% endfor %}
+                        </div>
+
+                        {{ form_start(form) }}
+                            <div class="mb-3">
+                                {{ form_row(form.amount) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.donorName) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.donorEmail) }}
+                            </div>
+                            <div class="mb-3">
+                                {{ form_row(form.message) }}
+                            </div>
+
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-gm-green btn-lg">
+                                    <i class="bi bi-heart-fill me-2"></i>Donner
+                                </button>
+                            </div>
+                        {{ form_end(form) }}
+
+                        <p class="text-center small text-gm-muted mt-3 mb-0">
+                            <i class="bi bi-shield-check me-1"></i>
+                            Paiement sécurisé par Stripe. Tu peux donner anonymement :
+                            nom, email et message sont optionnels.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Les boutons de montant suggéré remplissent le champ du formulaire
+        document.querySelectorAll('.donation-preset').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                document.querySelector('.donation-amount-input').value = btn.dataset.amount;
+                document.querySelectorAll('.donation-preset').forEach(function (b) {
+                    b.classList.remove('active');
+                });
+                btn.classList.add('active');
+            });
+        });
+    </script>
+{% endblock %}

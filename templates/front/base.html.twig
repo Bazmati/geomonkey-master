@@ -4,13 +4,36 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>{% block title %}GéoMonkey{% endblock %}</title>
-        
+
+        {# ===================================================== #}
+        {# SEO : description, canonical, Open Graph, Twitter     #}
+        {# Chaque template peut surcharger n'importe quel bloc. #}
+        {# ===================================================== #}
+        <meta name="description" content="{% block meta_description %}GéoMonkey, association culturelle et conviviale : événements, ateliers et rencontres. Rejoins-nous !{% endblock %}">
+
+        <link rel="canonical" href="{% block canonical %}{{ app.request.uri }}{% endblock %}">
+
+        {# Open Graph (partages Facebook, WhatsApp, LinkedIn...) #}
+        <meta property="og:type" content="{% block og_type %}website{% endblock %}">
+        <meta property="og:site_name" content="GéoMonkey">
+        <meta property="og:title" content="{{ block('title') }}">
+        <meta property="og:description" content="{{ block('meta_description') }}">
+        <meta property="og:url" content="{{ block('canonical') }}">
+        <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('images/logo.png')) }}{% endblock %}">
+        <meta property="og:locale" content="fr_FR">
+
+        {# Twitter / X #}
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="{{ block('title') }}">
+        <meta name="twitter:description" content="{{ block('meta_description') }}">
+        <meta name="twitter:image" content="{{ block('og_image') }}">
+
         {# Bootstrap Icons #}
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.min.css">
-        
+
         {# Favicon #}
         <link rel="icon" href="{{ asset('favicon.ico') }}">
-        
+
         {% block stylesheets %}
             <style>
                 /* Hero background image (ne peut pas être dans CSS statique) */
@@ -19,6 +42,18 @@
                 }
             </style>
         {% endblock %}
+
+        {# Données structurées : organisation (JSON-LD) #}
+        <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": "GéoMonkey",
+            "url": "{{ url('app_home') }}",
+            "logo": "{{ absolute_url(asset('images/logo.png')) }}",
+            "description": "Association culturelle et conviviale : événements, ateliers et rencontres."
+        }
+        </script>
     </head>
     <body>
         {# Messages flash #}
@@ -32,7 +67,7 @@
                 {% endfor %}
             {% endfor %}
         </div>
-        
+
         {% block body %}{% endblock %}
         <footer class="bg-gm-surface text-center text-gm-warning py-3 mt-5">
             <div class="container">
@@ -44,7 +79,7 @@
                 </p>
             </div>
         </footer>
-        
+
         {% block javascripts %}
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}

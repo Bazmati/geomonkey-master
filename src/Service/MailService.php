@@ -2,6 +2,7 @@
 
 namespace App\Service;
 
+use App\Entity\Donation;
 use App\Entity\User;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -10,7 +11,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 /**
  * Service pour l'envoi des emails transactionnels liés à l'adhésion
  * 
- * FLUX COMPLET DES 5 EMAILS :
+ * FLUX COMPLET DES EMAILS :
  * 
  * M1 - Inscription
  *   Déclencheur: Utilisateur s'inscrit
@@ -36,6 +37,26 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  *   Déclencheur: Expiration sous 30 jours
  *   Destinataire: L'adhérent
  *   Contenu: Expiration sous 30 jours + lien de renouvellement
+ * 
+ * M6 - Vérification email
+ *   Déclencheur: Inscription
+ *   Destinataire: L'utilisateur
+ *   Contenu: Lien de vérification (24h)
+ * 
+ * M7 - Reset mot de passe
+ *   Déclencheur: Demande de réinitialisation
+ *   Destinataire: L'utilisateur
+ *   Contenu: Lien de reset (1h)
+ * 
+ * M8 - Webhook don checkout.session.completed
+ *   Déclencheur: Don Stripe réussi (metadata type=donation)
+ *   Destinataire: Le donateur (si email fourni)
+ *   Contenu: Remerciement + accusé de réception du don
+ * 
+ * M9 - Alerte trésorerie don
+ *   Déclencheur: Don Stripe réussi (metadata type=donation)
+ *   Destinataire: CONTACT_EMAIL
+ *   Contenu: Alerte "Don de X€ reçu" (suivi comptable)
  */
 class MailService
 {
@@ -117,6 +138,34 @@ class MailService
             ->to($user->getEmail())
             ->subject(sprintf('Ton adhésion GéoMonkey expire dans %d jours', $daysUntilExpiry))
             ->html($this->renderExpirationReminderEmail($user, $daysUntilExpiry));
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * M8: Email de remerciement après un don
+     */
+    public function sendDonationThankYouEmail(Donation $donation): void
+    {
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($donation->getDonorEmail())
+            ->subject('Merci pour ton don à GéoMonkey ! 🙏')
+            ->html($this->renderDonationThankYouEmail($donation));
+
+        $this->mailer->send($email);
+    }
+
+    /**
+     * M9: Alerte trésorerie pour un don reçu
+     */
+    public function sendDonationAlert(Donation $donation): void
+    {
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($this->contactEmail)
+            ->subject(sprintf('🎁 Don de %.2f€ reçu', $donation->getAmountInEuros()))
+            ->html($this->renderDonationAlertEmail($donation));
 
         $this->mailer->send($email);
     }
@@ -261,6 +310,60 @@ class MailService
         $html .= '</a>';
         $html .= '</div>';
         $html .= '<p><small>Le tarif reste le même que celui que tu as payé l\'année dernière.</small></p>';
+        $html .= '</div></body></html>';
+        
+        return $html;
+    }
+
+    /**
+     * Rend le template M8: Remerciement don
+     */
+    private function renderDonationThankYouEmail(Donation $donation): string
+    {
+        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
+        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
+        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
+        $html .= '<h3>🙏 Merci pour ton don !</h3>';
+        $html .= '</div>';
+        
+        $name = $donation->getDonorName() ?: 'à toi';
+        $html .= '<p>Bonjour ' . htmlspecialchars($name) . ',</p>';
+        $html .= sprintf(
+            '<p>Nous avons bien reçu ton don de <strong>%.2f€</strong> à l\'association GéoMonkey. Il contribue directement au financement de nos événements et de nos projets.</p>',
+            $donation->getAmountInEuros()
+        );
+        
+        if ($donation->getMessage()) {
+            $html .= '<div style="margin: 15px 0; padding: 12px; background: #fff; border-left: 4px solid #ffc107; border-radius: 4px;">';
+            $html .= '<p style="margin: 0;"><em>« ' . htmlspecialchars($donation->getMessage()) . ' »</em></p>';
+            $html .= '</div>';
+        }
+        
+        $html .= '<p>Ce message t\' sert d\'accusé de réception. Conserve-le : il peut te servir de justificatif de paiement.</p>';
+        $html .= '<p style="margin-top: 20px; color: #666;">Un grand merci de la part de toute l\'équipe GéoMonkey 🐒</p>';
+        $html .= '</div></body></html>';
+        
+        return $html;
+    }
+
+    /**
+     * Rend le template M9: Alerte trésorerie
+     */
+    private function renderDonationAlertEmail(Donation $donation): string
+    {
+        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
+        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
+        $html .= '<h3>🎁 Nouveau don reçu</h3>';
+        $html .= '<p><strong>Montant :</strong> ' . sprintf('%.2f€', $donation->getAmountInEuros()) . '</p>';
+        $html .= '<p><strong>Donateur :</strong> ' . htmlspecialchars($donation->getDonorName() ?: 'Anonyme') . '</p>';
+        $html .= '<p><strong>Email :</strong> ' . htmlspecialchars($donation->getDonorEmail() ?: 'non fourni') . '</p>';
+        $html .= '<p><strong>Date :</strong> ' . $donation->getCreatedAt()->format('d/m/Y H:i') . '</p>';
+        
+        if ($donation->getMessage()) {
+            $html .= '<p><strong>Message :</strong> <em>« ' . htmlspecialchars($donation->getMessage()) . ' »</em></p>';
+        }
+        
+        $html .= '<p style="color: #666;"><small>Référence session Stripe : ' . htmlspecialchars((string) $donation->getStripeSessionId()) . '</small></p>';
         $html .= '</div></body></html>';
         
         return $html;

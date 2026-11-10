@@ -1,0 +1,40 @@
+{# templates/front/donation/success.html.twig #}
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Merci pour ton don ! - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 col-md-8 text-center">
+                <div class="card shadow-sm border-gm-green">
+                    <div class="card-header bg-gm-green text-gm-white">
+                        <h2 class="mb-0"><i class="bi bi-heart-fill me-2"></i>Merci pour ton don !</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="py-4">
+                            <i class="bi bi-emoji-heart-fill text-gm-green display-4"></i>
+                            <h3 class="mt-3 text-gm-green">Ton soutien compte énormément 🙏</h3>
+                            <p class="lead text-gm-muted">
+                                Ton don a bien été enregistré.
+                            </p>
+                            <p class="text-gm-muted">
+                                Il contribue directement au financement de nos événements
+                                et de nos projets associatifs.
+                            </p>
+                            <div class="alert alert-info">
+                                <i class="bi bi-envelope me-2"></i>
+                                Si tu as laissé ton email, un accusé de réception vient de t'être envoyé.
+                            </div>
+                        </div>
+                        <a href="{{ path('app_home') }}" class="btn btn-gm-green btn-lg px-4">
+                            <i class="bi bi-house me-2"></i> Retour à l'accueil
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
