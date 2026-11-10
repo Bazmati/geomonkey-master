@@ -54,17 +54,14 @@
             "description": "Association culturelle et conviviale : événements, ateliers et rencontres."
         }
         </script>
-        {# FullCalendar CSS #}
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/index.min.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6/index.min.css">
-        
-        {# FullCalendar JS (ordre critique : DayGrid AVANT Core) #}
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6/index.global.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/index.global.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6/locales/fr.global.min.js"></script>
-        
+        {# FullCalendar — bundles globaux auto-hébergés (assets/vendor/fullcalendar/).
+            La v6 injecte son CSS elle-même : pas de <link> CSS à charger.
+            defer : exécution avant DOMContentLoaded, donc avant le connect() Stimulus. #}
         {# Importmap chargé dans HEAD pour éviter les conflits #}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
+        <script src="{{ asset('vendor/fullcalendar/index.global.min.js') }}" defer></script>
+        <script src="{{ asset('vendor/fullcalendar/daygrid.global.min.js') }}" defer></script>
+        
     </head>
     <body data-turbo="false">
         {# Messages flash #}
