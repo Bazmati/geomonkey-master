@@ -23,39 +23,37 @@
                         <p class="mt-2">Aucun événement trouvé</p>
                     </div>
                 {% else %}
-                    <div class="table-responsive">
-                        <table class="table table-gm table-striped table-hover">
+                    {# gm-cards-table : table desktop, cartes mobiles (data-label) #}
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-gm table-striped table-hover gm-cards-table">
                             <thead>
                                 <tr>
                                     <th>ID</th>
                                     <th>Titre</th>
-                                    <th>Description</th>
                                     <th>Date de début</th>
                                     <th>Date de fin</th>
                                     <th>Lieu</th>
                                     <th>Publié</th>
                                     <th>Visibilité</th>
-                                    <th>Image</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {% for event in events %}
                                     <tr>
-                                        <td>{{ event.id }}</td>
-                                        <td>{{ event.title }}</td>
-                                        <td>{{ event.description }}</td>
-                                        <td>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}</td>
-                                        <td>{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
-                                        <td>{{ event.location }}</td>
-                                        <td>
+                                        <td data-label="ID">{{ event.id }}</td>
+                                        <td data-label="Titre">{{ event.title }}</td>
+                                        <td data-label="Début">{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}</td>
+                                        <td data-label="Fin">{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
+                                        <td data-label="Lieu">{{ event.location }}</td>
+                                        <td data-label="Statut">
                                             {% if event.isPublished %}
                                                 <span class="badge bg-gm-green text-gm-white" title="Visible selon sa visibilité">En ligne</span>
                                             {% else %}
                                                 <span class="badge bg-gm-warning text-gm-bg" title="Invisible du site public tant qu'il n'est pas mis en ligne">Brouillon</span>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td data-label="Visibilité">
                                             {% if event.isMembersOnly %}
                                                 <span class="badge bg-gm-warning text-gm-bg" title="Visible uniquement par les membres actifs">
                                                     <i class="bi bi-people"></i> Membres
@@ -66,8 +64,7 @@
                                                 </span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ event.image }}</td>
-                                        <td>
+                                        <td data-label="Actions">
                                             <div class="d-flex gap-1">
                                                 <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}"class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
                                                     <i class="bi bi-download"></i>
@@ -101,6 +98,63 @@
                                 {% endfor %}
                             </tbody>
                         </table>
+                    </div>
+
+                    {# ============================================================
+                       MOBILE : chaque événement devient une carte complète
+                       ============================================================ #}
+                    <div class="d-md-none">
+                        {% for event in events %}
+                            <div class="card mb-3 gm-admin-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0 text-gm-text">{{ event.title }}</h6>
+                                        <span class="badge {{ event.isPublished ? 'bg-gm-green text-gm-white' : 'bg-gm-warning text-gm-bg' }} ms-2 flex-shrink-0">
+                                            {{ event.isPublished ? 'En ligne' : 'Brouillon' }}
+                                        </span>
+                                    </div>
+                                    <p class="mb-1 small text-gm-muted">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        {{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}
+                                        → {{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}
+                                    </p>
+                                    <p class="mb-3 small text-gm-muted">
+                                        <i class="bi bi-geo-alt me-1"></i> {{ event.location }}
+                                        {% if event.isMembersOnly %}
+                                            <span class="badge bg-gm-warning text-gm-bg ms-2"><i class="bi bi-people"></i> Membres</span>
+                                        {% endif %}
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}" class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
+                                            <i class="bi bi-download"></i> Participants
+                                        </a>
+                                        {% if is_granted('ENTITY_PUBLISH') %}
+                                            <form method="post"
+                                                  action="{{ path('admin_events_toggle_publish', {'id': event.id}) }}"
+                                                  class="d-inline">
+                                                <input type="hidden" name="_token"
+                                                       value="{{ csrf_token('publish' ~ event.id) }}">
+                                                <button class="btn btn-sm btn-{{ event.isPublished ? 'outline-gm-gray' : 'outline-gm-green' }}"
+                                                        type="submit">
+                                                    <i class="bi bi-{{ event.isPublished ? 'eye-slash' : 'rocket-takeoff' }}-fill"></i>
+                                                    {{ event.isPublished ? 'Retirer' : 'Publier' }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{{ path('admin_events_edit', {'id': event.id}) }}" class="btn btn-sm btn-gm-yellow">
+                                            <i class="bi bi-pencil-fill"></i> Modifier
+                                        </a>
+                                        {% include 'front/partials/_delete_button.html.twig' with {
+                                            id: event.id,
+                                            path: path('admin_events_delete', {'id': event.id}),
+                                            entity_type: 'événement',
+                                            confirm_message: 'Êtes-vous sûr de vouloir supprimer cet événement ?',
+                                            csrf_token: csrf_token('delete' ~ event.id)
+                                        } %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
                     </div>
                 {% endif %}
             </div>

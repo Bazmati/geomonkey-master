@@ -25,4 +25,10 @@ return [
     '@hotwired/turbo' => [
         'version' => '7.3.0',
     ],
+        '@fullcalendar/core' => [
+        'version' => '6.1.15',
+    ],
+    '@fullcalendar/daygrid' => [
+        'version' => '6.1.15',
+    ],
 ];

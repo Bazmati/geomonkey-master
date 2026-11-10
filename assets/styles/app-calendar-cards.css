@@ -1,0 +1,129 @@
+/* ============================================================
+   ÉVÉNEMENTS — FullCalendar (desktop) + cartes admin mobile
+   À COLLER À LA FIN de assets/styles/app.css
+   ============================================================ */
+
+/* --------------------------------------------
+   FULLCALENDAR : thème sombre GéoMonkey
+   -------------------------------------------- */
+.gm-calendar {
+    --fc-border-color: var(--gm-gray-900);
+    --fc-page-bg-color: transparent;
+    --fc-neutral-bg-color: var(--gm-surface);
+    --fc-highlight-color: rgba(0, 160, 64, 0.15);
+    --fc-today-bg-color: rgba(224, 192, 32, 0.10);
+    --fc-event-border-color: var(--gm-green);
+    --fc-event-bg-color: var(--gm-green);
+    color: var(--gm-text);
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 0.5rem;
+    padding: 0.75rem;
+}
+
+.gm-calendar .fc-toolbar-title {
+    font-size: 1.1rem;
+    color: var(--gm-text);
+}
+
+.gm-calendar .fc-button {
+    background: var(--gm-gray-700);
+    border-color: var(--gm-gray-600);
+    color: var(--gm-white);
+    text-transform: capitalize;
+}
+.gm-calendar .fc-button:hover,
+.gm-calendar .fc-button:not(:disabled):active,
+.gm-calendar .fc-button-primary:not(:disabled).fc-button-active {
+    background: var(--gm-green-dark);
+    border-color: var(--gm-green-dark);
+    color: var(--gm-white);
+}
+
+.gm-calendar .fc-col-header-cell-cushion,
+.gm-calendar .fc-daygrid-day-number {
+    color: var(--gm-gray-200);
+    text-decoration: none;
+}
+.gm-calendar .fc-day-today .fc-daygrid-day-number {
+    color: var(--gm-yellow);
+    font-weight: 600;
+}
+
+/* Événement réservé aux membres : jaune */
+.gm-calendar .fc-event.gm-event-members {
+    --fc-event-bg-color: var(--gm-yellow);
+    --fc-event-border-color: var(--gm-yellow);
+    color: var(--gm-bg);
+}
+
+/* --------------------------------------------
+   FILTRE événements (front)
+   -------------------------------------------- */
+.gm-filter-group .btn {
+    border-radius: 0;
+}
+.gm-filter-group .btn:first-child {
+    border-top-left-radius: 0.375rem;
+    border-bottom-left-radius: 0.375rem;
+}
+.gm-filter-group .btn:last-child {
+    border-top-right-radius: 0.375rem;
+    border-bottom-right-radius: 0.375rem;
+}
+
+/* --------------------------------------------
+   TABLES ADMIN : mode cartes (data-label)
+   Pattern réutilisable : ajouter .gm-cards-table
+   à une table + data-label sur chaque <td>.
+   -------------------------------------------- */
+@media (max-width: 991.98px) {
+    .gm-cards-table thead {
+        display: none;
+    }
+
+    .gm-cards-table,
+    .gm-cards-table tbody,
+    .gm-cards-table tr,
+    .gm-cards-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .gm-cards-table tr {
+        background: var(--gm-surface);
+        border: 1px solid var(--gm-gray-900);
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.5rem 0.75rem;
+    }
+
+    .gm-cards-table td {
+        border: none;
+        padding: 0.35rem 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+
+    .gm-cards-table td::before {
+        content: attr(data-label);
+        color: var(--gm-gray-300);
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        flex-shrink: 0;
+        padding-top: 0.15rem;
+    }
+
+    .gm-cards-table td[data-label="Actions"] {
+        justify-content: flex-end;
+    }
+}
+
+/* Carte événement admin (mobile) */
+.gm-admin-card {
+    background: var(--gm-surface);
+    border-color: var(--gm-gray-900);
+}

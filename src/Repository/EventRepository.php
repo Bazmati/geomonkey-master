@@ -20,17 +20,26 @@ class EventRepository extends ServiceEntityRepository
      * Événements visibles sur le site public :
      * - publiés ;
      * - si l'internaute n'est pas membre actif, on exclut les
-     *   événements réservés aux membres.
+     *   événements réservés aux membres ;
+     * - filtre optionnel : 'a-venir' (futurs), 'passes' (passés),
+     *   'tous' (défaut).
      *
      * @return Event[] Triés par date de début décroissante
      */
-    public function findVisibleFor(bool $isActiveMember): array
+    public function findVisibleFor(bool $isActiveMember, string $filter = 'tous'): array
     {
         $qb = $this->createQueryBuilder('e')
             ->andWhere('e.isPublished = true');
 
         if (!$isActiveMember) {
             $qb->andWhere('e.isMembersOnly = false');
+        }
+
+        $now = new \DateTimeImmutable();
+        if ($filter === 'a-venir') {
+            $qb->andWhere('e.startDate >= :now')->setParameter('now', $now);
+        } elseif ($filter === 'passes') {
+            $qb->andWhere('e.startDate < :now')->setParameter('now', $now);
         }
 
         return $qb
