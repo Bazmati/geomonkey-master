@@ -158,4 +158,25 @@ final class EventController extends AbstractController
 
         return $this->redirectToRoute('admin_events_index', [], Response::HTTP_SEE_OTHER);
     }
+
+        /**
+     * Mise en ligne / retrait de la ligne — PRÉSIDENT UNIQUEMENT (pattern BlogPost).
+     * Le front (findVisibleFor) filtre sur isPublished : effet immédiat côté public.
+     */
+    #[Route('/{id}/toggle-publish', name: 'admin_events_toggle_publish', methods: ['POST'])]
+    #[IsGranted('ENTITY_PUBLISH', 'event')]
+    public function togglePublish(Request $request, Event $event, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('publish'.$event->getId(), $request->getPayload()->getString('_token'))) {
+            $publish = !$event->isPublished();
+            $event->setIsPublished($publish);
+            $entityManager->flush();
+
+            $this->addFlash('success', $publish
+                ? 'Événement mis en ligne : visible selon sa visibilité (public / membres).'
+                : 'Événement retiré de la ligne (il reste en brouillon).');
+        }
+
+        return $this->redirectToRoute('admin_events_index', [], Response::HTTP_SEE_OTHER);
+    }
 }

@@ -49,9 +49,11 @@
                                         <td>{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
                                         <td>{{ event.location }}</td>
                                         <td>
-                                            <span class="badge bg-{{ event.isPublished ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
-                                                {{ event.isPublished ? 'Oui' : 'Non' }}
-                                            </span>
+                                            {% if event.isPublished %}
+                                                <span class="badge bg-gm-green text-gm-white" title="Visible selon sa visibilité">En ligne</span>
+                                            {% else %}
+                                                <span class="badge bg-gm-warning text-gm-bg" title="Invisible du site public tant qu'il n'est pas mis en ligne">Brouillon</span>
+                                            {% endif %}
                                         </td>
                                         <td>
                                             {% if event.isMembersOnly %}
@@ -70,6 +72,19 @@
                                                 <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}"class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
                                                     <i class="bi bi-download"></i>
                                                 </a>
+                                                {% if is_granted('ENTITY_PUBLISH') %}
+                                                    <form method="post"
+                                                          action="{{ path('admin_events_toggle_publish', {'id': event.id}) }}"
+                                                          class="d-inline">
+                                                        <input type="hidden" name="_token"
+                                                               value="{{ csrf_token('publish' ~ event.id) }}">
+                                                        <button class="btn btn-sm btn-{{ event.isPublished ? 'outline-gm-gray' : 'outline-gm-green' }}"
+                                                                type="submit"
+                                                                title="{{ event.isPublished ? 'Retirer de la ligne' : 'Mettre en ligne' }}">
+                                                            <i class="bi bi-{{ event.isPublished ? 'eye-slash' : 'rocket-takeoff' }}-fill"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
                                                 <a href="{{ path('admin_events_edit', {'id': event.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>

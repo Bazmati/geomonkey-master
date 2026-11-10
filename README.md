@@ -2,7 +2,7 @@
 
 **Géomonkey** est une application web complète destinée aux associations : site vitrine public + espace de gestion des adhérents, des événements et des contenus. Développée avec **Symfony 8 / PHP 8.4**, elle a été imaginée pour une association réelle — ce qui en fait un projet de démonstration concret, avec de vraies contraintes (RGPD, paiements, formulaires sécurisés).
 
-> 🚀 **Démo en ligne :** [www.geomonkey.fr](https://www.geomonkey.fr)
+> 🌐 **Avancement du projet :** [www.geomonkey.fr](https://www.geomonkey.fr) — mise en production prévue fin novembre 2026, hébergée sur un serveur Proxmox (conteneur LXC).
 
 ## 👥 À qui s'adresse ce projet ?
 
@@ -17,16 +17,17 @@
 ### ✅ Terminées
 
 
-| Module             | Détail                                                          |
-| ------------------ | --------------------------------------------------------------- |
-| 👥 Utilisateurs    | CRUD complet, rôles et permissions, inscription                 |
-| 📅 Événements      | CRUD des événements, gestion des participants                   |
-| 🖼️ Galerie photos | CRUD galerie, import d'images en 3 tailles, conversion **WebP** |
-| 🔐 Sécurité        | Formulaires sécurisés, validation des données, contrôle d'accès |
-| ⚖️ RGPD            | Consentement, données personnelles maîtrisées                   |
-| 📜 Pages légales   | Conditions générales d'adhésion, politique de confidentialité   |
-| 📰 Blog            | CRUD BlogPost + pages publiques                                 |
-| 📝 Présentation    | CRUD Présentation (entité `PresentationPage`)                   |
+| Module               | Détail                                                          |
+| ------------------   | --------------------------------------------------------------- |
+| 👥 Utilisateurs      | CRUD complet, rôles et permissions, inscription                 |
+| 📅 Événements        | CRUD des événements, gestion des participants                   |
+| 🖼️ Galerie photos    | CRUD galerie, import d'images en 3 tailles, conversion **WebP** |
+| 🔐 Sécurité          | Formulaires sécurisés, validation des données, contrôle d'accès |
+| ⚖️ RGPD              | Consentement, données personnelles maîtrisées                   |
+| 📜 Pages légales     | Conditions générales d'adhésion, politique de confidentialité   |
+| 📰 Blog              | CRUD BlogPost + pages publiques                                 |
+| 📝 Présentation      | CRUD Présentation (entité PresentationPage)                     |
+| 💳 Adhésion en ligne | Paiement **Stripe** avec webhook signé                          |
 
 
 ### 🚧 En cours
@@ -38,24 +39,23 @@
 
 - 📈 SEO : métadonnées, sitemap, balisage
 - 📱 Style responsive
-- 📆 **FullCalendar** pour l'affichage des événements
+- 📆 FullCalendar pour l'affichage des événements
+- ❤️ Dons en ligne : le paiement Stripe étant opérationnel pour les adhésions, c'est une extension naturelle
 
-## 🔮 Feuille de route (V2)
+## 🔮 Feuille de route
+
+### V2
+
+- 🛍️ **Boutique de goodies**
+- 🎟️ **Billeterie** pour les événements
+- 💰 **Gestionnaire de comptabilité** pour les associations loi 1901 (suivi des cotisations — l'entité `MembershipFee` est déjà en place — et exports)
+
+### V3
 
 - 🎫 Intégration des outils **Flyers Generator** et **Ticket Generator** (génération de supports pour les événements)
-- 💰 **Comptabilité de l'association** : suivi des cotisations (l'entité `MembershipFee` est déjà en place), exports
-- ❤️ **Dons en ligne** : le paiement Stripe est déjà opérationnel pour les adhésions, les dons sont une extension naturelle
 - 🌍 Multi-associations (une instance, plusieurs associations)
 
 ## 🛠️ Stack technique
-
-Symfony  
-PHP  
-Twig  
-Bootstrap 5  
-{-PostgreSQL-}  
-{+MySQL+}  
-Docker
 
 - **Backend** : PHP 8.4, Symfony 8, Doctrine ORM 3, Doctrine Migrations
 - **Frontend** : Twig, Bootstrap 5.3, Stimulus, Turbo (Symfony UX)
@@ -63,7 +63,13 @@ Docker
 - **Images** : Intervention Image (redimensionnement + conversion WebP)
 - **Paiements** : Stripe (adhésions en ligne, webhook dédié)
 - **Tests** : PHPUnit
-- **Conteneurs** : Docker Compose fourni (`compose.yaml`)
+- **Hébergement** : production sur serveur Proxmox (conteneur LXC) — Docker Compose fourni pour le développement local 
+
+## 🧠 Choix techniques
+
+- **Stripe pour les paiements** : bundle officiel Symfony, sécurité et conformité PCI DSS prises en charge par Stripe, et aucune donnée de carte stockée par l'application — ce qui allège considérablement le dossier RGPD de l'association.
+- **Pas de bundle pour les images** : le traitement (redimensionnement, WebP) est un composant cœur de l'application — le garder en code maîtrisé évite de dépendre du calendrier de mise à jour d'un tiers et de ses éventuelles failles. Un bundle quand il protège, du code maîtrisé quand c'est le produit.
+- **Assistance IA** : le projet a été développé seul à un rythme soutenu avec l'assistance de l'IA — chaque choix tranché après compréhension, chaque ligne relue et validée avant commit.
 
 ## 🚀 Installation locale
 
@@ -101,7 +107,7 @@ L'application est alors accessible sur `https://localhost:8000`.
 
 ## 🌐 Mise en production
 
-- Le projet tourne en production sur [**www.geomonkey.fr**](https://www.geomonkey.fr).
+- La mise en production est prévue **fin novembre 2026** sur [**www.geomonkey.fr**](https://www.geomonkey.fr), sur un serveur Proxmox en conteneur LXC.
 - `.env.local.example` liste les variables à définir (base de données, SMTP, Stripe…).
 - Paiement : renseigner les clés Stripe et configurer le webhook (voir `StripeWebhookController`).
 
