@@ -342,6 +342,10 @@ class ImageManager
         // utilisé par les anciens uploads avant la mise en place des miniatures
         // par taille (ex. anciens articles de blog référencés par le front).
         $flatBasePath = 'uploads/' . $imagePath . '/' . $uuid;
+        // Le champ peut déjà contenir l'extension (ex. "photo.jpg") : essayer tel quel d'abord
+        if (file_exists($this->publicDir . '/' . $flatBasePath)) {
+            return $this->urlCache[$cacheKey] = '/' . $flatBasePath;
+        }
         foreach ($extensions as $ext) {
             $flatPath = $this->publicDir . '/' . $flatBasePath . $ext;
             if (file_exists($flatPath)) {

@@ -44,7 +44,7 @@
                                 {% for post in posts %}
                                     <tr>
                                         <td data-label="Titre">
-                                            {% include 'admin/partials/_card_media.html.twig' with {media: image_url(post, 'medium'), icon: 'bi-newspaper'} %}
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: image_url(post, 'medium') ?? (post.galleryImages is not empty ? image_url(post.galleryImages|first, 'medium') : null), icon: 'bi-newspaper'} %}
                                             <strong>{{ post.title }}</strong>
                                         </td>
                                         <td data-label="Slug"><code>{{ post.slug }}</code></td>

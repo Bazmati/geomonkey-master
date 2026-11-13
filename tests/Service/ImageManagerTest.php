@@ -283,18 +283,26 @@ class ImageManagerTest extends TestCase
         // Aucun fichier dans les dossiers par taille : getUrl doit retourner null
         $this->assertNull($this->imageManager->getUrl($event, 'medium'));
 
-        // On crée le fichier PLAT (anciens uploads, sans sous-dossier de taille)
         $dir = "{$this->publicDir}/uploads/events";
         if (!is_dir($dir)) {
             mkdir($dir, 0755, true);
         }
-        file_put_contents("{$this->publicDir}/uploads/events/legacy-flat-uuid.jpg", 'fake');
+        // Le champ peut contenir le nom AVEC extension (style ancien front) :
+        $event->setImage('legacy-flat.jpg');
+        file_put_contents("{$this->publicDir}/uploads/events/legacy-flat.jpg", 'fake');
 
         $this->assertSame(
-            '/uploads/events/legacy-flat-uuid.jpg',
+            '/uploads/events/legacy-flat.jpg',
             $this->imageManager->getUrl($event, 'medium'),
-            'getUrl doit retomber sur le chemin plat hérité quand aucune miniature n\'existe'
+            'getUrl doit retomber sur le chemin plat hérité tel quel quand aucune miniature n\'existe'
         );
+
+        // Cas où le champ ne contient PAS l'extension : elle est devinée
+        $event->setImage('legacy-noext');
+        mkdir("{$this->publicDir}/uploads/events/89/medium", 0755, true);
+        unlink("{$this->publicDir}/uploads/events/legacy-flat.jpg");
+        file_put_contents("{$this->publicDir}/uploads/events/legacy-noext.png", 'fake');
+        $this->assertSame('/uploads/events/legacy-noext.png', $this->imageManager->getUrl($event, 'medium'));
     }
 
     public function testDeleteForEntityDeletesOnlyGivenUuid(): void
