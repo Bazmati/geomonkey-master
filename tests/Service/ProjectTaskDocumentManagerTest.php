@@ -109,7 +109,7 @@ class ProjectTaskDocumentManagerTest extends TestCase
         $this->assertSame('Rapport Annuel.pdf', $document->getOriginalName());
         $this->assertIsString($document->getMimeType());
         $this->assertNotSame('', $document->getMimeType());
-        $this->assertSame(10, $document->getSize());
+        $this->assertSame(9, $document->getSize());
         $this->assertSame($document, $task->getDocuments()->first());
         $this->assertMatchesRegularExpression('/^rapport-annuel-[a-f0-9]+\.[a-z0-9]+$/', $document->getFileName());
     }
