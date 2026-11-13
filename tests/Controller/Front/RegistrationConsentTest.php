@@ -26,8 +26,8 @@ final class RegistrationConsentTest extends WebTestCase
         ]);
         $client->submit($form);
 
-        // Redirection = inscription acceptée (attente-validation pour membre actif)
-        $this->assertResponseRedirects('/inscription/attente-validation');
+        // Redirection = inscription acceptée (page de verification d'email)
+        $this->assertResponseRedirects('/inscription/verification-email');
 
         // Vérification en base : consentements horodatés
         $user = static::getContainer()->get(UserRepository::class)
@@ -81,7 +81,7 @@ final class RegistrationConsentTest extends WebTestCase
         ]);
         $client->submit($form);
 
-        $this->assertResponseRedirects('/inscription/attente-validation');
+        $this->assertResponseRedirects('/inscription/verification-email');
 
         $user = static::getContainer()->get(UserRepository::class)
             ->findOneBy(['email' => $email]);
