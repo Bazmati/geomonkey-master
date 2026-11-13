@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Blog — {{ parent() }}{% endblock %}
+{% block title %}Actualités — {{ parent() }}{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Actualités et articles de l'association GéoMonkey : projets, constructions, festivals et vie de l'association.">
@@ -8,30 +8,36 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<section class="py-5">
-    <div class="container">
-        
-        {{ breadcrumb() }}
 
-        <h1 class="mb-4"><i class="bi bi-newspaper"></i> Le blog de l'association</h1>
-
-        {% if posts is empty %}
-            <div class="alert alert-gm-info">
-                <i class="bi bi-info-circle"></i> Aucun article publié pour le moment. Revenez bientôt !
-            </div>
-        {% else %}
-            {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
-        {% endif %}
+{# ===== Hero de section ===== #}
+<header class="pres-hero">
+    <div class="container position-relative text-center">
+        <span class="badge home-hero-badge mb-3">
+            <i class="bi bi-newspaper me-1"></i> Actualités
+        </span>
+        <h1 class="pres-hero-title">La vie de l'assoc', en direct</h1>
+        <p class="home-hero-sub mx-auto mb-0">
+            Coulisses des chantiers, retours des événements, annonces et
+            petites histoires : chaque article est une invitation à plonger
+            dans l'univers GéoMonkey. Bonne lecture !
+        </p>
     </div>
-        {% if tags|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-tags"></i> Tags</h3>
-            <p>
-                {% for tag in tags %}
-                    <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
-                       class="badge bg-secondary text-decoration-none me-1 mb-1">#{{ tag.name }}</a>
-                {% endfor %}
-            </p>
-        {% endif %}
-</section>
+</header>
+
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
+
+    {% if tags|length > 0 %}
+        <hr class="my-5">
+        <h2 class="h4 mb-3"><i class="bi bi-tags text-gm-yellow"></i> Explorer par tag</h2>
+        <p class="mb-0">
+            {% for tag in tags %}
+                <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
+                   class="badge gm-tag-pill text-decoration-none me-1 mb-1">#{{ tag.name }}</a>
+            {% endfor %}
+        </p>
+    {% endif %}
+</main>
 {% endblock %}

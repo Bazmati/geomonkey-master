@@ -1647,3 +1647,93 @@ body > footer,
     .home-card:hover .proj-card-cta i { transform: none; }
     .proj-related:hover { transform: none; }
 }
+
+/* ============================================================
+   FRONT — Blog : À la une, fiche article, fin d'article
+   ============================================================ */
+
+/* ----- Carte "À la une" de la liste ----- */
+.blog-featured {
+    display: flex;
+    flex-direction: column;
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1.25rem;
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+.blog-featured:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--gm-green) 50%, var(--gm-gray-900));
+    box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .4);
+}
+.blog-featured-img {
+    width: 100%;
+    height: 260px;
+    object-fit: cover;
+}
+.blog-featured-img-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.6rem;
+    color: var(--gm-gray-500);
+    background: rgba(255, 255, 255, .04);
+}
+.blog-featured-body {
+    padding: 1.4rem 1.5rem 1.5rem;
+    flex: 1 1 auto;
+}
+.blog-featured-title {
+    color: var(--gm-white);
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 800;
+    margin-bottom: .5rem;
+}
+
+/* ----- Fiche article ----- */
+.blog-lead {
+    color: var(--gm-gray-200);
+    font-size: 1.15rem;
+    border-left: 3px solid var(--gm-yellow);
+    padding-left: 1rem;
+}
+
+/* Bloc de fin d'article : partage + adhésion */
+.blog-end {
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1.25rem;
+}
+
+/* ----- Partage social ----- */
+.share-buttons .btn { border-radius: 2rem; }
+
+/* ----- Tags de la liste ----- */
+.gm-tag-pill {
+    background: color-mix(in srgb, var(--gm-yellow) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gm-yellow) 40%, transparent);
+    color: var(--gm-yellow);
+    padding: .4rem .8rem;
+    font-size: .9rem;
+    transition: background .2s ease, color .2s ease;
+}
+.gm-tag-pill:hover {
+    background: var(--gm-yellow);
+    color: var(--gm-bg);
+}
+
+/* ----- À la une en horizontal sur grand écran ----- */
+@media (min-width: 992px) {
+    .blog-featured { flex-direction: row; }
+    .blog-featured-img,
+    .blog-featured-img-empty { width: 52%; height: auto; min-height: 320px; flex: 0 0 52%; }
+    .blog-featured-body { display: flex; flex-direction: column; justify-content: center; }
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .blog-featured, .gm-tag-pill { transition: none !important; }
+    .blog-featured:hover { transform: none; }
+}

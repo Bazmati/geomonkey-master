@@ -1,39 +1,82 @@
-{# Liste d'articles réutilisable : reçoit "posts" #}
+{# Liste d'articles réutilisable : reçoit "posts"
+   1er article = carte "À la une" horizontale, les suivants = grille #}
 {% if posts is empty %}
     <div class="alert alert-gm-info">
-        <i class="bi bi-info-circle"></i> Aucun article publié pour le moment. Revenez bientôt !
+        <i class="bi bi-info-circle me-2"></i> Aucun article publié pour le moment. Revenez bientôt !
     </div>
 {% else %}
-    <div class="row g-4">
-        {% for post in posts %}
-            <div class="col-md-6 col-lg-4">
-                <div class="card h-100 shadow-sm">
-                    {% if post.hasImage %}
-                        <img src="{{ asset('uploads/blog_posts/' ~ post.image) }}"
-                             class="card-img-top" alt="Illustration de l'article {{ post.title }}" loading="lazy">
-                    {% endif %}
-                    <div class="card-body d-flex flex-column">
-                        {% if post.category %}
-                            <a href="{{ path('app_blog_category', {'slug': post.category.slug}) }}"
-                               class="badge bg-success text-decoration-none mb-1">{{ post.category.name }}</a>
-                        {% endif %}
-                        <h5 class="card-title">{{ post.title }}</h5>
-                        <p class="card-text text-muted">{{ post.summary ?? post.excerpt }}</p>
-                        <div class="mt-auto">
-                            <p class="text-muted small mb-2">
-                                <i class="bi bi-person"></i>
-                                {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
-                                — <i class="bi bi-calendar"></i>
-                                {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
-                            </p>
-                            <a href="{{ path('app_blog_show', {'slug': post.slug}) }}"
-                               class="btn btn-success btn-sm">
-                                Lire l'article <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
+    {% set featured = posts|first %}
+
+    {# ===== À la une ===== #}
+    <a href="{{ path('app_blog_show', {'slug': featured.slug}) }}"
+       class="text-decoration-none">
+        <article class="blog-featured gmFadeUp">
+            {% if featured.hasImage %}
+                {{ image_tag(featured, 'large', 'Illustration de l\'article ' ~ featured.title, 'blog-featured-img') }}
+            {% else %}
+                <div class="blog-featured-img blog-featured-img-empty"><i class="bi bi-newspaper"></i></div>
+            {% endif %}
+            <div class="blog-featured-body">
+                <span class="badge bg-gm-yellow text-gm-bg mb-2">
+                    <i class="bi bi-star me-1"></i> À la une
+                    {% if featured.category %} · {{ featured.category.name }}{% endif %}
+                </span>
+                <h2 class="blog-featured-title">{{ featured.title }}</h2>
+                <p class="text-muted mb-2">
+                    {{ featured.summary ?? featured.excerpt(160) }}
+                </p>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-person"></i>
+                    {{ featured.author ? (featured.author.firstName ~ ' ' ~ featured.author.lastName) : 'Bureau' }}
+                    · <i class="bi bi-calendar"></i> {{ (featured.publishedAt ?? featured.createdAt)|date('d/m/Y') }}
+                    · {{ ((featured.content|striptags|split(' ')|length) / 200)|round(1, 'ceil') }} min de lecture
+                </p>
+                <span class="proj-card-cta">
+                    Lire l'article <i class="bi bi-arrow-right"></i>
+                </span>
             </div>
-        {% endfor %}
-    </div>
+        </article>
+    </a>
+
+    {# ===== Autres articles ===== #}
+    {% set rest = posts|slice(1) %}
+    {% if rest|length > 0 %}
+        <div class="row g-4 mt-1">
+            {% for post in rest %}
+                <div class="col-md-6 col-lg-4">
+                    <a href="{{ path('app_blog_show', {'slug': post.slug}) }}"
+                       class="text-decoration-none h-100 d-block">
+                        <article class="home-card position-relative gmFadeUp"
+                                 style="animation-delay: {{ loop.index0 * 60 }}ms">
+                            {% if post.hasImage %}
+                                {{ image_tag(post, 'medium', 'Illustration de l\'article ' ~ post.title, 'home-card-img') }}
+                            {% else %}
+                                <div class="home-card-img home-card-img-empty"><i class="bi bi-newspaper"></i></div>
+                            {% endif %}
+                            {% if post.category %}
+                                <span class="badge bg-gm-green text-gm-white position-absolute top-0 end-0 m-2">
+                                    {{ post.category.name }}
+                                </span>
+                            {% endif %}
+                            <div class="home-card-body">
+                                <h3 class="h5 text-light mb-2">{{ post.title }}</h3>
+                                <p class="text-muted small mb-2">
+                                    {{ post.summary ?? post.excerpt(120) }}
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    <i class="bi bi-person"></i>
+                                    {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
+                                    · {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
+                                    · {{ ((post.content|striptags|split(' ')|length) / 200)|round(1, 'ceil') }} min
+                                </p>
+                                <span class="proj-card-cta">
+                                    Lire l'article <i class="bi bi-arrow-right"></i>
+                                </span>
+                            </div>
+                        </article>
+                    </a>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 {% endif %}

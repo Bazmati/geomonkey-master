@@ -44,15 +44,22 @@ class BlogController extends AbstractController
 
     #[Route('/{slug}', name: 'show', methods: ['GET'])]
     public function show(
-        #[MapEntity(mapping: ['slug' => 'slug'])] BlogPost $post
+        #[MapEntity(mapping: ['slug' => 'slug'])] BlogPost $post,
+        BlogPostRepository $repo
     ): Response {
         if (!$post->isPublished()) {
             throw $this->createNotFoundException();
         }
 
+        $related = array_values(array_filter(
+            $repo->findPublishedPosts(),
+            static fn (BlogPost $p) => $p->getId() !== $post->getId()
+        ));
+
         return $this->render('front/blog/show.html.twig', [
             'post' => $post,
             'image_url' => $this->imageManager->getUrl($post, 'large'),
+            'related' => array_slice($related, 0, 3),
         ]);
     }
 }
