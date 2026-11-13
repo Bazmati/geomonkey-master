@@ -9,6 +9,7 @@ use App\Entity\User;
 use App\Repository\EventParticipantRepository;
 use App\Repository\EventRepository;
 use App\Repository\MembershipRepository;
+use App\Service\EventIcsGenerator;
 use App\Service\ImageManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -28,6 +29,7 @@ class EventController extends AbstractController
         private readonly ImageManager $imageManager,
         private readonly EventParticipantRepository $participantRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly EventIcsGenerator $icsGenerator,
     ) {
     }
 
@@ -204,45 +206,7 @@ class EventController extends AbstractController
 
         $url = $this->generateUrl('app_event_show', ['id' => $event->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
-        $escape = static function (?string $value): string {
-            $value = (string) $value;
-
-            return str_replace(
-                ['\\', ';', ',', "\r\n", "\n"],
-                ['\\\\', '\\;', '\\,', '\\n', '\\n'],
-                $value
-            );
-        };
-
-        $formatUtc = static function (?\DateTimeImmutable $date): string {
-            return null === $date ? '' : $date->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
-        };
-
-        $lines = [
-            'BEGIN:VCALENDAR',
-            'VERSION:2.0',
-            'PRODID:-//GeoMonkey//Events//FR',
-            'CALSCALE:GREGORIAN',
-            'BEGIN:VEVENT',
-            'UID:event-' . $event->getId() . '@geomonkey',
-            'DTSTAMP:' . (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Ymd\THis\Z'),
-            'DTSTART:' . $formatUtc($event->getStartDate()),
-            'DTEND:' . $formatUtc($event->getEndDate()),
-            'SUMMARY:' . $escape($event->getTitle()),
-            'LOCATION:' . $escape($event->getLocation()),
-            'DESCRIPTION:' . $escape($event->getDescription()),
-            'URL:' . $url,
-            'END:VEVENT',
-            'END:VCALENDAR',
-        ];
-
-        $filename = 'evenement-' . $event->getId() . '.ics';
-
-        $response = new Response(implode("\r\n", $lines));
-        $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
-        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
-
-        return $response;
+        return $this->icsGenerator->response($event, $url);
     }
 
     /**

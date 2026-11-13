@@ -112,21 +112,21 @@ class ProjectTaskDocumentTest extends TestCase
         $document->setTask($task);
         $document->setFileName('document.pdf');
         
-        $expectedPath = 'uploads/task_documents/123/document.pdf';
-        $this->assertEquals($expectedPath, $document->getWebPath());
+        $expectedPath = 'task_documents/123/document.pdf';
+        $this->assertEquals($expectedPath, $document->getStorageRelativePath());
     }
 
-    public function testGetWebPathWithoutTask(): void
+    public function testGetStorageRelativePathWithoutTask(): void
     {
         $document = new ProjectTaskDocument();
         $document->setFileName('document.pdf');
         
         // Sans task, getId() retourne null, qui est casté en chaîne vide
         // donc le chemin sera "//document.pdf"
-        $this->assertEquals('uploads/task_documents//document.pdf', $document->getWebPath());
+        $this->assertEquals('task_documents//document.pdf', $document->getStorageRelativePath());
     }
 
-    public function testGetWebPathWithoutFileName(): void
+    public function testGetStorageRelativePathWithoutFileName(): void
     {
         $document = new ProjectTaskDocument();
         $task = new ProjectTask();
@@ -138,7 +138,7 @@ class ProjectTaskDocumentTest extends TestCase
         $document->setTask($task);
         
         // Sans fileName, le chemin se termine par null
-        $this->assertStringContainsString('uploads/task_documents/123/', $document->getWebPath());
+        $this->assertStringContainsString('task_documents/123/', $document->getStorageRelativePath());
     }
 
     public function testGetIconForImages(): void
@@ -287,7 +287,7 @@ class ProjectTaskDocumentTest extends TestCase
         $this->assertEquals(1024 * 1024 * 2, $document->getSize());
         $this->assertEquals($date, $document->getUploadedAt());
         $this->assertSame($user, $document->getUploadedBy());
-        $this->assertEquals('uploads/task_documents/123/unique-name.pdf', $document->getWebPath());
+        $this->assertEquals('task_documents/123/unique-name.pdf', $document->getStorageRelativePath());
         $this->assertEquals('bi-file-pdf', $document->getIcon());
         $this->assertEquals('2 Mo', $document->getFormattedSize());
     }

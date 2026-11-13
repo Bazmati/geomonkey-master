@@ -10,6 +10,7 @@ use App\Enum\ParticipantRole;
 use App\Repository\EventParticipantRepository;
 use App\Repository\EventRepository;
 use App\Repository\MembershipRepository;
+use App\Service\EventIcsGenerator;
 use App\Service\ImageManager;
 use Doctrine\ORM\EntityManagerInterface;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +54,7 @@ class EventControllerTest extends TestCase
     private function createControllerWithUser(?User $user): EventController
     {
         // Créer une classe anonyme qui étend EventController et permet de mock getUser()
-        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em) extends EventController {
+        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em, new EventIcsGenerator()) extends EventController {
             private ?User $mockUser;
             
             public function setMockUser(?User $user): void
@@ -394,7 +395,7 @@ class EventControllerTest extends TestCase
         
         // Classe anonyme : ics() appelle generateUrl() (qui passe par le container
         // Symfony) -> on la surcharge pour rendre le test autonome.
-        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em) extends EventController {
+        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em, new EventIcsGenerator()) extends EventController {
             private ?User $mockUser = null;
             
             public function setMockUser(?User $user): void

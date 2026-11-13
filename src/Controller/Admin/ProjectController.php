@@ -11,22 +11,20 @@ use App\Repository\ProjectTaskDocumentRepository;
 use App\Repository\ProjectTaskRepository;
 use App\Repository\ProjectRepository;
 use App\Service\ImageManager;
+use App\Service\ProjectTaskDocumentManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\String\Slugger\SluggerInterface;
 
 #[Route('/admin/project')]
 final class ProjectController extends AbstractController
 {
     public function __construct(
-        #[Autowire('%kernel.project_dir%')]
-        private readonly string $projectDir,
+        private readonly ProjectTaskDocumentManager $documentManager,
     ) {
     }
     #[Route(name: 'admin_projects_index', methods: ['GET'])]
@@ -163,8 +161,7 @@ final class ProjectController extends AbstractController
         Request $request,
         Project $project,
         EntityManagerInterface $entityManager,
-        ProjectTaskRepository $taskRepository,
-        SluggerInterface $slugger
+        ProjectTaskRepository $taskRepository
     ): Response {
         $task = new ProjectTask();
         $task->setProject($project);
@@ -177,7 +174,9 @@ final class ProjectController extends AbstractController
             $entityManager->persist($task);
             $entityManager->flush();
 
-            $this->uploadTaskDocuments($task, $form->get('newDocuments')->getData(), $slugger, $entityManager);
+            foreach ($this->documentManager->upload($task, $form->get('newDocuments')->getData(), $this->getUser()) as $document) {
+                $entityManager->persist($document);
+            }
             $entityManager->flush();
 
             $this->addFlash('success', 'La tâche a été ajoutée au projet.');
@@ -198,8 +197,7 @@ final class ProjectController extends AbstractController
         Request $request,
         int $taskId,
         EntityManagerInterface $entityManager,
-        ProjectTaskRepository $taskRepository,
-        SluggerInterface $slugger
+        ProjectTaskRepository $taskRepository
     ): Response {
         // Résolution manuelle (pas de MapEntity) : recherche par identifiant
         $task = $taskRepository->find($taskId);
@@ -211,7 +209,9 @@ final class ProjectController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $this->uploadTaskDocuments($task, $form->get('newDocuments')->getData(), $slugger, $entityManager);
+            foreach ($this->documentManager->upload($task, $form->get('newDocuments')->getData(), $this->getUser()) as $document) {
+                $entityManager->persist($document);
+            }
             $entityManager->flush();
 
             $this->addFlash('success', 'La tâche a été modifiée.');
@@ -242,7 +242,7 @@ final class ProjectController extends AbstractController
         $projectId = $task->getProject()->getId();
 
         if ($this->isCsrfTokenValid('task-delete' . $task->getId(), $request->getPayload()->getString('_token'))) {
-            $this->deleteTaskFiles($task);
+            $this->documentManager->removeAll($task);
 
             $entityManager->remove($task);
             $entityManager->flush();
@@ -272,7 +272,7 @@ final class ProjectController extends AbstractController
         $projectId = $document->getTask()->getProject()->getId();
 
         if ($this->isCsrfTokenValid('task-doc-delete' . $document->getId(), $request->getPayload()->getString('_token'))) {
-            $this->deleteTaskFile($document);
+            $this->documentManager->remove($document);
 
             $entityManager->remove($document);
             $entityManager->flush();
@@ -284,61 +284,20 @@ final class ProjectController extends AbstractController
     }
 
     /**
-     * Stocke les fichiers uploadés d'une tâche dans
-     * public/uploads/task_documents/{taskId}/ et crée les entités associées.
-     *
-     * @param UploadedFile[] $files
+     * Télécharge un document rattaché à une tâche (streaming authentifié,
+     * le fichier n'est plus servi depuis public/).
      */
-    private function uploadTaskDocuments(ProjectTask $task, array $files, SluggerInterface $slugger, EntityManagerInterface $entityManager): void
-    {
-        $uploadDir = $this->projectDir . '/public/uploads/task_documents/' . $task->getId();
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0775, true);
+    #[Route('/task-document/{document}/download', name: 'admin_projects_task_document_download', methods: ['GET'])]
+    #[IsGranted('ENTITY_VIEW')]
+    public function taskDocumentDownload(
+        int $document,
+        ProjectTaskDocumentRepository $documentRepository
+    ): BinaryFileResponse {
+        $document = $documentRepository->find($document);
+        if ($document === null) {
+            throw $this->createNotFoundException('Document introuvable.');
         }
 
-        foreach ($files as $file) {
-            // IMPORTANT : lire toutes les infos AVANT move(),
-            // car le fichier temporaire disparaît après le déplacement.
-            $originalName = $file->getClientOriginalName() ?? 'document';
-            $mimeType = $file->getMimeType() ?? 'application/octet-stream';
-            $size = (int) $file->getSize();
-
-            $safeName = strtolower(
-                $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME))
-                . '-' . uniqid()
-                . '.' . ($file->guessExtension() ?? 'bin')
-            );
-
-            $file->move($uploadDir, $safeName);
-
-            $document = new ProjectTaskDocument();
-            $document->setTask($task)
-                ->setFileName($safeName)
-                ->setOriginalName($originalName)
-                ->setMimeType($mimeType)
-                ->setSize($size)
-                ->setUploadedBy($this->getUser());
-
-            $entityManager->persist($document);
-            $task->addDocument($document);
-        }
-    }
-
-    /**
-     * Supprime tous les fichiers d'une tâche sur le disque.
-     */
-    private function deleteTaskFiles(ProjectTask $task): void
-    {
-        foreach ($task->getDocuments() as $document) {
-            $this->deleteTaskFile($document);
-        }
-    }
-
-    private function deleteTaskFile(ProjectTaskDocument $document): void
-    {
-        $path = $this->projectDir . '/public/' . $document->getWebPath();
-        if (is_file($path)) {
-            unlink($path);
-        }
+        return $this->documentManager->downloadResponse($document);
     }
 }

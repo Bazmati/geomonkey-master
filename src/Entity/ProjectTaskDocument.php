@@ -8,9 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Fichier uploadé rattaché à une tâche de projet (PDF, image, document…).
  *
- * Stocké dans public/uploads/task_documents/{taskId}/ ; le nom en base est
- * le nom technique du fichier sur le disque, le nom d'origine est conservé
- * pour l'affichage et le téléchargement.
+ * Stocké hors de public/, dans var/task_documents/{taskId}/ (chemin relatif
+ * retourné par getStorageRelativePath()) ; le nom en base est le nom
+ * technique du fichier sur le disque, le nom d'origine est conservé pour
+ * l'affichage et le téléchargement.
  */
 #[ORM\Entity(repositoryClass: ProjectTaskDocumentRepository::class)]
 class ProjectTaskDocument
@@ -144,11 +145,12 @@ class ProjectTaskDocument
     }
 
     /**
-     * Chemin web du fichier (relatif à public/).
+     * Chemin relatif du fichier, par rapport à var/
+     * (ou à public/uploads/ pour les fichiers historiques non migrés).
      */
-    public function getWebPath(): string
+    public function getStorageRelativePath(): string
     {
-        return 'uploads/task_documents/' . $this->task?->getId() . '/' . $this->fileName;
+        return 'task_documents/' . $this->task?->getId() . '/' . $this->fileName;
     }
 
     /**

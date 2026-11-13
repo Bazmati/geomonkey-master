@@ -73,7 +73,7 @@
                                                 <ul class="list-unstyled mb-0 small">
                                                     {% for document in task.documents %}
                                                         <li class="d-flex align-items-center gap-1">
-                                                            <a href="{{ asset(document.webPath) }}" target="_blank" rel="noopener">
+                                                            <a href="{{ path('admin_projects_task_document_download', {document: document.id}) }}">
                                                                 <i class="bi {{ document.icon }}"></i> {{ document.originalName }}
                                                             </a>
                                                             <form method="post"
@@ -132,7 +132,7 @@
                                     {% endif %}
                                     {% for document in task.documents %}
                                         <p class="mb-1 small">
-                                            <a href="{{ asset(document.webPath) }}" target="_blank" rel="noopener">
+                                            <a href="{{ path('admin_projects_task_document_download', {document: document.id}) }}">
                                                 <i class="bi {{ document.icon }}"></i> {{ document.originalName }}
                                             </a>
                                         </p>
