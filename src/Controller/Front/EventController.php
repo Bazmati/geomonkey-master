@@ -8,6 +8,7 @@ use App\Enum\ParticipantRole;
 use App\Entity\User;
 use App\Repository\EventParticipantRepository;
 use App\Repository\EventRepository;
+use App\Repository\GalleryImageRepository;
 use App\Repository\MembershipRepository;
 use App\Service\EventIcsGenerator;
 use App\Service\ImageManager;
@@ -34,7 +35,7 @@ class EventController extends AbstractController
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(Request $request): Response
+    public function index(Request $request, GalleryImageRepository $galleryRepo): Response
     {
         $filter = $request->query->get('filter', 'tous');
         if (!in_array($filter, self::FILTERS, true)) {
@@ -48,12 +49,12 @@ class EventController extends AbstractController
         $events = $this->entityManager->getRepository(Event::class)
             ->findVisibleFor($isActiveMember, $filter);
 
-        $imageManager = $this->imageManager;
-
         return $this->render('front/event/index.html.twig', [
             'events' => $events,
             'filter' => $filter,
-            'image_helper' => fn (Event $event) => $imageManager->getEventImage($event),
+            // Si aucun événement n'est programmé, l'affiche laisse place
+            // à un défilement d'images de la galerie (visibles par l'utilisateur).
+            'gallery_images' => array_slice($galleryRepo->findVisibleForUser($user), 0, 12),
         ]);
     }
 
@@ -74,7 +75,7 @@ class EventController extends AbstractController
                 'title' => $event->getTitle(),
                 'start' => $event->getStartDate()?->format(DATE_ATOM),
                 'end' => $event->getEndDate()?->format(DATE_ATOM),
-                'url' => $this->generateUrl('app_event_show', ['id' => $event->getId()]),
+                'url' => $this->generateUrl('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]),
                 'membersOnly' => $event->isMembersOnly(),
                 'location' => $event->getLocation(),
                 'past' => $event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time(),
@@ -84,14 +85,32 @@ class EventController extends AbstractController
         return $this->json($data);
     }
 
-    #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
-    public function show(int $id): Response
+    #[Route('/{slug}', name: 'show', requirements: ['slug' => '[a-z0-9-]+'], methods: ['GET'])]
+    public function show(string $slug): Response
     {
-        $event = $this->findVisibleEventOr404($id);
-
         /** @var User|null $user */
         $user = $this->getUser();
         $isActiveMember = $this->isViewerActiveMember();
+        $repo = $this->entityManager->getRepository(Event::class);
+
+        // Ancien format /evenements/17 : redirection permanente vers le slug
+        if (ctype_digit($slug)) {
+            $byId = $repo->findOneVisibleBy((int) $slug, $isActiveMember);
+            if ($byId === null) {
+                throw $this->createNotFoundException('Événement introuvable.');
+            }
+
+            return $this->redirectToRoute(
+                'app_event_show',
+                ['slug' => $byId->getSlug() ?: (string) $byId->getId()],
+                301
+            );
+        }
+
+        $event = $repo->findOneVisibleBySlug($slug, $isActiveMember);
+        if ($event === null) {
+            throw $this->createNotFoundException('Événement introuvable.');
+        }
 
         $participantCount = $this->participantRepository->countParticipants($event);
         $capacity = $event->getCapacity();

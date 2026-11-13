@@ -77,6 +77,28 @@ class EventRepository extends ServiceEntityRepository
      * Un événement publié, visible selon le statut de membre de l'internaute.
      * Le front ne doit JAMAIS servir un événement non publié, même avec l'ID deviné.
      */
+    /**
+     * Un événement publié visible, par slug (URL publique).
+     */
+    public function findOneVisibleBySlug(string $slug, bool $isActiveMember): ?Event
+    {
+        $qb = $this->createQueryBuilder('e')
+            ->andWhere('e.slug = :slug')
+            ->andWhere('e.isPublished = true')
+            ->setParameter('slug', $slug);
+
+        if (!$isActiveMember) {
+            $qb->andWhere('e.isMembersOnly = false');
+        }
+
+        return $qb
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
+    /**
+     * Un événement publié visible, par id (anciens liens, .ics, POST inscription).
+     */
     public function findOneVisibleBy(int $id, bool $isActiveMember): ?Event
     {
         $qb = $this->createQueryBuilder('e')

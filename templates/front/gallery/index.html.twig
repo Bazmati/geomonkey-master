@@ -2,70 +2,176 @@
 
 {% block title %}Galerie - GéoMonkey{% endblock %}
 
+{% block meta %}
+    <meta name="description" content="Le patchwork photo de GéoMonkey : coulisses, événements et projets de l'association en images.">
+{% endblock %}
+
 {% block body %}
-    {% include 'partials/_navbar.html.twig' %}
+{% include 'partials/_navbar.html.twig' %}
 
-
-    <div class="container py-4">
-
-        {{ breadcrumb() }}
-        
-        <h1 class="mb-4">Galerie</h1>
-
-        {% if images is empty %}
-            <div class="alert alert-gm-info">
-                <i class="bi bi-info-circle"></i> Aucune image à afficher pour le moment.
-            </div>
-        {% else %}
-            <div class="row g-3">
-                {% for image in images %}
-                    <div class="col-6 col-md-4 col-lg-3">
-                        <figure class="gallery-item card h-100">
-                            <div class="card-body p-2">
-                                {% include 'front/gallery_image/_picture.html.twig' with {
-                                    image: image,
-                                    size: 'medium',
-                                    alt: image.alt
-                                } %}
-                            </div>
-                            
-                            {% if image.title or image.description %}
-                                <div class="card-footer bg-transparent p-2">
-                                    {% if image.title %}
-                                        <h3 class="h6 m-0">{{ image.title }}</h3>
-                                    {% endif %}
-                                    {% if image.description %}
-                                        <figcaption class="small text-muted mb-0">{{ image.description }}</figcaption>
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                            
-                            {# Boutons d'action : uniquement pour ceux qui ont le droit #}
-                            {% if is_granted('GALLERY_IMAGE_EDIT', image) or 
-                                  is_granted('GALLERY_IMAGE_DELETE', image) %}
-                                <div class="card-footer bg-light p-2">
-                                    {% if is_granted('GALLERY_IMAGE_EDIT', image) %}
-                                        <a href="{{ path('app_admin_gallery_image_edit', {id: image.id}) }}" 
-                                           class="btn btn-sm btn-outline-warning me-1"
-                                           title="Éditer cette image">
-                                            <i class="bi bi-pencil"></i>
-                                        </a>
-                                    {% endif %}
-
-                                    {% if is_granted('GALLERY_IMAGE_DELETE', image) %}
-                                        {% include 'front/partials/_delete_button.html.twig' with {
-                                            id: image.id,
-                                            path: path('app_admin_gallery_image_delete', {id: image.id}),
-                                            entity_type: 'image',
-                                            csrf_token: csrf_token('delete' ~ image.id)
-                                        } %}
-                                    {% endif %}
-                                </div>
-                            {% endif %}
-                        </figure>
-                    </div>
-                {% endfor %}
-            </div>
+{# ===== Hero de section ===== #}
+<header class="pres-hero">
+    <div class="container position-relative text-center">
+        <span class="badge home-hero-badge mb-3">
+            <i class="bi bi-images me-1"></i> Galerie
+        </span>
+        <h1 class="pres-hero-title">Le patchwork des souvenirs</h1>
+        <p class="home-hero-sub mx-auto mb-0">
+            Des morceaux de vie d'asso, grands et petits, cousus les uns aux
+            autres. Clique sur une image pour l'agrandir — et laisse-toi porter.
+        </p>
+        {% if images|length > 0 %}
+            <p class="mt-3 mb-0">
+                <span class="badge bg-gm-surface border-gm-yellow text-gm-yellow">
+                    <i class="bi bi-image me-1"></i> {{ images|length }} souvenirs
+                </span>
+            </p>
         {% endif %}
     </div>
+</header>
+
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    {% if images is empty %}
+        <div class="alert alert-gm-info">
+            <i class="bi bi-info-circle me-2"></i> Aucune image à afficher pour le moment. Revenez bientôt !
+        </div>
+    {% else %}
+        {# ===== Patchwork : tailles libre, légendes au survol ===== #}
+        <div class="gm-patchwork">
+            {% for image in images %}
+                <figure class="gm-patch gmFadeUp"
+                        style="animation-delay: {{ (loop.index0 % 12) * 45 }}ms"
+                        data-full="{{ image_url(image, 'large') ?? image_url(image, 'medium') }}"
+                        data-title="{{ image.title }}"
+                        data-desc="{{ image.description|striptags|slice(0, 160) }}">
+                    {% include 'partials/_picture.html.twig' with {
+                        image: image,
+                        size: 'medium',
+                        alt: image.alt,
+                        class: 'gm-patch-img',
+                        title: image.description,
+                        fallback: true,
+                        context: 'front'
+                    } %}
+
+                    {% if image.visibility is defined and image.visibility.value != 'public' %}
+                        <span class="gm-patch-lock" title="Image réservée aux membres connectés">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                    {% endif %}
+
+                    {% if is_granted('GALLERY_IMAGE_EDIT', image) or is_granted('GALLERY_IMAGE_DELETE', image) %}
+                        <div class="gm-patch-admin">
+                            {% if is_granted('GALLERY_IMAGE_EDIT', image) %}
+                                <a href="{{ path('app_admin_gallery_image_edit', {id: image.id}) }}"
+                                   class="btn btn-sm btn-outline-gm-green" title="Éditer cette image">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                            {% endif %}
+                            {% if is_granted('GALLERY_IMAGE_DELETE', image) %}
+                                {% include 'front/partials/_delete_button.html.twig' with {
+                                    id: image.id,
+                                    path: path('app_admin_gallery_image_delete', {id: image.id}),
+                                    entity_type: 'image',
+                                    csrf_token: csrf_token('delete' ~ image.id)
+                                } %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
+                    {% if image.title or image.description %}
+                        <figcaption class="gm-patch-caption">
+                            {% if image.title %}<strong class="d-block">{{ image.title }}</strong>{% endif %}
+                            {% if image.description %}
+                                <span class="small">{{ image.description|striptags|slice(0, 90) }}{% if image.description|striptags|length > 90 %}…{% endif %}</span>
+                            {% endif %}
+                        </figcaption>
+                    {% endif %}
+                </figure>
+            {% endfor %}
+        </div>
+
+        {# Tip de fermeture #}
+        <p class="text-center text-muted small mt-4 mb-0">
+            <i class="bi bi-zoom-in me-1"></i> Astuce : clique sur une image pour l'ouvrir en grand — flèches ← → pour naviguer, Échap pour fermer.
+        </p>
+    {% endif %}
+</main>
+
+{# ===== Lightbox plein écran (sans dépendance) ===== #}
+<div class="gm-lightbox" id="gm-lightbox" hidden aria-hidden="true" role="dialog" aria-label="Visionneuse d'images">
+    <button type="button" class="gm-lightbox-close" title="Fermer (Échap)">
+        <i class="bi bi-x-lg"></i>
+    </button>
+    <button type="button" class="gm-lightbox-nav gm-lightbox-prev" title="Image précédente">
+        <i class="bi bi-chevron-left"></i>
+    </button>
+    <figure class="gm-lightbox-figure">
+        <img src="" alt="" class="gm-lightbox-img">
+        <figcaption class="gm-lightbox-caption"></figcaption>
+    </figure>
+    <button type="button" class="gm-lightbox-nav gm-lightbox-next" title="Image suivante">
+        <i class="bi bi-chevron-right"></i>
+    </button>
+    <span class="gm-lightbox-counter"></span>
+</div>
+
+<script>
+(function () {
+    var patches = Array.prototype.slice.call(document.querySelectorAll('.gm-patch[data-full]'));
+    if (patches.length === 0) { return; }
+
+    var box = document.getElementById('gm-lightbox');
+    if (!box) { return; }
+    var img = box.querySelector('.gm-lightbox-img');
+    var caption = box.querySelector('.gm-lightbox-caption');
+    var counter = box.querySelector('.gm-lightbox-counter');
+    var current = -1;
+
+    function show(index) {
+        current = (index + patches.length) % patches.length;
+        var p = patches[current];
+        img.src = p.dataset.full;
+        img.alt = p.dataset.title || '';
+        var text = '';
+        if (p.dataset.title) { text += '<strong>' + p.dataset.title + '</strong>'; }
+        if (p.dataset.desc) {
+            if (text) { text += '<br>'; }
+            text += '<span class="small">' + p.dataset.desc + '</span>';
+        }
+        caption.innerHTML = text;
+        counter.textContent = (current + 1) + ' / ' + patches.length;
+        box.hidden = false;
+        box.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function close() {
+        box.hidden = true;
+        box.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    }
+
+    patches.forEach(function (p, i) {
+        p.addEventListener('click', function (e) {
+            if (e.target.closest('a, form, button')) { return; }
+            show(i);
+        });
+    });
+
+    box.querySelector('.gm-lightbox-close').addEventListener('click', close);
+    box.querySelector('.gm-lightbox-prev').addEventListener('click', function () { show(current - 1); });
+    box.querySelector('.gm-lightbox-next').addEventListener('click', function () { show(current + 1); });
+    box.addEventListener('click', function (e) { if (e.target === box) { close(); } });
+
+    document.addEventListener('keydown', function (e) {
+        if (box.hidden) { return; }
+        if (e.key === 'Escape') { close(); }
+        else if (e.key === 'ArrowLeft') { show(current - 1); }
+        else if (e.key === 'ArrowRight') { show(current + 1); }
+    });
+})();
+</script>
 {% endblock %}

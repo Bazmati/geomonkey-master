@@ -1,7 +1,5 @@
 {% extends 'front/base.html.twig' %}
 
-{% import 'partials/_breadcrumb.html.twig' as breadcrumb_macros %}
-
 {% block title %}{{ event.title }} — {{ parent() }}{% endblock %}
 {% block meta %}
     <meta name="description" content="{{ event.description|striptags|slice(0, 155) }}">
@@ -9,137 +7,213 @@
     <meta property="og:title" content="{{ event.title }}">
     <meta property="og:description" content="{{ event.description|striptags|slice(0, 155) }}">
     <meta property="og:url" content="{{ app.request.uri }}">
-    {% if image_url %}
-        <meta property="og:image" content="{{ absolute_url(asset(image_url)) }}">
+    {% set hero_img = image_url(event, 'large') %}
+    {% if hero_img %}
+        <meta property="og:image" content="{{ absolute_url(asset(hero_img)) }}">
     {% endif %}
     <meta name="twitter:card" content="summary_large_image">
 {% endblock %}
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<article class="py-5">
-    <div class="container max-w-800">
-        {{ breadcrumb() }}
 
-        <h1 class="mb-3">{{ event.title }}</h1>
-
-        <p class="text-muted">
-            <i class="bi bi-calendar"></i>
-            {{ event.startDate|date('d/m/Y H:i') }} — {{ event.endDate|date('d/m/Y H:i') }}
-            &nbsp;·&nbsp; <i class="bi bi-geo-alt"></i>
-            {% if event.location %}
-                <a href="https://www.google.com/maps/search/?api=1&amp;query={{ event.location|url_encode }}"
-                   target="_blank" rel="noopener">
-                    {{ event.location }}
-                </a>
-            {% endif %}
+{# ===== Hero : image de fond + titre par-dessus ===== #}
+<header class="pres-show-hero {{ hero_img ? '' : 'pres-hero' }}">
+    {% if hero_img %}
+        <div class="pres-show-hero-bg" style="background-image: url('{{ hero_img }}')"></div>
+        <div class="pres-show-hero-overlay"></div>
+    {% endif %}
+    <div class="container position-relative">
+        <p class="mb-2">
             {% if event.isMembersOnly %}
-                &nbsp;·&nbsp; <span class="badge bg-warning text-dark"><i class="bi bi-people"></i> Réservé aux membres</span>
+                <span class="badge bg-gm-yellow text-gm-bg"><i class="bi bi-people me-1"></i> Réservé aux membres</span>
+            {% endif %}
+            {% if isPast %}
+                <span class="badge bg-secondary text-white"><i class="bi bi-clock-history me-1"></i> Événement passé</span>
+            {% else %}
+                <span class="badge bg-gm-green text-gm-white"><i class="bi bi-stars me-1"></i> À venir</span>
             {% endif %}
         </p>
+        <h1 class="pres-show-hero-title">{{ event.title }}</h1>
+        <p class="pres-show-hero-excerpt mb-0">
+            <i class="bi bi-calendar me-1"></i>
+            {{ event.startDate|date('d/m/Y à H\\h i') }} — {{ event.endDate|date('d/m/Y à H\\h i') }}
+            {% if event.location %}&nbsp;·&nbsp; <i class="bi bi-geo-alt me-1"></i>{{ event.location }}{% endif %}
+        </p>
+    </div>
+</header>
 
-        {% if event.hasImage %}
-            {{ image_tag(event, 'large', "Illustration de l'événement " ~ event.title, 'img-fluid rounded mb-4') }}
-        {% endif %}
+<main class="container py-5">
+    {{ breadcrumb() }}
 
-        <div class="article-content">
-            {{ event.description|nl2br }}
+    <div class="row g-4">
+        {# ===== Colonne principale : description + contenus liés ===== #}
+        <div class="col-lg-8">
+            <article class="pres-show-content">
+                <div class="article-content mb-0">
+                    {{ event.description|nl2br }}
+                </div>
+            </article>
+
+            {% set gallery = event.galleryImages|filter(i => i.isPublished) %}
+            {% if gallery|length > 0 %}
+                <section class="mt-5">
+                    <h2 class="h4 mb-3"><i class="bi bi-images text-gm-yellow"></i> En images</h2>
+                    <div class="row g-3">
+                        {% for image in gallery %}
+                            <div class="col-6 col-md-4">
+                                {{ image_tag(image, 'medium', image.alt, 'home-mosaic w-100') }}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </section>
+            {% endif %}
+
+            {% set related_projects = event.projects|filter(p => p.isPublished) %}
+            {% if related_projects|length > 0 %}
+                <section class="mt-5">
+                    <h2 class="h4 mb-3"><i class="bi bi-kanban text-gm-green"></i> Projets liés</h2>
+                    {% for project in related_projects %}
+                        <a href="{{ path('app_project_show', {'slug': project.slug}) }}" class="proj-related mb-2">
+                            <i class="bi bi-kanban fs-5 text-gm-green"></i>
+                            <span class="flex-grow-1"><strong>{{ project.title }}</strong></span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+            {% set related_posts = event.blogPosts|filter(p => p.isPublished) %}
+            {% if related_posts|length > 0 %}
+                <section class="mt-5">
+                    <h2 class="h4 mb-3"><i class="bi bi-newspaper text-gm-yellow"></i> Articles liés</h2>
+                    {% for post in related_posts %}
+                        <a href="{{ path('app_blog_show', {'slug': post.slug}) }}" class="proj-related mb-2">
+                            <i class="bi bi-newspaper fs-5 text-gm-yellow"></i>
+                            <span class="flex-grow-1"><strong>{{ post.title }}</strong></span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endfor %}
+                </section>
+            {% endif %}
         </div>
 
-        {% if not isPast %}
-            <div class="card bg-gm-surface border-gm-yellow mt-4">
-                <div class="card-body">
-                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-2">
-                        <h2 class="h6 mb-0"><i class="bi bi-person-check"></i> Inscription</h2>
-                        {% if event.capacity %}
-                            <span class="text-muted small">{{ participantCount }} / {{ event.capacity }} places</span>
-                        {% elseif participantCount > 0 %}
-                            <span class="text-muted small">{{ participantCount }} inscrit{{ participantCount > 1 ? 's' : '' }}</span>
+        {# ===== Colonne latérale : infos + inscription ===== #}
+        <aside class="col-lg-4">
+            <div class="gm-event-aside">
+                {% if not isPast %}
+                    <div class="bg-gm-surface border-gm-green rounded p-3 mb-3 text-center">
+                        {% if event.startDate|date('U') >= 'now'|date('U') %}
+                            <p class="small text-muted mb-1"><i class="bi bi-hourglass-split me-1"></i> Ça commence dans</p>
+                            <span class="gm-countdown badge bg-gm-surface border-gm-yellow text-gm-yellow fs-6 w-100 py-2"
+                                  data-start="{{ event.startDate|date(constant('DATE_ATOM')) }}">…</span>
+                        {% else %}
+                            <p class="mb-0 small text-muted"><i class="bi bi-lightning-charge me-1 text-gm-yellow"></i> L'événement est en cours !</p>
                         {% endif %}
                     </div>
+                {% endif %}
+
+                <div class="bg-gm-surface border-gm-yellow rounded p-3">
+                    <h2 class="h6 mb-3"><i class="bi bi-person-check"></i> Inscription</h2>
 
                     {% if event.capacity %}
+                        <div class="d-flex justify-content-between small mb-1">
+                            <span class="text-muted">Places</span>
+                            <strong>{{ participantCount }} / {{ event.capacity }}</strong>
+                        </div>
                         {% set gauge = (participantCount / event.capacity * 100)|round %}
                         <div class="progress mb-3" role="progressbar" aria-label="Places occupées"
                              aria-valuenow="{{ gauge }}" aria-valuemin="0" aria-valuemax="100">
                             <div class="progress-bar {{ gauge >= 100 ? 'bg-danger' : 'bg-gm-green' }}"
                                  style="width: {{ gauge }}%"></div>
                         </div>
+                    {% elseif participantCount > 0 %}
+                        <p class="text-muted small mb-3">
+                            {{ participantCount }} inscrit{{ participantCount > 1 ? 's' : '' }}
+                        </p>
                     {% endif %}
 
-                    {% if isRegistered %}
+                    {% if isPast %}
+                        <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> Inscriptions closes : cet événement est terminé.</p>
+                    {% elseif isRegistered %}
                         <span class="badge bg-gm-green text-white mb-2"><i class="bi bi-check-circle"></i> Vous êtes inscrit</span>
-                        <form method="post" action="{{ path('app_event_unregister', {id: event.id}) }}"
-                              class="d-inline">
+                        <form method="post" action="{{ path('app_event_unregister', {id: event.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('unregister' ~ event.id) }}">
-                            <button type="submit" class="btn btn-outline-gm-green btn-sm">
+                            <button type="submit" class="btn btn-outline-gm-green btn-sm w-100">
                                 <i class="bi bi-x-circle"></i> Annuler mon inscription
                             </button>
                         </form>
                     {% elseif not app.user %}
-                        <a href="{{ path('app_login') }}" class="btn btn-gm-green">
+                        <a href="{{ path('app_login') }}" class="btn btn-gm-green w-100">
                             <i class="bi bi-box-arrow-in-right"></i> Se connecter pour participer
                         </a>
                     {% elseif event.isMembersOnly and not is_active_member %}
-                        <button type="button" class="btn btn-gm-green" disabled>
+                        <button type="button" class="btn btn-gm-green w-100" disabled>
                             <i class="bi bi-person-plus"></i> Je participe
                         </button>
-                        <p class="text-muted small mt-2 mb-0">Réservé aux membres actifs de l'association.</p>
+                        <p class="text-muted small mt-2 mb-0">Réservé aux membres actifs — <a href="{{ path('app_membership_register') }}">rejoins l'assoc'</a> pour participer !</p>
                     {% elseif isFull %}
-                        <button type="button" class="btn btn-gm-green" disabled>
+                        <button type="button" class="btn btn-gm-green w-100" disabled>
                             <i class="bi bi-person-x"></i> Complet
                         </button>
                     {% else %}
                         <form method="post" action="{{ path('app_event_register', {id: event.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('register' ~ event.id) }}">
-                            <button type="submit" class="btn btn-gm-green">
+                            <button type="submit" class="btn btn-gm-green w-100">
                                 <i class="bi bi-person-plus"></i> Je participe
                             </button>
                         </form>
                     {% endif %}
                 </div>
-            </div>
-        {% endif %}
 
-        <a href="{{ path('app_event_ics', {id: event.id}) }}" class="btn btn-outline-gm-green mt-3">
-            <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier (.ics)
-        </a>
-
-        {% if event.galleryImages|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-images"></i> Images de l'événement</h3>
-            <div class="row g-3">
-                {% for image in event.galleryImages %}
-                    {% if image.isPublished %}
-                        <div class="col-md-4">
-                            {{ image_tag(image, 'medium', image.alt, 'img-fluid rounded') }}
-                        </div>
+                <div class="bg-gm-surface border-gm-yellow rounded p-3 mt-3">
+                    <h2 class="h6 mb-3"><i class="bi bi-pin-map"></i> Infos pratiques</h2>
+                    <p class="small mb-2">
+                        <i class="bi bi-calendar text-gm-green me-1"></i>
+                        {{ event.startDate|date('d/m/Y à H\\h i') }}<br>
+                        <i class="bi bi-calendar-check text-gm-green me-1"></i>
+                        {{ event.endDate|date('d/m/Y à H\\h i') }}
+                    </p>
+                    {% if event.location %}
+                        <p class="small mb-2">
+                            <i class="bi bi-geo-alt text-gm-green me-1"></i>
+                            <a href="https://www.google.com/maps/search/?api=1&amp;query={{ event.location|url_encode }}"
+                               target="_blank" rel="noopener">{{ event.location }}</a>
+                        </p>
                     {% endif %}
-                {% endfor %}
+                    <a href="{{ path('app_event_ics', {id: event.id}) }}" class="btn btn-outline-gm-green btn-sm w-100 mt-2">
+                        <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier (.ics)
+                    </a>
+                </div>
             </div>
-        {% endif %}
-
-        {% if event.projects|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-kanban"></i> Projets liés</h3>
-            <ul class="list-unstyled">
-                {% for project in event.projects|filter(project => project.isPublished) %}
-                    <li><i class="bi bi-folder"></i>
-                        <a href="{{ path('app_project_show', {'slug': project.slug}) }}">{{ project.title }}</a></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        {% if event.blogPosts|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-newspaper"></i> Articles liés</h3>
-            <ul class="list-unstyled">
-                {% for post in event.blogPosts|filter(post => post.isPublished)%}
-                    <li><i class="bi bi-file-text"></i>
-                        <a href="{{ path('app_blog_show', {'slug': post.slug}) }}">{{ post.title }}</a></li>
-                {% endfor %}
-            </ul>
-        {% endif %}
+        </aside>
     </div>
-</article>
+</main>
+
+<script>
+(function () {
+    var el = document.querySelector('.gm-countdown[data-start]');
+    if (!el) { return; }
+    var start = new Date(el.dataset.start).getTime();
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function tick() {
+        var diff = start - Date.now();
+        if (isNaN(start) || diff <= 0) {
+            el.innerHTML = '<i class="bi bi-lightning-charge me-1"></i> ' + "C'est parti !";
+            return;
+        }
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor(diff / 3600000) % 24;
+        var m = Math.floor(diff / 60000) % 60;
+        var s = Math.floor(diff / 1000) % 60;
+        el.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> ' +
+            (d > 0 ? 'J-' + d + ' · ' : '') + pad(h) + 'h ' + pad(m) + 'min ' + pad(s) + 's';
+        setTimeout(tick, 1000);
+    }
+
+    tick();
+})();
+</script>
 {% endblock %}

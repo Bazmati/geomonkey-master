@@ -1740,3 +1740,253 @@ body > footer,
     .blog-card, .gm-tag-pill { transition: none !important; }
     .blog-card:hover { transform: none; }
 }
+
+/* ============================================================
+   FRONT — Galerie : patchwork + lightbox plein écran
+   ============================================================ */
+
+/* ----- Patchwork : colonnes masonry, tailles libres ----- */
+.gm-patchwork {
+    columns: 2;
+    column-gap: 1rem;
+}
+@media (min-width: 576px)  { .gm-patchwork { columns: 2; } }
+@media (min-width: 768px)  { .gm-patchwork { columns: 3; } }
+@media (min-width: 1200px) { .gm-patchwork { columns: 4; } }
+
+.gm-patch {
+    position: relative;
+    margin: 0 0 1rem;
+    border-radius: 1rem;
+    overflow: hidden;
+    border: 1px solid var(--gm-gray-900);
+    cursor: zoom-in;
+    break-inside: avoid;
+    transition: border-color .2s ease, box-shadow .2s ease;
+}
+.gm-patch:hover {
+    border-color: color-mix(in srgb, var(--gm-yellow) 45%, var(--gm-gray-900));
+    box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .45);
+}
+.gm-patch-img,
+.gm-patch img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: transform .35s ease;
+}
+.gm-patch:hover img { transform: scale(1.04); }
+
+/* Légende : glisse depuis le bas au survol */
+.gm-patch-caption {
+    position: absolute;
+    inset: auto 0 0 0;
+    padding: 2rem 1rem .9rem;
+    color: var(--gm-white);
+    background: linear-gradient(180deg, transparent, rgba(28, 28, 26, .92));
+    opacity: 0;
+    transform: translateY(30%);
+    transition: opacity .25s ease, transform .25s ease;
+    pointer-events: none;
+}
+.gm-patch:hover .gm-patch-caption {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Badge "réservé aux membres" */
+.gm-patch-lock {
+    position: absolute;
+    top: .6rem;
+    left: .6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.9rem;
+    height: 1.9rem;
+    border-radius: .6rem;
+    background: rgba(28, 28, 26, .75);
+    border: 1px solid color-mix(in srgb, var(--gm-yellow) 55%, transparent);
+    color: var(--gm-yellow);
+    font-size: .85rem;
+}
+
+/* Boutons admin : coin haut droit au survol */
+.gm-patch-admin {
+    position: absolute;
+    top: .6rem;
+    right: .6rem;
+    display: flex;
+    gap: .3rem;
+    opacity: 0;
+    transition: opacity .2s ease;
+}
+.gm-patch:hover .gm-patch-admin { opacity: 1; }
+
+/* ----- Lightbox plein écran ----- */
+.gm-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    background: rgba(15, 15, 14, .94);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 4.5rem 3.5rem;
+    cursor: default;
+}
+.gm-lightbox[hidden] { display: none; }
+.gm-lightbox-figure {
+    max-width: min(1100px, 100%);
+    margin: 0;
+    text-align: center;
+}
+.gm-lightbox-img {
+    max-width: 100%;
+    max-height: 78vh;
+    border-radius: .75rem;
+    box-shadow: 0 1rem 4rem rgba(0, 0, 0, .6);
+    animation: gmLbIn .25s ease both;
+}
+@keyframes gmLbIn {
+    from { opacity: 0; transform: scale(.96); }
+    to   { opacity: 1; transform: scale(1); }
+}
+.gm-lightbox-caption {
+    color: var(--gm-gray-200);
+    margin-top: .8rem;
+    animation: gmFadeUp .3s ease both;
+}
+.gm-lightbox-close,
+.gm-lightbox-nav {
+    position: absolute;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, .06);
+    border: 1px solid var(--gm-gray-700);
+    color: var(--gm-white);
+    border-radius: 50%;
+    width: 2.8rem;
+    height: 2.8rem;
+    font-size: 1.2rem;
+    transition: background .2s ease, border-color .2s ease;
+}
+.gm-lightbox-close:hover,
+.gm-lightbox-nav:hover {
+    background: rgba(0, 160, 64, .25);
+    border-color: var(--gm-green);
+}
+.gm-lightbox-close { top: 1.2rem; right: 1.2rem; }
+.gm-lightbox-prev { left: 1.2rem; top: 50%; transform: translateY(-50%); }
+.gm-lightbox-next { right: 1.2rem; top: 50%; transform: translateY(-50%); }
+.gm-lightbox-counter {
+    position: absolute;
+    bottom: 1.2rem;
+    left: 50%;
+    transform: translateX(-50%);
+    color: var(--gm-gray-400);
+    font-size: .9rem;
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .gm-patch, .gm-patch img, .gm-patch-caption,
+    .gm-patch-admin, .gm-lightbox-img, .gm-lightbox-caption {
+        transition: none !important;
+        animation: none !important;
+    }
+    .gm-patch:hover img { transform: none; }
+    .gm-patch:hover .gm-patch-caption { transform: none; }
+}
+
+/* ============================================================
+   FRONT — Événements : affiche du prochain rendez-vous + agenda
+   ============================================================ */
+
+/* Affiche "Prochain rendez-vous" : réutilise .blog-card en plus haute */
+.gm-event-showcase { min-height: 380px; }
+@media (min-width: 992px) { .gm-event-showcase { min-height: 430px; } }
+.gm-showcase-link {
+    color: var(--gm-white);
+    text-decoration: none;
+}
+.gm-showcase-link:hover {
+    color: color-mix(in srgb, var(--gm-green) 55%, var(--gm-white));
+    text-decoration: underline;
+}
+
+/* Compte à rebours */
+.gm-countdown { font-variant-numeric: tabular-nums; letter-spacing: .02em; }
+
+/* Le calendrier FullCalendar dans une carte cohérente avec le thème */
+.gm-calendar-card {
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1.25rem;
+    padding: 1.25rem;
+    margin: 0;
+}
+@media (max-width: 991.98px) {
+    .gm-calendar-card { padding: .75rem; }
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .gm-event-showcase { animation: none !important; }
+}
+
+/* ============================================================
+   FRONT — Événements : rotateur de galerie (affiche de secours)
+   ============================================================ */
+.gm-rotator { position: relative; cursor: default; }
+.gm-rotator-layer {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.1s ease;
+}
+.gm-rotator-layer.is-visible { opacity: 1; }
+.gm-rotator .blog-card-overlay { position: relative; }
+
+/* Pastilles de position */
+.gm-rotator-dots {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .4rem .6rem;
+    border-radius: 2rem;
+    background: rgba(28, 28, 26, .55);
+    border: 1px solid var(--gm-gray-700);
+}
+.gm-rotator-dot {
+    width: .55rem;
+    height: .55rem;
+    border-radius: 50%;
+    background: var(--gm-gray-400);
+    transition: background .3s ease, transform .3s ease;
+}
+.gm-rotator-dot.is-active {
+    background: var(--gm-yellow);
+    transform: scale(1.25);
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .gm-rotator-layer, .gm-rotator-dot { transition: none !important; }
+}
+
+/* ============================================================
+   FRONT — Fiche événement : colonne latérale (inscription, infos)
+   ============================================================ */
+.gm-event-aside {
+    position: sticky;
+    top: 5rem;
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .gm-event-aside { position: static; }
+}

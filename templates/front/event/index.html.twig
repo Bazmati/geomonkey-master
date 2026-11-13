@@ -4,93 +4,252 @@
 
 {% block meta_description %}Découvrez les événements de l'association GéoMonkey : ateliers, constructions, festivals et rencontres.{% endblock %}
 
-{% block stylesheets %}
-    {{ parent() }}
-{% endblock %}
-
-{% block javascripts %}
-    {{ parent() }}
-{% endblock %}
-
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<section class="py-5 ">
-    <div class="container">
 
-        {{ breadcrumb() }}
+{# ===== Hero de section ===== #}
+<header class="pres-hero">
+    <div class="container position-relative text-center">
+        <span class="badge home-hero-badge mb-3">
+            <i class="bi bi-calendar-event me-1"></i> Agenda
+        </span>
+        <h1 class="pres-hero-title">La vie de l'assoc', jour après jour</h1>
+        <p class="home-hero-sub mx-auto mb-0">
+            Ateliers, constructions, sorties et festifs : retrouve tout
+            l'agenda GéoMonkey et réserve ta place pour le prochain rendez-vous.
+        </p>
+    </div>
+</header>
 
-        <h1 class="mb-4"><i class="bi bi-calendar-event"></i> Nos événements</h1>
+{% set upcoming = events|filter(e => e.startDate and e.startDate|date('U') >= 'now'|date('U')) %}
+{% set next = upcoming|first %}
 
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    {# ============================================================
+       AFFICHE : le prochain événement (visible par tous les écrans)
+       ============================================================ #}
+    {% if next %}
+        {% set next_img = image_url(next, 'large') %}
+        <article class="blog-card gm-event-showcase {{ next_img ? '' : 'blog-card-noimg' }} gmFadeUp"
+                 {% if next_img %}style="background-image: url('{{ next_img }}')"{% endif %}>
+            <div class="blog-card-overlay">
+                <span class="badge bg-gm-green text-gm-white mb-2">
+                    <i class="bi bi-stars me-1"></i> Prochain rendez-vous
+                </span>
+                <h2 class="blog-card-title">
+                    <a href="{{ path('app_event_show', {'slug': next.slug}) }}" class="gm-showcase-link">{{ next.title }}</a>
+                </h2>
+                <p class="blog-card-meta mb-2">
+                    <i class="bi bi-calendar"></i> {{ next.startDate|date('d/m/Y à H\\h i') }}
+                    {% if next.location %} · <i class="bi bi-geo-alt"></i> {{ next.location }}{% endif %}
+                    {% if next.isMembersOnly %} · <i class="bi bi-people"></i> Réservé aux membres{% endif %}
+                </p>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <span class="gm-countdown badge bg-gm-surface border-gm-yellow text-gm-yellow fs-6"
+                          data-start="{{ next.startDate|date(constant('DATE_ATOM')) }}">…</span>
+                    <a href="{{ path('app_event_ics', {'id': next.id}) }}" class="proj-card-cta">
+                        <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier
+                    </a>
+                    <a href="{{ path('app_event_show', {'slug': next.slug}) }}" class="proj-card-cta">
+                        Voir l'événement <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+        </article>
+    {% elseif gallery_images is defined and gallery_images|length > 0 %}
         {# ============================================================
-           FILTRE (visible partout : agit sur la liste mobile,
-           le calendrier desktop affiche lui l'intégralité)
+           PAS D'ÉVÉNEMENT À L'HORIZON : la galerie défile à la place
            ============================================================ #}
-        <div class="btn-group mb-4 gm-filter-group" role="group" aria-label="Filtrer les événements">
-            <a href="{{ path('app_event_index', {'filtre': 'tous'}) }}"
-               class="btn btn-sm {{ filter == 'tous' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Tous</a>
-            <a href="{{ path('app_event_index', {'filtre': 'a-venir'}) }}"
-               class="btn btn-sm {{ filter == 'a-venir' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">À venir</a>
-            <a href="{{ path('app_event_index', {'filtre': 'passes'}) }}"
-               class="btn btn-sm {{ filter == 'passes' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Passés</a>
-        </div>
+        <article class="blog-card gm-event-showcase gm-rotator gmFadeUp" data-rotator>
+            <div class="gm-rotator-layer" data-role="layer-a"></div>
+            <div class="gm-rotator-layer" data-role="layer-b"></div>
+            <div class="blog-card-overlay">
+                <span class="badge bg-gm-yellow text-gm-bg mb-2">
+                    <i class="bi bi-hourglass me-1"></i> Prochain événement en préparation
+                </span>
+                <h2 class="blog-card-title">Rien à l'agenda… pour l'instant</h2>
+                <p class="blog-card-excerpt mb-2">
+                    L'équipe mijote la suite. En attendant, plonge dans nos
+                    souvenirs : chaque image raconte un moment de vie de l'assoc'.
+                </p>
+                <div class="d-flex flex-wrap align-items-center gap-3">
+                    <span class="gm-rotator-dots" data-role="dots"></span>
+                    <a href="{{ path('app_gallery_index') }}" class="proj-card-cta">
+                        Voir toute la galerie <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+            <script type="application/json" data-role="slides">
+                {{ gallery_images|map(image => {'src': image_url(image, 'large') ?? image_url(image, 'medium'), 'alt': image.alt})|json_encode(constant('JSON_HEX_TAG') + constant('JSON_HEX_APOS') + constant('JSON_HEX_AMP') + constant('JSON_HEX_QUOT'))|raw }}
+            </script>
+        </article>
+    {% endif %}
 
+    {# ============================================================
+       FILTRE (agit sur la liste mobile ; le calendrier desktop
+       affiche lui l'intégralité)
+       ============================================================ #}
+    <div class="btn-group mb-4 gm-filter-group" role="group" aria-label="Filtrer les événements">
+        <a href="{{ path('app_event_index', {'filtre': 'tous'}) }}"
+           class="btn btn-sm {{ filter == 'tous' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Tous</a>
+        <a href="{{ path('app_event_index', {'filtre': 'a-venir'}) }}"
+           class="btn btn-sm {{ filter == 'a-venir' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">À venir</a>
+        <a href="{{ path('app_event_index', {'filtre': 'passes'}) }}"
+           class="btn btn-sm {{ filter == 'passes' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Passés</a>
+    </div>
+
+    <div class="row g-4">
         {# ============================================================
            DESKTOP (>= lg) : calendrier FullCalendar alimenté par le feed JSON
            ============================================================ #}
-        <div class="d-none d-lg-block gm-calendar gm-calendar-container"
-             data-controller="event-calendar"
-             data-event-calendar-feed-url-value="{{ path('app_event_data') }}"></div>
+        <div class="col-lg-8 d-none d-lg-block">
+            <div class="gm-calendar gm-calendar-container gm-calendar-card"
+                 data-controller="event-calendar"
+                 data-event-calendar-feed-url-value="{{ path('app_event_data') }}"></div>
+
+            {# Les événements qui suivent, en écho du calendrier #}
+            {% if upcoming|length > 1 %}
+                <section class="mt-2">
+                    <h2 class="h6 text-muted text-uppercase mb-3"><i class="bi bi-clock-history"></i> Et ensuite</h2>
+                    {% for event in upcoming|slice(1, 4) %}
+                        <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="proj-related mb-2">
+                            <i class="bi bi-calendar-event fs-5 text-gm-green"></i>
+                            <span class="flex-grow-1">
+                                <strong>{{ event.title }}</strong><br>
+                                <span class="text-muted small">{{ event.startDate|date('d/m/Y à H\\h i') }}{% if event.location %} — {{ event.location }}{% endif %}</span>
+                            </span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endfor %}
+                </section>
+            {% endif %}
+        </div>
 
         {# ============================================================
-           MOBILE (< lg) : cartes d'événements
+           MOBILE (< lg) : cartes d'événements en overlay image
            ============================================================ #}
-        <div class="d-lg-none">
+        <div class="col-12 d-lg-none">
             {% if events is empty %}
                 <div class="alert alert-gm-info">
-                    <i class="bi bi-info-circle"></i> Aucun événement à afficher pour ce filtre. Revenez bientôt !
+                    <i class="bi bi-info-circle me-2"></i> Aucun événement à afficher pour ce filtre. Revenez bientôt !
                 </div>
             {% else %}
                 <div class="row g-4">
                     {% for event in events %}
+                        {% set e_img = image_url(event, 'medium') %}
                         <div class="col-12 col-md-6">
-                            <div class="card h-100 shadow-sm">
-                                {% if event.hasImage %}
-                                    <img src="{{ asset('uploads/events/' ~ event.image) }}"
-                                         class="card-img-top" alt="Illustration de l'événement {{ event.title }}" loading="lazy">
-                                {% endif %}
-                                <div class="card-body d-flex flex-column">
-                                    <div class="mb-2">
+                            <a href="{{ path('app_event_show', {'slug': event.slug}) }}"
+                               class="text-decoration-none h-100 d-block">
+                                <article class="blog-card h-100 {{ e_img ? '' : 'blog-card-noimg' }} gmFadeUp"
+                                         style="animation-delay: {{ loop.index0 * 50 }}ms{% if e_img %}; background-image: url('{{ e_img }}'){% endif %}">
+                                    <div class="blog-card-overlay">
                                         {% if event.isMembersOnly %}
-                                            <span class="badge bg-warning text-dark">
+                                            <span class="badge bg-gm-yellow text-gm-bg mb-2">
                                                 <i class="bi bi-people"></i> Réservé aux membres
                                             </span>
                                         {% endif %}
-                                        <span class="badge bg-{{ event.endDate|date('U') >= 'now'|date('U') ? 'success' : 'secondary' }} text-light">
+                                        <span class="badge {{ event.endDate|date('U') >= 'now'|date('U') ? 'bg-gm-green text-gm-white' : 'bg-secondary text-white' }} mb-2">
                                             {{ event.endDate|date('U') >= 'now'|date('U') ? 'À venir' : 'Passé' }}
                                         </span>
-                                    </div>
-                                    <h5 class="card-title">{{ event.title }}</h5>
-                                    <p class="card-text text-muted small mb-1">
-                                        <i class="bi bi-calendar"></i>
-                                        {{ event.startDate|date('d/m/Y H:i') }}
-                                        — {{ event.endDate|date('d/m/Y H:i') }}
-                                    </p>
-                                    <p class="card-text text-muted small">
-                                        <i class="bi bi-geo-alt"></i> {{ event.location }}
-                                    </p>
-                                    <div class="mt-auto">
-                                        <a href="{{ path('app_event_show', {'id': event.id}) }}"
-                                           class="btn btn-success btn-sm">
+                                        <h3 class="blog-card-title h5">{{ event.title }}</h3>
+                                        <p class="blog-card-meta mb-2">
+                                            <i class="bi bi-calendar"></i> {{ event.startDate|date('d/m/Y à H\\h i') }}{% if event.location %} · <i class="bi bi-geo-alt"></i> {{ event.location }}{% endif %}
+                                        </p>
+                                        <span class="proj-card-cta">
                                             Voir l'événement <i class="bi bi-arrow-right"></i>
-                                        </a>
+                                        </span>
                                     </div>
-                                </div>
-                            </div>
+                                </article>
+                            </a>
                         </div>
                     {% endfor %}
                 </div>
             {% endif %}
         </div>
     </div>
-</section>
+</main>
+
+<script>
+(function () {
+    var el = document.querySelector('.gm-countdown[data-start]');
+    if (!el) { return; }
+    var start = new Date(el.dataset.start).getTime();
+
+    function pad(n) { return n < 10 ? '0' + n : '' + n; }
+
+    function tick() {
+        var diff = start - Date.now();
+        if (isNaN(start) || diff <= 0) {
+            el.innerHTML = '<i class="bi bi-lightning-charge me-1"></i> ' + "C'est maintenant !";
+            return;
+        }
+        var d = Math.floor(diff / 86400000);
+        var h = Math.floor(diff / 3600000) % 24;
+        var m = Math.floor(diff / 60000) % 60;
+        var s = Math.floor(diff / 1000) % 60;
+        el.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> ' +
+            (d > 0 ? 'J-' + d + ' · ' : '') + pad(h) + 'h ' + pad(m) + 'min ' + pad(s) + 's';
+        setTimeout(tick, 1000);
+    }
+
+    tick();
+})();
+
+/* ============================================================
+   ROTATEUR D'IMAGES (affiche quand aucun événement n'est prévu) :
+   deux calques en fondu enchaîné + pastilles de position
+   ============================================================ */
+(function () {
+    var rot = document.querySelector('[data-rotator]');
+    if (!rot) { return; }
+
+    var slides = [];
+    try {
+        var parsed = JSON.parse(rot.querySelector('[data-role="slides"]').textContent);
+        parsed.forEach(function (s) { if (s.src) { slides.push(s.src); } });
+    } catch (e) { return; }
+    if (slides.length === 0) { rot.classList.add('blog-card-noimg'); return; }
+
+    var layers = [
+        rot.querySelector('[data-role="layer-a"]'),
+        rot.querySelector('[data-role="layer-b"]')
+    ];
+    var dotsBox = rot.querySelector('[data-role="dots"]');
+    var current = 0;
+    var front = 0;
+
+    slides.forEach(function (src, i) {
+        var d = document.createElement('span');
+        d.className = 'gm-rotator-dot';
+        d.setAttribute('role', 'img');
+        d.setAttribute('aria-label', 'Image ' + (i + 1) + ' sur ' + slides.length);
+        dotsBox.appendChild(d);
+    });
+    var dots = Array.prototype.slice.call(dotsBox.children);
+
+    function paint() {
+        layers[front].style.backgroundImage = "url('" + slides[current] + "')";
+        layers[front].classList.add('is-visible');
+        layers[1 - front].classList.remove('is-visible');
+        dots.forEach(function (d, i) { d.classList.toggle('is-active', i === current); });
+        front = 1 - front;
+    }
+
+    // Préchargement pour éviter les flashs au changement
+    slides.forEach(function (src) { var im = new Image(); im.src = src; });
+
+    layers[0].style.backgroundImage = "url('" + slides[0] + "')";
+    layers[0].classList.add('is-visible');
+    dots[0].classList.add('is-active');
+    front = 1;
+
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        return; // Première image statique, pas de défilement
+    }
+
+    setInterval(function () { current = (current + 1) % slides.length; paint(); }, 5000);
+})();
+</script>
 {% endblock %}

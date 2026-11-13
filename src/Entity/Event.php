@@ -13,6 +13,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Event implements ImageableInterface
 {
     #[ORM\Id]
@@ -30,6 +31,13 @@ class Event implements ImageableInterface
     )]
     #[Assert\Type(type: 'string', message: "Le titre doit être une chaîne de caractères")]
     private ?string $title = null;
+
+    /**
+     * Slug public : URL lisible type /evenements/sortie-canoe-2026.
+     * Calculé une fois à la création pour garder les URLs stables.
+     */
+    #[ORM\Column(length: 255, unique: true, nullable: true)]
+    private ?string $slug = null;
 
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: "La description est obligatoire")]
@@ -178,6 +186,45 @@ class Event implements ImageableInterface
     public function getImage(): ?string
     {
         return $this->image;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(?string $slug): static
+    {
+        $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * Génère le slug à partir du titre (même logique que BlogPost/Project).
+     * « Sortie canoë 2026 » → « sortie-canoe-2026 »
+     */
+    public function computeSlug(): void
+    {
+        $slug = transliterator_transliterate('Any-Latin; Latin-ASCII; lower', $this->title ?? '');
+        $slug = preg_replace('/[^a-z0-9]+/', '-', $slug ?? '') ?? '';
+        $this->slug = trim($slug, '-') ?: 'evenement';
+    }
+
+    #[ORM\PrePersist]
+    public function onPrePersistSlug(): void
+    {
+        if ($this->slug === null || $this->slug === '') {
+            $this->computeSlug();
+        }
+    }
+
+    #[ORM\PreUpdate]
+    public function onPreUpdateSlug(): void
+    {
+        if ($this->slug === null || $this->slug === '') {
+            $this->computeSlug();
+        }
     }
 
     public function setImage(?string $image): static

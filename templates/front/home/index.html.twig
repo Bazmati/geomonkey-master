@@ -114,7 +114,7 @@
                 <div class="row g-4">
                     {% for event in upcomingEvents %}
                         <div class="col-md-6 col-lg-4">
-                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="text-decoration-none">
+                            <a href="{{ path('app_event_show', {slug: event.slug}) }}" class="text-decoration-none">
                                 <article class="home-card h-100">
                                     {% set media = image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null) %}
                                     {% if media %}

@@ -76,7 +76,7 @@
                 <section class="mt-5">
                     <h2 class="h4 mb-3"><i class="bi bi-calendar-event text-gm-green"></i> Événements liés</h2>
                     {% for event in post.events %}
-                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="proj-related mb-2">
+                        <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="proj-related mb-2">
                             <i class="bi bi-calendar-event fs-5 text-gm-green"></i>
                             <span class="flex-grow-1">
                                 <strong>{{ event.title }}</strong><br>
