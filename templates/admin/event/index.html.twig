@@ -117,7 +117,7 @@
                         {% for event in events %}
                             <div class="card mb-3 gm-admin-card">
                                 <div class="card-body">
-                                    {% include 'admin/partials/_card_media.html.twig' with {media: image_url(event, 'medium'), icon: 'bi-calendar-event', wrapper: 'gm-card-banner'} %}
+                                    {% include 'admin/partials/_card_media.html.twig' with {media: image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null), icon: 'bi-calendar-event', wrapper: 'gm-card-banner'} %}
                                     <div class="d-flex justify-content-between align-items-start mb-2">
                                         <h6 class="mb-0 text-gm-text">{{ event.title }}</h6>
                                         <span class="badge {{ event.isPublished ? 'bg-gm-green text-gm-white' : 'bg-gm-warning text-gm-bg' }} ms-2 flex-shrink-0">

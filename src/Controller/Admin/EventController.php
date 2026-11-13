@@ -94,12 +94,6 @@ final class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            // Handle image upload (takes precedence over deletion)
-            $imageFile = $form->get('imageFile')->getData();
-            if ($imageFile) {
-                $imageManager->upload($event, $imageFile);
-            }
-
             $entityManager->flush();
 
             $imageFile = $form->get('newImageFile')->getData();
