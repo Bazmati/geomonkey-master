@@ -5,9 +5,13 @@ namespace App\Form;
 use App\Entity\BlogPost;
 use App\Entity\Event;
 use App\Entity\Project;
+use App\Entity\User;
+use App\Enum\ProjectStatus;
+use App\Repository\UserRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
+use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
@@ -45,6 +49,25 @@ class ProjectType extends AbstractType
                 'required' => false,
                 'help' => 'Si coché, le projet est visible sur le site public.',
                 'attr' => ['class' => 'form-check-input'],
+            ])
+            ->add('status', ChoiceType::class, [
+                'label' => 'Statut public',
+                'choices' => ProjectStatus::cases(),
+                'choice_label' => fn (ProjectStatus $status) => $status->getLabel(),
+                'choice_value' => fn (?ProjectStatus $status) => $status?->value,
+                'help' => 'Statut visible par tous : "En cours" ou "Planifié" donne envie de rejoindre l\'association.',
+            ])
+            ->add('leader', EntityType::class, [
+                'class' => User::class,
+                'choice_label' => fn (User $user) => $user->getFirstName() . ' ' . $user->getLastName(),
+                'required' => false,
+                'label' => 'Chef de projet',
+                'help' => 'Adhérent actif qui conduit le projet : lui seul et les responsables de tâches font avancer le suivi.',
+                'query_builder' => fn (UserRepository $er) => $er->createQueryBuilder('u')
+                    ->join('u.memberships', 'm')
+                    ->where('m.isActive = true')
+                    ->orderBy('u.lastName', 'ASC')
+                    ->addOrderBy('u.firstName', 'ASC'),
             ])
             ->add('events', EntityType::class, [
                 'class' => Event::class,

@@ -29,14 +29,7 @@
                             {% endif %}
                             <div class="card-body d-flex flex-column">
                                 <div class="mb-2">
-                                    {% set now = 'now'|date('U') %}
-                                    {% if project.endDate and project.endDate|date('U') < now %}
-                                        <span class="badge bg-secondary text-light">Terminé</span>
-                                    {% elseif project.startDate and project.startDate|date('U') <= now %}
-                                        <span class="badge bg-success text-light">En cours</span>
-                                    {% else %}
-                                        <span class="badge bg-warning text-dark">À venir</span>
-                                    {% endif %}
+                                    <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
                                 </div>
                                 <h5 class="card-title">{{ project.title }}</h5>
                                 {% if project.startDate %}

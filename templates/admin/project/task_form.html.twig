@@ -1,0 +1,30 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_content %}
+    {% set page_title = task.id ? 'Modifier la tâche' : 'Nouvelle tâche' %}
+
+    <div class="p-4">
+        {{ breadcrumb() }}
+
+        <div class="card bg-gm-surface border-gm-yellow">
+            <div class="card-header bg-gm-surface d-flex justify-content-end">
+                <a href="{{ path('admin_projects_tasks', {id: project.id}) }}" class="btn btn-gm-surface btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour aux tâches
+                </a>
+            </div>
+
+            <div class="card-body">
+                <h1 class="text-gm-green mb-4">
+                    <i class="bi bi-list-check"></i> {{ task.id ? 'Modifier la tâche' : 'Nouvelle tâche' }} — {{ project.title }}
+                </h1>
+                {{ include('admin/project/_task_form.html.twig', {'button_label': 'Enregistrer'}) }}
+            </div>
+
+            <div class="card-footer bg-gm-surface d-flex justify-content-end">
+                <button type="submit" form="project-task-form" class="btn btn-gm-green">
+                    <i class="bi bi-check-circle"></i> Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+{% endblock %}

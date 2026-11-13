@@ -1,0 +1,129 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Avancement : {{ project.title }} — {{ parent() }}{% endblock %}
+
+{% block meta %}
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Tableau de suivi du projet {{ project.title }} (espace interne).">
+{% endblock %}
+
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+<section class="py-5">
+    <div class="container">
+
+        {{ breadcrumb() }}
+
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+            <div>
+                <h1 class="mb-1"><i class="bi bi-kanban"></i> {{ project.title }}</h1>
+                <p class="text-muted mb-2">Tableau de suivi interne — <a href="{{ path('app_project_show', {'slug': project.slug}) }}">retour à la fiche publique</a></p>
+                <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
+                {% if project.leader %}
+                    <span class="badge bg-gm-surface border-gm-yellow text-gm-text">
+                        <i class="bi bi-person-badge"></i> Chef de projet : {{ project.leader.firstName }} {{ project.leader.lastName }}
+                    </span>
+                {% endif %}
+            </div>
+            <div class="text-center">
+                <div class="fs-4 fw-bold text-gm-green" id="progress-label">{{ project.progressPercent }}&nbsp;%</div>
+                <div class="text-muted small">{{ project.doneTasksCount }} / {{ project.tasks|length }} tâches</div>
+            </div>
+        </div>
+
+        <div class="progress mb-4" role="progressbar" aria-label="Avancement du projet"
+             aria-valuenow="{{ project.progressPercent }}" aria-valuemin="0" aria-valuemax="100">
+            <div class="progress-bar bg-gm-green" style="width: {{ project.progressPercent }}%"></div>
+        </div>
+
+        {% if not is_leader %}
+            <div class="alert alert-light border d-flex align-items-center gap-2">
+                <i class="bi bi-info-circle"></i>
+                <span class="small">Seuls le chef de projet et les responsables de chaque tâche peuvent faire avancer le suivi.</span>
+            </div>
+        {% endif %}
+
+        <div class="row g-3">
+            {% for column in ['a_faire', 'en_cours', 'fait'] %}
+                {% set column_tasks = project.tasks|filter(t => t.state.value == column) %}
+                <div class="col-12 col-md-4">
+                    <div class="card bg-gm-surface h-100">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            {% set labels = {'a_faire': 'À faire', 'en_cours': 'En cours', 'fait': 'Fait'} %}
+                            <h2 class="h6 mb-0">{{ labels[column] }}</h2>
+                            <span class="badge bg-secondary text-white">{{ column_tasks|length }}</span>
+                        </div>
+                        <div class="card-body">
+                            {% if column_tasks is empty %}
+                                <p class="text-muted small mb-0">Aucune tâche dans cette colonne.</p>
+                            {% else %}
+                                {% for task in column_tasks %}
+                                    {% set can_manage = is_leader or (app.user and task.assignee == app.user) %}
+                                    <div class="card border-gm-yellow mb-3">
+                                        <div class="card-body">
+                                            <h3 class="h6 mb-2 text-gm-text">
+                                                <i class="bi {{ task.state.icon }}"></i> {{ task.title }}
+                                            </h3>
+
+                                            {% if task.description %}
+                                                <div class="small text-gm-text mb-2">{{ task.description|nl2br }}</div>
+                                            {% endif %}
+
+                                            {% if task.assignee %}
+                                                <p class="mb-2 small text-muted">
+                                                    <i class="bi bi-person"></i>
+                                                    {{ task.assignee.firstName }} {{ task.assignee.lastName }}
+                                                </p>
+                                            {% endif %}
+
+                                            {% if task.galleryImages|length > 0 %}
+                                                                <p class="mb-2 small">
+                                                                    <i class="bi bi-images"></i>
+                                                                    {% for image in task.galleryImages %}
+                                                                        {{ image_tag(image, 'small', image.alt, 'img-thumbnail m-1') }}
+                                                                    {% endfor %}
+                                                                </p>
+                                            {% endif %}
+
+                                            {% if task.documents|length > 0 %}
+                                                <ul class="list-unstyled mb-2 small">
+                                                    {% for document in task.documents %}
+                                                        <li>
+                                                            <a href="{{ asset(document.webPath) }}" target="_blank" rel="noopener">
+                                                                <i class="bi {{ document.icon }}"></i> {{ document.originalName }}
+                                                            </a>
+                                                            <span class="text-muted">({{ document.formattedSize }})</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            {% endif %}
+
+                                            {% if can_manage %}
+                                                <div class="d-flex flex-wrap gap-1 mt-2">
+                                                    {% for state in ['a_faire', 'en_cours', 'fait'] %}
+                                                        {% if state != task.state.value %}
+                                                            <form method="post"
+                                                                  action="{{ path('app_project_task_state', {slug: project.slug, task: task.id}) }}"
+                                                                  class="d-inline">
+                                                                <input type="hidden" name="_token" value="{{ csrf_token('task-state' ~ task.id) }}">
+                                                                <input type="hidden" name="state" value="{{ state }}">
+                                                                <button type="submit" class="btn btn-sm btn-outline-gm-green">
+                                                                    {% if state == 'a_faire' %}<i class="bi bi-circle"></i> À faire{% elseif state == 'en_cours' %}<i class="bi bi-arrow-repeat"></i> En cours{% else %}<i class="bi bi-check-circle-fill"></i> Fait{% endif %}
+                                                                </button>
+                                                            </form>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </div>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endblock %}

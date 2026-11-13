@@ -34,6 +34,7 @@
                                     <th>Fin</th>
                                     <th>Événements</th>
                                     <th>Articles</th>
+                                    <th>Suivi</th>
                                     <th>Statut</th>
                                     <th>Actions</th>
                                 </tr>
@@ -47,7 +48,14 @@
                                         <td data-label="Fin">{{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}</td>
                                         <td data-label="Événements">{{ project.events|length }}</td>
                                         <td data-label="Articles">{{ project.blogPosts|length }}</td>
+                                        <td data-label="Suivi">
+                                            <a href="{{ path('admin_projects_tasks', {id: project.id}) }}"
+                                               class="text-gm-text text-decoration-none" title="Gérer les tâches du projet">
+                                                <i class="bi bi-list-check"></i> {{ project.tasks|length }} tâche(s)
+                                            </a>
+                                        </td>
                                         <td data-label="Statut">
+                                            <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
                                             {% if project.isPublished %}
                                                 <span class="badge bg-gm-green text-gm-white" title="Visible sur le site public">En ligne</span>
                                             {% else %}
@@ -56,6 +64,10 @@
                                         </td>
                                         <td data-label="Actions">
                                             <div class="d-flex gap-1">
+                                                <a href="{{ path('admin_projects_tasks', {id: project.id}) }}"
+                                                   class="btn btn-sm btn-gm-yellow" title="Tâches du projet">
+                                                    <i class="bi bi-list-check"></i>
+                                                </a>
                                                 {% if is_granted('ENTITY_PUBLISH') %}
                                                     <form method="post"
                                                           action="{{ path('admin_projects_toggle_publish', {'id': project.id}) }}"
@@ -104,10 +116,13 @@
                                         → {{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}
                                     </p>
                                     <p class="mb-3 small text-gm-muted">
-                                        <i class="bi bi-calendar me-1"></i> {{ project.events|length }} événement(s)
+                                        <i class="bi bi-list-check me-1"></i> {{ project.tasks|length }} tâche(s) · {{ project.progressPercent }} %
                                         · <i class="bi bi-newspaper me-1"></i> {{ project.blogPosts|length }} article(s)
                                     </p>
                                     <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ path('admin_projects_tasks', {id: project.id}) }}" class="btn btn-sm btn-gm-yellow">
+                                            <i class="bi bi-list-check"></i> Tâches
+                                        </a>
                                         {% if is_granted('ENTITY_PUBLISH') %}
                                             <form method="post"
                                                   action="{{ path('admin_projects_toggle_publish', {'id': project.id}) }}"

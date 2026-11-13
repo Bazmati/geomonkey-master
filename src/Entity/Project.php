@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Interface\ImageableInterface;
+use App\Enum\ProjectStatus;
 use App\Repository\ProjectRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -60,6 +61,28 @@ class Project implements ImageableInterface
     private ?string $image = null;
 
     /**
+     * Statut public du projet (planifié / en cours / terminé).
+     * Le public ne voit que ce statut, pas le détail des tâches.
+     */
+    #[ORM\Column(enumType: ProjectStatus::class, options: ['default' => 'planifie'])]
+    private ProjectStatus $status = ProjectStatus::Planned;
+
+    /**
+     * Chef de projet : conduit le projet et peut faire avancer toutes les tâches.
+     * C'est forcément un adhérent actif de l'association.
+     */
+    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?User $leader = null;
+
+    /**
+     * Tâches du projet (checklist d'avancement interne).
+     */
+    #[ORM\OneToMany(targetEntity: ProjectTask::class, mappedBy: 'project', cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['position' => 'ASC'])]
+    private Collection $tasks;
+
+    /**
      * Événements rattachés à ce projet (propriétaire de la relation).
      */
     #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'projects')]
@@ -78,6 +101,7 @@ class Project implements ImageableInterface
     {
         $this->events = new ArrayCollection();
         $this->blogPosts = new ArrayCollection();
+        $this->tasks = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -207,6 +231,83 @@ class Project implements ImageableInterface
     public function hasImage(): bool
     {
         return $this->image !== null && $this->image !== '';
+    }
+
+    // =========================================
+    // SUIVI (TÂCHES & AVANCEMENT)
+    // =========================================
+
+    public function getStatus(): ProjectStatus
+    {
+        return $this->status;
+    }
+
+    public function setStatus(ProjectStatus $status): static
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getLeader(): ?User
+    {
+        return $this->leader;
+    }
+
+    public function setLeader(?User $leader): static
+    {
+        $this->leader = $leader;
+
+        return $this;
+    }
+
+    /** @return Collection<int, ProjectTask> */
+    public function getTasks(): Collection
+    {
+        return $this->tasks;
+    }
+
+    public function addTask(ProjectTask $task): static
+    {
+        if (!$this->tasks->contains($task)) {
+            $this->tasks->add($task);
+            $task->setProject($this);
+        }
+
+        return $this;
+    }
+
+    public function removeTask(ProjectTask $task): static
+    {
+        if ($this->tasks->removeElement($task)) {
+            if ($task->getProject() === $this) {
+                $task->setProject(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Nombre de tâches terminées.
+     */
+    public function getDoneTasksCount(): int
+    {
+        return $this->tasks->filter(fn (ProjectTask $task) => $task->getState() === \App\Enum\ProjectTaskState::Done)->count();
+    }
+
+    /**
+     * Pourcentage d'avancement du projet (0-100), calculé sur les tâches.
+     * Un projet sans tâche est considéré à 0 %.
+     */
+    public function getProgressPercent(): int
+    {
+        $total = $this->tasks->count();
+        if ($total === 0) {
+            return 0;
+        }
+
+        return (int) round($this->getDoneTasksCount() / $total * 100);
     }
 
     // =========================================
