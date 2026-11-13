@@ -163,6 +163,18 @@ class Event implements ImageableInterface
         return $this;
     }
 
+    public function getCapacity(): ?int
+    {
+        return $this->capacity;
+    }
+
+    public function setCapacity(?int $capacity): static
+    {
+        $this->capacity = $capacity;
+
+        return $this;
+    }
+
     public function getImage(): ?string
     {
         return $this->image;
@@ -174,6 +186,13 @@ class Event implements ImageableInterface
 
         return $this;
     }
+
+    /**
+     * Capacité maximale de l'événement (inscriptions).
+     * null = places illimitées.
+     */
+    #[ORM\Column(nullable: true)]
+    private ?int $capacity = null;
 
     // Image file for upload (not persisted in database)
     private ?File $imageFile = null;

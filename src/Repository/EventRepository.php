@@ -28,24 +28,32 @@ class EventRepository extends ServiceEntityRepository
      */
     public function findVisibleFor(bool $isActiveMember, string $filter = 'tous'): array
     {
-        $qb = $this->createQueryBuilder('e')
-            ->andWhere('e.isPublished = true');
-
-        if (!$isActiveMember) {
-            $qb->andWhere('e.isMembersOnly = false');
-        }
-
         $now = new \DateTimeImmutable();
-        if ($filter === 'a-venir') {
-            $qb->andWhere('e.startDate >= :now')->setParameter('now', $now);
-        } elseif ($filter === 'passes') {
-            $qb->andWhere('e.startDate < :now')->setParameter('now', $now);
-        }
 
-        return $qb
-            ->orderBy('e.startDate', 'DESC')
-            ->getQuery()
-            ->getResult();
+        // Requête partielle : événements à venir (>=) ou passés (<), tri imposé
+        $fetch = function (string $operator, string $order) use ($isActiveMember, $now): array {
+            $qb = $this->createQueryBuilder('e')
+                ->andWhere('e.isPublished = true');
+
+            if (!$isActiveMember) {
+                $qb->andWhere('e.isMembersOnly = false');
+            }
+
+            return $qb
+                ->andWhere('e.startDate ' . $operator . ' :now')
+                ->setParameter('now', $now)
+                ->orderBy('e.startDate', $order)
+                ->getQuery()
+                ->getResult();
+        };
+
+        return match ($filter) {
+            'a-venir' => $fetch('>=', 'ASC'),
+            'passes' => $fetch('<', 'DESC'),
+            // Défaut : les événements à venir d'abord (du plus proche au plus lointain),
+            // puis les passés (du plus récent au plus ancien).
+            default => array_merge($fetch('>=', 'ASC'), $fetch('<', 'DESC')),
+        };
     }
 
     /**

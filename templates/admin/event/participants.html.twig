@@ -1,0 +1,168 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set page_title = 'Participants : ' ~ event.title %}
+
+{% block admin_content %}
+    <div class="p-4">
+
+        {{ breadcrumb() }}
+
+        <div class="d-flex flex-wrap justify-content-between align-items-start gap-2 mb-4">
+            <h1 class="text-gm-green mb-0"><i class="bi bi-people"></i> Participants</h1>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ path('admin_events_index') }}" class="btn btn-outline-gm-gray">
+                    <i class="bi bi-arrow-left"></i> Retour aux événements
+                </a>
+                <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}" class="btn btn-gm-yellow">
+                    <i class="bi bi-download"></i> Exporter (CSV)
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm mb-3">
+            <div class="card-body">
+                <h2 class="h5 text-gm-text mb-1">{{ event.title }}</h2>
+                <p class="text-gm-muted small mb-0">
+                    <i class="bi bi-calendar me-1"></i>
+                    {{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}
+                    → {{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}
+                </p>
+                <p class="mb-0 mt-2">
+                    <span class="badge bg-gm-green text-gm-white">
+                        <i class="bi bi-people"></i>
+                        {{ participantCount }} inscrit{{ participantCount > 1 ? 's' : '' }}
+                    </span>
+                    {% if event.capacity %}
+                        <span class="badge bg-gm-info text-gm-bg">Capacité : {{ event.capacity }} places</span>
+                        {% if participantCount >= event.capacity %}
+                            <span class="badge bg-gm-warning text-gm-bg">Complet</span>
+                        {% endif %}
+                    {% else %}
+                        <span class="badge bg-gm-info text-gm-bg">Places illimitées</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if participants is empty %}
+                    <div class="text-center py-4 text-gm-muted-light">
+                        <i class="bi bi-person-x fs-1"></i>
+                        <p class="mt-2">Aucun participant pour le moment</p>
+                    </div>
+                {% else %}
+                    {# gm-cards-table : table desktop, cartes mobiles (data-label) #}
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-gm table-striped table-hover gm-cards-table">
+                            <thead>
+                                <tr>
+                                    <th>Participant</th>
+                                    <th>Rôle</th>
+                                    <th>Inscrit le</th>
+                                    <th>Présence</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for participant in participants %}
+                                    <tr>
+                                        <td data-label="Participant">
+                                            <strong>{{ participant.user.firstName }} {{ participant.user.lastName }}</strong>
+                                            <br><span class="text-gm-muted small">{{ participant.user.email }}</span>
+                                        </td>
+                                        <td data-label="Rôle">
+                                            <span class="badge bg-gm-info text-gm-bg">{{ participant.role.getLabel() }}</span>
+                                        </td>
+                                        <td data-label="Inscrit le">{{ participant.registeredAt|date('d/m/Y H:i') }}</td>
+                                        <td data-label="Présence">
+                                            {% if participant.hasAttended %}
+                                                <span class="badge bg-gm-green text-gm-white"><i class="bi bi-check-circle"></i> Présent</span>
+                                            {% else %}
+                                                <span class="badge bg-gm-warning text-gm-bg"><i class="bi bi-clock"></i> Non pointé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Actions">
+                                            <div class="d-flex gap-1">
+                                                <form method="post"
+                                                      action="{{ path('admin_events_participant_attended', {id: event.id, userId: participant.user.id}) }}"
+                                                      class="d-inline">
+                                                    <input type="hidden" name="_token"
+                                                           value="{{ csrf_token('attended' ~ event.id ~ '-' ~ participant.user.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-gm-yellow"
+                                                            title="{{ participant.hasAttended ? 'Marquer comme absent' : 'Marquer comme présent' }}">
+                                                        <i class="bi bi-{{ participant.hasAttended ? 'x-circle' : 'check-circle' }}"></i>
+                                                    </button>
+                                                </form>
+                                                <form method="post"
+                                                      action="{{ path('admin_events_participant_remove', {id: event.id, userId: participant.user.id}) }}"
+                                                      class="d-inline"
+                                                      onsubmit="return confirm('Retirer {{ participant.user.firstName|e('js') }} de cet événement ?');">
+                                                    <input type="hidden" name="_token"
+                                                           value="{{ csrf_token('participant-remove' ~ event.id ~ '-' ~ participant.user.id) }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-gm-gray"
+                                                            title="Retirer de l'événement">
+                                                        <i class="bi bi-person-dash"></i>
+                                                    </button>
+                                                </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# ============================================================
+                       MOBILE : chaque participant devient une carte complète
+                       ============================================================ #}
+                    <div class="d-md-none">
+                        {% for participant in participants %}
+                            <div class="card mb-3 gm-admin-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0 text-gm-text">
+                                            {{ participant.user.firstName }} {{ participant.user.lastName }}
+                                        </h6>
+                                        <span class="badge bg-gm-info text-gm-bg ms-2 flex-shrink-0">{{ participant.role.getLabel() }}</span>
+                                    </div>
+                                    <p class="mb-1 small text-gm-muted">
+                                        <i class="bi bi-envelope me-1"></i> {{ participant.user.email }}
+                                    </p>
+                                    <p class="mb-3 small text-gm-muted">
+                                        <i class="bi bi-clock me-1"></i> Inscrit le {{ participant.registeredAt|date('d/m/Y H:i') }}
+                                        {% if participant.hasAttended %}
+                                            <span class="badge bg-gm-green text-gm-white ms-2"><i class="bi bi-check-circle"></i> Présent</span>
+                                        {% endif %}
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        <form method="post"
+                                              action="{{ path('admin_events_participant_attended', {id: event.id, userId: participant.user.id}) }}"
+                                              class="d-inline">
+                                            <input type="hidden" name="_token"
+                                                   value="{{ csrf_token('attended' ~ event.id ~ '-' ~ participant.user.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-gm-yellow">
+                                                <i class="bi bi-{{ participant.hasAttended ? 'x-circle' : 'check-circle' }}"></i>
+                                                {{ participant.hasAttended ? 'Marquer absent' : 'Marquer présent' }}
+                                            </button>
+                                        </form>
+                                        <form method="post"
+                                              action="{{ path('admin_events_participant_remove', {id: event.id, userId: participant.user.id}) }}"
+                                              class="d-inline"
+                                              onsubmit="return confirm('Retirer {{ participant.user.firstName|e('js') }} de cet événement ?');">
+                                            <input type="hidden" name="_token"
+                                                   value="{{ csrf_token('participant-remove' ~ event.id ~ '-' ~ participant.user.id) }}">
+                                            <button type="submit" class="btn btn-sm btn-outline-gm-gray">
+                                                <i class="bi bi-person-dash"></i> Retirer
+                                            </button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

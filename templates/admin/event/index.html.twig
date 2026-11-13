@@ -33,6 +33,7 @@
                                     <th>Date de début</th>
                                     <th>Date de fin</th>
                                     <th>Lieu</th>
+                                    <th>Inscrits</th>
                                     <th>Publié</th>
                                     <th>Visibilité</th>
                                     <th>Actions</th>
@@ -46,6 +47,12 @@
                                         <td data-label="Début">{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}</td>
                                         <td data-label="Fin">{{ event.endDate ? event.endDate|date('d/m/Y H:i') : '' }}</td>
                                         <td data-label="Lieu">{{ event.location }}</td>
+                                        <td data-label="Inscrits">
+                                            <a href="{{ path('admin_events_participants', {id: event.id}) }}"
+                                               class="text-gm-text text-decoration-none" title="Voir les participants">
+                                                <i class="bi bi-people"></i> {{ event.participants|length }}
+                                            </a>
+                                        </td>
                                         <td data-label="Statut">
                                             {% if event.isPublished %}
                                                 <span class="badge bg-gm-green text-gm-white" title="Visible selon sa visibilité">En ligne</span>
@@ -66,6 +73,10 @@
                                         </td>
                                         <td data-label="Actions">
                                             <div class="d-flex gap-1">
+                                                <a href="{{ path('admin_events_participants', {id: event.id}) }}"
+                                                   class="btn btn-sm btn-gm-yellow" title="Participants">
+                                                    <i class="bi bi-people"></i>
+                                                </a>
                                                 <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}"class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
                                                     <i class="bi bi-download"></i>
                                                 </a>
@@ -120,11 +131,16 @@
                                     </p>
                                     <p class="mb-3 small text-gm-muted">
                                         <i class="bi bi-geo-alt me-1"></i> {{ event.location }}
+                                        &nbsp;·&nbsp; <i class="bi bi-people me-1"></i>
+                                        {{ event.participants|length }} inscrit{{ event.participants|length > 1 ? 's' : '' }}
                                         {% if event.isMembersOnly %}
                                             <span class="badge bg-gm-warning text-gm-bg ms-2"><i class="bi bi-people"></i> Membres</span>
                                         {% endif %}
                                     </p>
                                     <div class="d-flex flex-wrap gap-2">
+                                        <a href="{{ path('admin_events_participants', {id: event.id}) }}" class="btn btn-sm btn-gm-yellow">
+                                            <i class="bi bi-people"></i> Participants
+                                        </a>
                                         <a href="{{ path('app_admin_export_event_participants', {id: event.id}) }}" class="btn btn-sm btn-gm-yellow" title="Exporter les participants (CSV)">
                                             <i class="bi bi-download"></i> Participants
                                         </a>

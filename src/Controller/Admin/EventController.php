@@ -6,6 +6,7 @@ use App\Entity\Event;
 use App\Entity\GalleryImage;
 use App\Enum\ImageVisibility;
 use App\Form\EventType;
+use App\Repository\EventParticipantRepository;
 use App\Repository\EventRepository;
 use App\Service\ImageManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -178,5 +179,73 @@ final class EventController extends AbstractController
         }
 
         return $this->redirectToRoute('admin_events_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Liste des participants à un événement (inscriptions "Je participe").
+     */
+    #[Route('/{id}/participants', name: 'admin_events_participants', methods: ['GET'])]
+    #[IsGranted('ENTITY_EDIT', 'event')]
+    public function participants(Event $event, EventParticipantRepository $participantRepository): Response
+    {
+        return $this->render('admin/event/participants.html.twig', [
+            'event' => $event,
+            'participants' => $participantRepository->findParticipantsByEvent($event),
+            'participantCount' => $participantRepository->countParticipants($event),
+        ]);
+    }
+
+    /**
+     * Marque / démarque un participant comme "présent" (pointage le jour J).
+     */
+    #[Route('/{id}/participant/{userId}/attended', name: 'admin_events_participant_attended', methods: ['POST'])]
+    #[IsGranted('ENTITY_EDIT', 'event')]
+    public function toggleAttended(
+        Request $request,
+        Event $event,
+        int $userId,
+        EntityManagerInterface $entityManager,
+        EventParticipantRepository $participantRepository
+    ): Response {
+        if ($this->isCsrfTokenValid('attended'.$event->getId().'-'.$userId, $request->getPayload()->getString('_token'))) {
+            $participant = $participantRepository->findOneBy(['event' => $event, 'user' => $userId]);
+
+            if ($participant) {
+                $participant->setAttended(!$participant->hasAttended());
+                $entityManager->flush();
+
+                $this->addFlash('success', $participant->hasAttended()
+                    ? 'Participant marqué comme présent.'
+                    : 'Participant marqué comme absent.');
+            }
+        }
+
+        return $this->redirectToRoute('admin_events_participants', ['id' => $event->getId()], Response::HTTP_SEE_OTHER);
+    }
+
+    /**
+     * Retire un participant d'un événement (côté admin).
+     */
+    #[Route('/{id}/participant/{userId}', name: 'admin_events_participant_remove', methods: ['POST'])]
+    #[IsGranted('ENTITY_EDIT', 'event')]
+    public function removeParticipant(
+        Request $request,
+        Event $event,
+        int $userId,
+        EntityManagerInterface $entityManager,
+        EventParticipantRepository $participantRepository
+    ): Response {
+        if ($this->isCsrfTokenValid('participant-remove'.$event->getId().'-'.$userId, $request->getPayload()->getString('_token'))) {
+            $participant = $participantRepository->findOneBy(['event' => $event, 'user' => $userId]);
+
+            if ($participant) {
+                $entityManager->remove($participant);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'Le participant a été retiré de l\'événement.');
+            }
+        }
+
+        return $this->redirectToRoute('admin_events_participants', ['id' => $event->getId()], Response::HTTP_SEE_OTHER);
     }
 }

@@ -1,0 +1,143 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set page_title = 'Projets' %}
+
+{% block admin_content %}
+    <div class="p-4">
+
+        {{ breadcrumb() }}
+        
+        <h1 class="text-gm-green mb-4"><i class="bi bi-kanban"></i> Gestion des projets</h1>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ path('admin_projects_new') }}" class="btn btn-gm-green">
+                <i class="bi bi-plus-circle"></i> Nouveau projet
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if projects is empty %}
+                    <div class="text-center py-4 text-gm-muted-light">
+                        <i class="bi bi-folder-x fs-1"></i>
+                        <p class="mt-2">Aucun projet trouvé</p>
+                    </div>
+                {% else %}
+                    {# Table desktop #}
+                    <div class="table-responsive d-none d-md-block">
+                        <table class="table table-gm table-striped table-hover gm-cards-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Titre</th>
+                                    <th>Début</th>
+                                    <th>Fin</th>
+                                    <th>Événements</th>
+                                    <th>Articles</th>
+                                    <th>Statut</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for project in projects %}
+                                    <tr>
+                                        <td data-label="ID">{{ project.id }}</td>
+                                        <td data-label="Titre">{{ project.title }}</td>
+                                        <td data-label="Début">{{ project.startDate ? project.startDate|date('d/m/Y') : '—' }}</td>
+                                        <td data-label="Fin">{{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}</td>
+                                        <td data-label="Événements">{{ project.events|length }}</td>
+                                        <td data-label="Articles">{{ project.blogPosts|length }}</td>
+                                        <td data-label="Statut">
+                                            {% if project.isPublished %}
+                                                <span class="badge bg-gm-green text-gm-white" title="Visible sur le site public">En ligne</span>
+                                            {% else %}
+                                                <span class="badge bg-gm-warning text-gm-bg" title="Invisible du site public tant qu'il n'est pas mis en ligne">Brouillon</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Actions">
+                                            <div class="d-flex gap-1">
+                                                {% if is_granted('ENTITY_PUBLISH') %}
+                                                    <form method="post"
+                                                          action="{{ path('admin_projects_toggle_publish', {'id': project.id}) }}"
+                                                          class="d-inline">
+                                                        <input type="hidden" name="_token"
+                                                               value="{{ csrf_token('publish' ~ project.id) }}">
+                                                        <button class="btn btn-sm btn-{{ project.isPublished ? 'outline-gm-gray' : 'outline-gm-green' }}"
+                                                                type="submit"
+                                                                title="{{ project.isPublished ? 'Retirer de la ligne' : 'Mettre en ligne' }}">
+                                                            <i class="bi bi-{{ project.isPublished ? 'eye-slash' : 'rocket-takeoff' }}-fill"></i>
+                                                        </button>
+                                                    </form>
+                                                {% endif %}
+                                                <a href="{{ path('admin_projects_edit', {'id': project.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                {% include 'front/partials/_delete_button.html.twig' with {
+                                                    id: project.id,
+                                                    path: path('admin_projects_delete', {'id': project.id}),
+                                                    entity_type: 'projet',
+                                                    confirm_message: 'Êtes-vous sûr de vouloir supprimer ce projet ?',
+                                                    csrf_token: csrf_token('delete' ~ project.id)
+                                                } %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {# Cartes mobile #}
+                    <div class="d-md-none">
+                        {% for project in projects %}
+                            <div class="card mb-3 gm-admin-card">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <h6 class="mb-0 text-gm-text">{{ project.title }}</h6>
+                                        <span class="badge {{ project.isPublished ? 'bg-gm-green text-gm-white' : 'bg-gm-warning text-gm-bg' }} ms-2 flex-shrink-0">
+                                            {{ project.isPublished ? 'En ligne' : 'Brouillon' }}
+                                        </span>
+                                    </div>
+                                    <p class="mb-1 small text-gm-muted">
+                                        <i class="bi bi-calendar-event me-1"></i>
+                                        {{ project.startDate ? project.startDate|date('d/m/Y') : '—' }}
+                                        → {{ project.endDate ? project.endDate|date('d/m/Y') : '—' }}
+                                    </p>
+                                    <p class="mb-3 small text-gm-muted">
+                                        <i class="bi bi-calendar me-1"></i> {{ project.events|length }} événement(s)
+                                        · <i class="bi bi-newspaper me-1"></i> {{ project.blogPosts|length }} article(s)
+                                    </p>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        {% if is_granted('ENTITY_PUBLISH') %}
+                                            <form method="post"
+                                                  action="{{ path('admin_projects_toggle_publish', {'id': project.id}) }}"
+                                                  class="d-inline">
+                                                <input type="hidden" name="_token"
+                                                       value="{{ csrf_token('publish' ~ project.id) }}">
+                                                <button class="btn btn-sm btn-{{ project.isPublished ? 'outline-gm-gray' : 'outline-gm-green' }}"
+                                                        type="submit">
+                                                    <i class="bi bi-{{ project.isPublished ? 'eye-slash' : 'rocket-takeoff' }}-fill"></i>
+                                                    {{ project.isPublished ? 'Retirer' : 'Publier' }}
+                                                </button>
+                                            </form>
+                                        {% endif %}
+                                        <a href="{{ path('admin_projects_edit', {'id': project.id}) }}" class="btn btn-sm btn-gm-yellow">
+                                            <i class="bi bi-pencil-fill"></i> Modifier
+                                        </a>
+                                        {% include 'front/partials/_delete_button.html.twig' with {
+                                            id: project.id,
+                                            path: path('admin_projects_delete', {'id': project.id}),
+                                            entity_type: 'projet',
+                                            confirm_message: 'Êtes-vous sûr de vouloir supprimer ce projet ?',
+                                            csrf_token: csrf_token('delete' ~ project.id)
+                                        } %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

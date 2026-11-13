@@ -2,99 +2,273 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\Event;
+use App\Entity\EventParticipant;
+use App\Enum\ParticipantRole;
 use App\Entity\User;
+use App\Repository\EventParticipantRepository;
 use App\Repository\EventRepository;
 use App\Repository\MembershipRepository;
 use App\Service\ImageManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 #[Route('/evenements', name: 'app_event_')]
 class EventController extends AbstractController
 {
-    /**
-     * Filtres disponibles pour la liste d'événements (mobile).
-     */
     private const FILTERS = ['tous', 'a-venir', 'passes'];
 
     public function __construct(
-        private MembershipRepository $membershipRepository,
-        private ImageManager $imageManager,
-    ) {}
+        private readonly MembershipRepository $membershipRepository,
+        private readonly ImageManager $imageManager,
+        private readonly EventParticipantRepository $participantRepository,
+        private readonly EntityManagerInterface $entityManager,
+    ) {
+    }
 
-    #[Route('', name: 'index', methods: ['GET'])]
-    public function index(Request $request, EventRepository $eventRepository): Response
+    #[Route('/', name: 'index', methods: ['GET'])]
+    public function index(Request $request): Response
     {
-        $filter = $request->query->get('filtre', 'tous');
+        $filter = $request->query->get('filter', 'tous');
         if (!in_array($filter, self::FILTERS, true)) {
             $filter = 'tous';
         }
 
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $isActiveMember = null !== $user && $this->membershipRepository->hasActiveMembership($user);
+
+        $events = $this->entityManager->getRepository(Event::class)
+            ->findVisibleFor($isActiveMember, $filter);
+
+        $imageManager = $this->imageManager;
+
         return $this->render('front/event/index.html.twig', [
-            'events' => $eventRepository->findVisibleFor($this->isViewerActiveMember(), $filter),
+            'events' => $events,
             'filter' => $filter,
+            'image_helper' => fn (Event $event) => $imageManager->getEventImage($event),
         ]);
     }
 
-    /**
-     * Feed JSON pour le calendrier FullCalendar (desktop).
-     * Mêmes règles de visibilité que la liste : jamais d'événement
-     * non publié ni réservé aux membres si l'internaute n'y a pas droit.
-     */
     #[Route('/data', name: 'data', methods: ['GET'])]
-    public function data(EventRepository $eventRepository): JsonResponse
+    public function data(): Response
     {
-        $isActiveMember = $this->isViewerActiveMember();
-        $now = time();
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $isActiveMember = null !== $user && $this->membershipRepository->hasActiveMembership($user);
 
-        $payload = [];
-        foreach ($eventRepository->findVisibleFor($isActiveMember, 'tous') as $event) {
-            $payload[] = [
+        $events = $this->entityManager->getRepository(Event::class)
+            ->findVisibleFor($isActiveMember);
+
+        $data = [];
+        foreach ($events as $event) {
+            $data[] = [
                 'id' => $event->getId(),
                 'title' => $event->getTitle(),
-                'start' => $event->getStartDate()?->format(\DateTimeInterface::ATOM),
-                'end' => $event->getEndDate()?->format(\DateTimeInterface::ATOM),
+                'start' => $event->getStartDate()?->format(DATE_ATOM),
+                'end' => $event->getEndDate()?->format(DATE_ATOM),
                 'url' => $this->generateUrl('app_event_show', ['id' => $event->getId()]),
-                'membersOnly' => (bool) $event->isMembersOnly(),
+                'membersOnly' => $event->isMembersOnly(),
                 'location' => $event->getLocation(),
-                'past' => $event->getEndDate() !== null && $event->getEndDate()->getTimestamp() < $now,
+                'past' => $event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time(),
             ];
         }
 
-        return $this->json($payload);
+        return $this->json($data);
     }
 
-    #[Route('/{id}', name: 'show', methods: ['GET'], requirements: ['id' => '\d+'])]
-    public function show(int $id, EventRepository $eventRepository): Response
+    #[Route('/{id}', name: 'show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(int $id): Response
     {
-        $event = $eventRepository->findOneVisibleBy($id, $this->isViewerActiveMember());
+        $event = $this->findVisibleEventOr404($id);
 
-        if ($event === null) {
-            throw $this->createNotFoundException("Cet événement n'existe pas ou n'est pas accessible.");
-        }
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $isActiveMember = $this->isViewerActiveMember();
+
+        $participantCount = $this->participantRepository->countParticipants($event);
+        $capacity = $event->getCapacity();
 
         return $this->render('front/event/show.html.twig', [
             'event' => $event,
-            'image_url' => $this->imageManager->getUrl($event, 'large'),
+            'is_active_member' => $isActiveMember,
+            'isRegistered' => null !== $user && $this->participantRepository->userParticipatesInEvent($user, $event),
+            'participantCount' => $participantCount,
+            'isPast' => $event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time(),
+            'isFull' => null !== $capacity && $participantCount >= $capacity,
         ]);
     }
 
-    /**
-     * L'internaute courant est-il membre actif de l'association ?
-     * (adhésion active ET non expirée)
-     */
-    private function isViewerActiveMember(): bool
+    #[Route('/{id}/register', name: 'register', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function register(Request $request, int $id): Response
     {
+        $event = $this->findVisibleEventOr404($id);
+
+        /** @var User|null $user */
         $user = $this->getUser();
-        if (!$user instanceof User) {
-            return false;
+        if (null === $user) {
+            $this->addFlash('warning', 'Connectez-vous pour participer à un événement.');
+
+            return $this->redirectToRoute('app_login');
         }
 
-        $membership = $this->membershipRepository->findLastActiveByUser($user);
+        if (!$this->isCsrfTokenValid('register' . $event->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
 
-        return $membership !== null && !$membership->isExpired();
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        // Événement réservé aux membres : adhésion active obligatoire
+        if ($event->isMembersOnly() && !$this->isViewerActiveMember()) {
+            $this->addFlash('warning', 'Cet événement est réservé aux membres actifs de l\'association.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        // Événement déjà commencé
+        if ($event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time()) {
+            $this->addFlash('warning', 'Cet événement a déjà commencé, les inscriptions sont fermées.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        // Capacité atteinte
+        if (null !== $event->getCapacity()
+            && $this->participantRepository->countParticipants($event) >= $event->getCapacity()) {
+            $this->addFlash('warning', 'Toutes les places sont prises, l\'événement est complet.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        // Déjà inscrit
+        if ($this->participantRepository->userParticipatesInEvent($user, $event)) {
+            $this->addFlash('info', 'Vous êtes déjà inscrit à cet événement.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        $participant = new EventParticipant();
+        $participant->setEvent($event)
+            ->setUser($user)
+            ->setRole(ParticipantRole::Participant);
+
+        $this->entityManager->persist($participant);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Inscription confirmée, à bientôt !');
+
+        return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+    }
+
+    #[Route('/{id}/unregister', name: 'unregister', requirements: ['id' => '\d+'], methods: ['POST'])]
+    public function unregister(Request $request, int $id): Response
+    {
+        $event = $this->findVisibleEventOr404($id);
+
+        /** @var User|null $user */
+        $user = $this->getUser();
+        if (null === $user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        if (!$this->isCsrfTokenValid('unregister' . $event->getId(), $request->request->get('_token'))) {
+            $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        $participant = $this->participantRepository->findOneBy(['event' => $event, 'user' => $user]);
+        if (null === $participant) {
+            $this->addFlash('info', 'Vous n\'êtes pas inscrit à cet événement.');
+
+            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        }
+
+        $this->entityManager->remove($participant);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Votre inscription a été annulée.');
+
+        return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+    }
+
+    #[Route('/{id}.ics', name: 'ics', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function ics(int $id): Response
+    {
+        $event = $this->findVisibleEventOr404($id);
+
+        $url = $this->generateUrl('app_event_show', ['id' => $event->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        $escape = static function (?string $value): string {
+            $value = (string) $value;
+
+            return str_replace(
+                ['\\', ';', ',', "\r\n", "\n"],
+                ['\\\\', '\\;', '\\,', '\\n', '\\n'],
+                $value
+            );
+        };
+
+        $formatUtc = static function (?\DateTimeImmutable $date): string {
+            return null === $date ? '' : $date->setTimezone(new \DateTimeZone('UTC'))->format('Ymd\THis\Z');
+        };
+
+        $lines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//GeoMonkey//Events//FR',
+            'CALSCALE:GREGORIAN',
+            'BEGIN:VEVENT',
+            'UID:event-' . $event->getId() . '@geomonkey',
+            'DTSTAMP:' . (new \DateTimeImmutable('now', new \DateTimeZone('UTC')))->format('Ymd\THis\Z'),
+            'DTSTART:' . $formatUtc($event->getStartDate()),
+            'DTEND:' . $formatUtc($event->getEndDate()),
+            'SUMMARY:' . $escape($event->getTitle()),
+            'LOCATION:' . $escape($event->getLocation()),
+            'DESCRIPTION:' . $escape($event->getDescription()),
+            'URL:' . $url,
+            'END:VEVENT',
+            'END:VCALENDAR',
+        ];
+
+        $filename = 'evenement-' . $event->getId() . '.ics';
+
+        $response = new Response(implode("\r\n", $lines));
+        $response->headers->set('Content-Type', 'text/calendar; charset=utf-8');
+        $response->headers->set('Content-Disposition', 'attachment; filename="' . $filename . '"');
+
+        return $response;
+    }
+
+    /**
+     * Retrouve un événement publié visible pour l'utilisateur courant, sinon 404.
+     */
+    private function findVisibleEventOr404(int $id): Event
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+        $isActiveMember = null !== $user && $this->membershipRepository->hasActiveMembership($user);
+
+        $event = $this->entityManager->getRepository(Event::class)
+            ->findOneVisibleBy($id, $isActiveMember);
+
+        if (null === $event) {
+            throw $this->createNotFoundException('Événement introuvable.');
+        }
+
+        return $event;
+    }
+
+    private function isViewerActiveMember(): bool
+    {
+        /** @var User|null $user */
+        $user = $this->getUser();
+
+        return null !== $user && $this->membershipRepository->hasActiveMembership($user);
     }
 }

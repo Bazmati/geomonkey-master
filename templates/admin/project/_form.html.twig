@@ -1,0 +1,28 @@
+{{ form_start(form, {'attr': {'class': 'row g-3', 'enctype': 'multipart/form-data', 'id': 'project-form'}}) }}
+    {# Colonne gauche : identité du projet #}
+    <div class="col-md-6">
+        {{ form_row(form.title, {'attr': {'class': 'form-control'}}) }}
+        {{ form_row(form.startDate, {'attr': {'class': 'form-control'}}) }}
+        {{ form_row(form.endDate, {'attr': {'class': 'form-control'}}) }}
+        {{ form_row(form.isPublished, {'attr': {'class': 'form-check-input'}}) }}
+        {{ form_row(form.events, {'attr': {'class': 'form-select', 'size': 6}}) }}
+        {{ form_row(form.blogPosts, {'attr': {'class': 'form-select', 'size': 6}}) }}
+    </div>
+
+    {# Colonne droite : description + image #}
+    <div class="col-md-6">
+        {{ form_row(form.description, {'attr': {'class': 'form-control', 'rows': 10, 'style': 'min-height: 200px'}}) }}
+
+        <div class="mb-3">
+            {{ form_row(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+            <div class="form-text">Formats : JPG, PNG, GIF, WebP (max 5 Mo)</div>
+
+            {% if project.hasImage %}
+                <div class="mt-2">
+                    {{ image_tag(project, 'small', 'Image actuelle du projet ' ~ project.title, 'img-thumbnail') }}
+                    <span class="form-text d-block">Image actuelle — laisser vide le champ pour la conserver.</span>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{{ form_end(form) }}

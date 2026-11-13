@@ -1,0 +1,66 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Projets — {{ parent() }}{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Découvrez les projets de l'association GéoMonkey : chantiers, créations et aventures collectives en cours ou achevés.">
+{% endblock %}
+
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+<section class="py-5 bg-surface">
+    <div class="container">
+
+        {{ breadcrumb() }}
+
+        <h1 class="mb-4"><i class="bi bi-kanban"></i> Nos projets</h1>
+
+        {% if projects is empty %}
+            <div class="alert alert-info">
+                <i class="bi bi-info-circle"></i> Aucun projet à afficher pour le moment. Revenez bientôt !
+            </div>
+        {% else %}
+            <div class="row g-4">
+                {% for project in projects %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card h-100 shadow-sm">
+                            {% if project.hasImage %}
+                                {{ image_tag(project, 'medium', 'Illustration du projet ' ~ project.title, 'card-img-top') }}
+                            {% endif %}
+                            <div class="card-body d-flex flex-column">
+                                <div class="mb-2">
+                                    {% set now = 'now'|date('U') %}
+                                    {% if project.endDate and project.endDate|date('U') < now %}
+                                        <span class="badge bg-secondary text-light">Terminé</span>
+                                    {% elseif project.startDate and project.startDate|date('U') <= now %}
+                                        <span class="badge bg-success text-light">En cours</span>
+                                    {% else %}
+                                        <span class="badge bg-warning text-dark">À venir</span>
+                                    {% endif %}
+                                </div>
+                                <h5 class="card-title">{{ project.title }}</h5>
+                                {% if project.startDate %}
+                                    <p class="card-text text-muted small">
+                                        <i class="bi bi-calendar"></i>
+                                        Démarré le {{ project.startDate|date('d/m/Y') }}
+                                        {% if project.endDate %} — {{ project.endDate|date('d/m/Y') }}{% endif %}
+                                    </p>
+                                {% endif %}
+                                <p class="card-text text-muted small">
+                                    {{ project.description|striptags|slice(0, 120) }}{% if project.description|length > 120 %}…{% endif %}
+                                </p>
+                                <div class="mt-auto">
+                                    <a href="{{ path('app_project_show', {'slug': project.slug}) }}"
+                                       class="btn btn-success btn-sm">
+                                        Voir le projet <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

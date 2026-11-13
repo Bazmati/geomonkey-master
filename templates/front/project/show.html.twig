@@ -1,0 +1,70 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}{{ project.title }} — {{ parent() }}{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="{{ project.description|striptags|slice(0, 155) }}">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="{{ project.title }}">
+    <meta property="og:description" content="{{ project.description|striptags|slice(0, 155) }}">
+    <meta property="og:url" content="{{ app.request.uri }}">
+    <meta name="twitter:card" content="summary_large_image">
+{% endblock %}
+
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+<article class="py-5">
+    <div class="container max-w-800">
+
+        {{ breadcrumb() }}
+
+        <h1 class="mb-3">{{ project.title }}</h1>
+
+        <p class="text-muted">
+            {% if project.startDate %}
+                <i class="bi bi-calendar"></i>
+                {{ project.startDate|date('d/m/Y') }}{% if project.endDate %} — {{ project.endDate|date('d/m/Y') }}{% endif %}
+            {% endif %}
+        </p>
+
+        {% if project.hasImage %}
+            {{ image_tag(project, 'large', "Illustration du projet " ~ project.title, 'img-fluid rounded mb-4') }}
+        {% endif %}
+
+        <div class="article-content">
+            {{ project.description|nl2br }}
+        </div>
+
+        {% if project.events|length > 0 %}
+            <hr class="my-5">
+            <h3><i class="bi bi-calendar-event"></i> Événements liés à ce projet</h3>
+            <ul class="list-unstyled">
+                {% for event in project.events %}
+                    {% if event.isPublished %}
+                        <li class="mb-2">
+                            <i class="bi bi-arrow-right-short"></i>
+                            <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.title }}</a>
+                            <span class="text-muted small">— {{ event.startDate|date('d/m/Y') }}</span>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if project.blogPosts|length > 0 %}
+            <hr class="my-5">
+            <h3><i class="bi bi-newspaper"></i> Articles liés à ce projet</h3>
+            <ul class="list-unstyled">
+                {% for post in project.blogPosts %}
+                    {% if post.isPublished %}
+                        <li class="mb-2">
+                            <i class="bi bi-arrow-right-short"></i>
+                            <a href="{{ path('app_blog_show', {'slug': post.slug}) }}">{{ post.title }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</article>
+{% endblock %}
