@@ -7,10 +7,10 @@ use App\Entity\ProjectTask;
 use App\Entity\ProjectTaskDocument;
 use App\Form\ProjectTaskType;
 use App\Form\ProjectType;
+use App\Repository\ProjectTaskDocumentRepository;
 use App\Repository\ProjectTaskRepository;
 use App\Repository\ProjectRepository;
 use App\Service\ImageManager;
-use Doctrine\Bundle\DoctrineBundle\Attribute\MapEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -193,14 +193,20 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/task/{taskId}/edit', name: 'admin_projects_task_edit', methods: ['GET', 'POST'])]
-    #[MapEntity(mapping: ['taskId' => 'id'])]
-    #[IsGranted('ENTITY_EDIT', 'task')]
+    #[IsGranted('ENTITY_EDIT')]
     public function taskEdit(
         Request $request,
-        ProjectTask $task,
+        int $taskId,
         EntityManagerInterface $entityManager,
+        ProjectTaskRepository $taskRepository,
         SluggerInterface $slugger
     ): Response {
+        // Résolution manuelle (pas de MapEntity) : recherche par identifiant
+        $task = $taskRepository->find($taskId);
+        if ($task === null) {
+            throw $this->createNotFoundException('Tâche introuvable.');
+        }
+
         $form = $this->createForm(ProjectTaskType::class, $task);
         $form->handleRequest($request);
 
@@ -221,13 +227,18 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/task/{taskId}', name: 'admin_projects_task_delete', methods: ['POST'])]
-    #[MapEntity(mapping: ['taskId' => 'id'])]
-    #[IsGranted('ENTITY_EDIT', 'task')]
+    #[IsGranted('ENTITY_EDIT')]
     public function taskDelete(
         Request $request,
-        ProjectTask $task,
-        EntityManagerInterface $entityManager
+        int $taskId,
+        EntityManagerInterface $entityManager,
+        ProjectTaskRepository $taskRepository
     ): Response {
+        $task = $taskRepository->find($taskId);
+        if ($task === null) {
+            throw $this->createNotFoundException('Tâche introuvable.');
+        }
+
         $projectId = $task->getProject()->getId();
 
         if ($this->isCsrfTokenValid('task-delete' . $task->getId(), $request->getPayload()->getString('_token'))) {
@@ -246,13 +257,18 @@ final class ProjectController extends AbstractController
      * Retire un document uploadé d'une tâche (fichier + entité).
      */
     #[Route('/task-document/{document}', name: 'admin_projects_task_document_delete', methods: ['POST'])]
-    #[MapEntity(mapping: ['document' => 'id'])]
-    #[IsGranted('ENTITY_EDIT', 'document')]
+    #[IsGranted('ENTITY_EDIT')]
     public function taskDocumentDelete(
         Request $request,
-        ProjectTaskDocument $document,
-        EntityManagerInterface $entityManager
+        int $document,
+        EntityManagerInterface $entityManager,
+        ProjectTaskDocumentRepository $documentRepository
     ): Response {
+        $document = $documentRepository->find($document);
+        if ($document === null) {
+            throw $this->createNotFoundException('Document introuvable.');
+        }
+
         $projectId = $document->getTask()->getProject()->getId();
 
         if ($this->isCsrfTokenValid('task-doc-delete' . $document->getId(), $request->getPayload()->getString('_token'))) {

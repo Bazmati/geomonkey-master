@@ -2,11 +2,10 @@
 
 namespace App\Controller\Front;
 
-use App\Entity\ProjectTask;
 use App\Entity\User;
 use App\Enum\ProjectTaskState;
 use App\Repository\ProjectRepository;
-use Doctrine\Bundle\DoctrineBundle\Attribute\MapEntity;
+use App\Repository\ProjectTaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -72,10 +71,19 @@ class ProjectController extends AbstractController
      * responsable désigné de la tâche (avec jeton CSRF).
      */
     #[Route('/{slug}/task/{task}/state', name: 'task_state', methods: ['POST'])]
-    #[MapEntity(mapping: ['task' => 'id'])]
     #[IsGranted('IS_AUTHENTICATED')]
-    public function taskState(Request $request, string $slug, ProjectTask $task): Response
-    {
+    public function taskState(
+        Request $request,
+        string $slug,
+        int $task,
+        ProjectTaskRepository $taskRepository
+    ): Response {
+        // Résolution manuelle (pas de MapEntity) : recherche par identifiant
+        $task = $taskRepository->find($task);
+        if ($task === null) {
+            throw $this->createNotFoundException('Tâche introuvable.');
+        }
+
         $project = $task->getProject();
 
         if ($project === null || $project->getSlug() !== $slug || !$project->isPublished()) {
