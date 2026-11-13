@@ -51,7 +51,7 @@
                 </td>
                 <td data-label="Adhésion">
                     {% if user.hasActiveMembership() %}
-                        <span class="badge bg-gm-green text-gm-white">Valide jusqu'au {{ user.membershipValidUntil|date('d/m/Y') }}</span>
+                        <span class="badge bg-gm-green text-gm-white">Valide jusqu'au {{ (user.membershipValidDate ?? user.membershipValidUntil)|date('d/m/Y') }}</span>
                     {% else %}
                         <span class="badge bg-gm-danger text-gm-white">Expirée</span>
                     {% endif %}

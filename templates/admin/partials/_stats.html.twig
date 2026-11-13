@@ -1,19 +1,27 @@
 {% set stat_items = [
+    {label: 'Adhésions en attente', value: stats.pendingMembers, icon: 'bi-person-plus', accent: 'yellow', href: path('app_admin_membership_requests')},
+    {label: 'Brouillons d\'actus', value: stats.draftPosts, icon: 'bi-pencil-square', accent: 'yellow', href: path('app_admin_blog_index')},
+    {label: 'Projets en cours', value: stats.ongoingProjects, icon: 'bi-kanban', accent: 'green', href: path('admin_projects_index')},
     {label: 'Événements', value: stats.events, icon: 'bi-calendar2-event', accent: 'green'},
-    {label: 'Projets', value: stats.projects, icon: 'bi-kanban', accent: 'yellow'},
     {label: 'Utilisateurs', value: stats.users, icon: 'bi-people', accent: 'gray'},
 ] %}
 
-<div class="row g-4 admin-fade-group">
+<div class="row row-cols-2 row-cols-lg-5 g-3 admin-fade-group">
     {% for item in stat_items %}
-        <div class="col-md-4">
+        <div class="col">
+            {% if item.href is defined %}
+                <a href="{{ item.href }}" class="text-decoration-none">
+            {% endif %}
             <div class="card stat-card stat-{{ item.accent }} h-100">
                 <div class="card-body">
                     <div class="stat-icon"><i class="bi {{ item.icon }}" aria-hidden="true"></i></div>
                     <p class="stat-label">{{ item.label }}</p>
-                    <p class="stat-value" data-count="{{ item.value }}">0</p>
+                    <p class="stat-value" data-count="{{ item.value }}">{{ item.value }}</p>
                 </div>
             </div>
+            {% if item.href is defined %}
+                </a>
+            {% endif %}
         </div>
     {% endfor %}
 </div>

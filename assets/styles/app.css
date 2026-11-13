@@ -1067,3 +1067,6 @@ body > footer,
         transition: none !important;
     }
 }
+
+/* Dashboard : 5e compteur de la cascade */
+.admin-fade-group > *:nth-child(5) { animation-delay: .32s; }

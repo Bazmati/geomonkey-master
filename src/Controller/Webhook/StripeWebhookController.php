@@ -259,7 +259,8 @@ class StripeWebhookController extends AbstractController
         // Marquer l'inscription comme confirmée et mettre à jour la date d'expiration
         $user->setIsRegistrationConfirmed(true);
         $user->setRegistrationValidatedAt($nowImmutable);
-        $user->setMembershipValidUntil($now);
+        // "Valide jusqu'au" = date de paiement + 1 an (aligné sur Membership.expiresAt)
+        $user->setMembershipValidUntil(\DateTime::createFromImmutable($expiresAt));
         
         $this->em->persist($membership);
         

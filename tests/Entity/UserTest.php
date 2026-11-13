@@ -155,5 +155,25 @@ class UserTest extends TestCase
         $this->assertTrue($user->isRegistrationConfirmed());
         $this->assertInstanceOf(\DateTimeImmutable::class, $user->getRegistrationValidatedAt());
         $this->assertEquals('membre_actif', $user->getRequestedFunction());
+
+    public function testMembershipValidDateDeriveDeLAdhesionActive(): void
+    {
+        $user = new User();
+
+        // Sans adhésion : repli sur l'ancien champ
+        $this->assertNull($user->getMembershipValidDate());
+        $legacy = new \DateTime('2026-10-02');
+        $user->setMembershipValidUntil($legacy);
+        $this->assertSame($legacy, $user->getMembershipValidDate());
+
+        // Avec une adhésion active : c'est expiresAt (paiement + 1 an) qui prime
+        $membership = new \App\Entity\Membership();
+        $user->addMembership($membership);
+        $this->assertSame($membership->getExpiresAt(), $user->getMembershipValidDate());
+        $this->assertNotSame($legacy, $user->getMembershipValidDate());
+
+        // Adhésion expirée : on retombe sur l'ancien champ
+        $membership->setIsActive(false);
+        $this->assertSame($legacy, $user->getMembershipValidDate());
     }
 }

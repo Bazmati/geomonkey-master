@@ -44,4 +44,21 @@ class ProjectRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+    /**
+     * Projets en cours (non terminés), les plus récents d'abord.
+     *
+     * @return Project[]
+     */
+    public function findOngoing(int $limit = 6): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.status != :completed')
+            ->setParameter('completed', \App\Enum\ProjectStatus::Completed)
+            ->orderBy('p.startDate', 'DESC')
+            ->addOrderBy('p.id', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

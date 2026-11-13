@@ -54,4 +54,19 @@ class BlogPostRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
+    /**
+     * Brouillons non publiés (les plus récemment modifiés d'abord).
+     *
+     * @return BlogPost[]
+     */
+    public function findDrafts(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.isPublished = false')
+            ->orderBy('p.updatedAt', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
 }

@@ -16,55 +16,177 @@
             <p class="dash-hero-date">{{ 'now'|date('EEEE d MMMM Y')|capitalize }}</p>
         </div>
 
-        {# Cartes statistiques (count-up animé) #}
+        {# Compteurs rapides (liens vers les sections concernées) #}
         <div class="mt-4">
             {% include 'admin/partials/_stats.html.twig' with {'stats': stats} %}
         </div>
 
-        {# Prochains événements #}
-        <div class="card mt-4 shadow-sm admin-fade-up" style="animation-delay:.15s">
-            <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
-                <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Prochains événements</h5>
-                <a href="{{ path('admin_events_index') }}" class="btn btn-sm btn-gm-yellow">
-                    <i class="bi bi-list"></i> Tous les événements
-                </a>
-            </div>
-            <div class="card-body">
-                {% if upcomingEvents is empty %}
-                    <div class="text-center text-gm-muted py-4">
-                        <i class="bi bi-inbox fs-1"></i>
-                        <p class="mt-2">Aucun événement à venir</p>
+        <div class="row g-4 mt-0">
+            {# ----- Adhésions en attente de validation ----- #}
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100 admin-fade-up" style="animation-delay:.1s">
+                    <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-person-plus"></i> Adhésions en attente</h5>
+                        <a href="{{ path('app_admin_membership_requests') }}" class="btn btn-sm btn-gm-yellow">
+                            <i class="bi bi-list"></i> Traiter
+                        </a>
                     </div>
-                {% else %}
-                    <div class="dash-event-list">
-                        {% for event in upcomingEvents %}
-                            <div class="dash-event">
-                                {% set media = image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null) %}
-                                {% if media %}
-                                    <img src="{{ media }}" alt="" loading="lazy" class="dash-event-img">
-                                {% else %}
-                                    <div class="dash-event-img dash-event-img-empty">
-                                        <i class="bi bi-calendar-event" aria-hidden="true"></i>
-                                    </div>
-                                {% endif %}
-                                <div class="dash-event-body">
-                                    <h6 class="text-gm-text mb-1">{{ event.title }}</h6>
-                                    <p class="mb-0 text-gm-muted small">
-                                        <i class="bi bi-clock" aria-hidden="true"></i>
-                                        {{ event.startDate ? event.startDate|date('d/m/Y H:i') : '—' }}
-                                    </p>
-                                    <p class="mb-0 text-gm-muted small">
-                                        <i class="bi bi-geo-alt" aria-hidden="true"></i> {{ event.location }}
-                                    </p>
-                                </div>
-                                <div class="dash-event-date" aria-label="{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}">
-                                    <span class="dash-event-day">{{ event.startDate ? event.startDate|date('d') : '?' }}</span>
-                                    <span class="dash-event-month">{{ event.startDate ? event.startDate|date('M')|upper : '—' }}</span>
-                                </div>
+                    <div class="card-body">
+                        {% if pendingMembers is empty %}
+                            <div class="text-center text-gm-muted py-4">
+                                <i class="bi bi-check-circle fs-1 text-gm-green"></i>
+                                <p class="mt-2">Aucune demande en attente 🎉</p>
                             </div>
-                        {% endfor %}
+                        {% else %}
+                            <div class="dash-event-list">
+                                {% for member in pendingMembers %}
+                                    <div class="dash-event">
+                                        <div class="dash-event-img dash-event-img-empty"><i class="bi bi-person" aria-hidden="true"></i></div>
+                                        <div class="dash-event-body">
+                                            <h6 class="text-gm-text mb-1">{{ member.firstName }} {{ member.lastName }}</h6>
+                                            <p class="mb-0 text-gm-muted small"><i class="bi bi-clock" aria-hidden="true"></i> Demandé le {{ member.createdAt ? member.createdAt|date('d/m/Y') : '—' }}</p>
+                                        </div>
+                                        <span class="badge bg-gm-warning text-gm-bg">À valider</span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
                     </div>
-                {% endif %}
+                </div>
+            </div>
+
+            {# ----- Brouillons d'actualités ----- #}
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100 admin-fade-up" style="animation-delay:.15s">
+                    <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-pencil-square"></i> Actualités en brouillon</h5>
+                        <a href="{{ path('app_admin_blog_index') }}" class="btn btn-sm btn-gm-yellow">
+                            <i class="bi bi-list"></i> Tous les articles
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if draftPosts is empty %}
+                            <div class="text-center text-gm-muted py-4">
+                                <i class="bi bi-check-circle fs-1 text-gm-green"></i>
+                                <p class="mt-2">Aucun brouillon en attente 🎉</p>
+                            </div>
+                        {% else %}
+                            <div class="dash-event-list">
+                                {% for post in draftPosts %}
+                                    <div class="dash-event">
+                                        <div class="dash-event-img dash-event-img-empty"><i class="bi bi-journal-text" aria-hidden="true"></i></div>
+                                        <div class="dash-event-body">
+                                            <h6 class="text-gm-text mb-1">{{ post.title }}</h6>
+                                            <p class="mb-0 text-gm-muted small">
+                                                <i class="bi bi-person" aria-hidden="true"></i>
+                                                {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : '—' }}
+                                                · modifié le {{ post.updatedAt ? post.updatedAt|date('d/m/Y') : post.createdAt|date('d/m/Y') }}
+                                            </p>
+                                        </div>
+                                        {% if post.author == app.user %}
+                                            <span class="badge bg-gm-warning text-gm-bg">À toi de finir</span>
+                                        {% else %}
+                                            <span class="badge bg-gm-gray-600 text-gm-white">À valider</span>
+                                        {% endif %}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ----- Projets en cours ----- #}
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100 admin-fade-up" style="animation-delay:.2s">
+                    <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-kanban"></i> Projets en cours</h5>
+                        <a href="{{ path('admin_projects_index') }}" class="btn btn-sm btn-gm-yellow">
+                            <i class="bi bi-list"></i> Tous les projets
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if ongoingProjects is empty %}
+                            <div class="text-center text-gm-muted py-4">
+                                <i class="bi bi-check-circle fs-1 text-gm-green"></i>
+                                <p class="mt-2">Aucun projet en cours 🎉</p>
+                            </div>
+                        {% else %}
+                            <div class="dash-event-list">
+                                {% for project in ongoingProjects %}
+                                    <div class="dash-event">
+                                        {% set media = image_url(project, 'medium') ?? (project.galleryImages is not empty ? image_url(project.galleryImages|first, 'medium') : null) %}
+                                        {% if media %}
+                                            <img src="{{ media }}" alt="" loading="lazy" class="dash-event-img">
+                                        {% else %}
+                                            <div class="dash-event-img dash-event-img-empty"><i class="bi bi-kanban" aria-hidden="true"></i></div>
+                                        {% endif %}
+                                        <div class="dash-event-body">
+                                            <h6 class="text-gm-text mb-1">{{ project.title }}</h6>
+                                            <p class="mb-0 text-gm-muted small">
+                                                <i class="bi bi-person-check" aria-hidden="true"></i>
+                                                {{ project.leader ? (project.leader.firstName ~ ' ' ~ project.leader.lastName) : 'Sans responsable' }}
+                                            </p>
+                                        </div>
+                                        <div class="text-end">
+                                            <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
+                                            {% if project.leader == app.user %}
+                                                <span class="badge bg-gm-warning text-gm-bg mt-1">Organisé par toi</span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {# ----- Prochains événements ----- #}
+            <div class="col-lg-6">
+                <div class="card shadow-sm h-100 admin-fade-up" style="animation-delay:.25s">
+                    <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Prochains événements</h5>
+                        <a href="{{ path('admin_events_index') }}" class="btn btn-sm btn-gm-yellow">
+                            <i class="bi bi-list"></i> Tous les événements
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% if upcomingEvents is empty %}
+                            <div class="text-center text-gm-muted py-4">
+                                <i class="bi bi-inbox fs-1"></i>
+                                <p class="mt-2">Aucun événement à venir</p>
+                            </div>
+                        {% else %}
+                            <div class="dash-event-list">
+                                {% for event in upcomingEvents %}
+                                    <div class="dash-event">
+                                        {% set media = image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null) %}
+                                        {% if media %}
+                                            <img src="{{ media }}" alt="" loading="lazy" class="dash-event-img">
+                                        {% else %}
+                                            <div class="dash-event-img dash-event-img-empty"><i class="bi bi-calendar-event" aria-hidden="true"></i></div>
+                                        {% endif %}
+                                        <div class="dash-event-body">
+                                            <h6 class="text-gm-text mb-1">{{ event.title }}</h6>
+                                            <p class="mb-0 text-gm-muted small">
+                                                <i class="bi bi-clock" aria-hidden="true"></i>
+                                                {{ event.startDate ? event.startDate|date('d/m/Y H:i') : '—' }}
+                                            </p>
+                                            <p class="mb-0 text-gm-muted small">
+                                                <i class="bi bi-geo-alt" aria-hidden="true"></i> {{ event.location }}
+                                            </p>
+                                        </div>
+                                        <div class="dash-event-date" aria-label="{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}">
+                                            <span class="dash-event-day">{{ event.startDate ? event.startDate|date('d') : '?' }}</span>
+                                            <span class="dash-event-month">{{ event.startDate ? event.startDate|date('M')|upper : '—' }}</span>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -251,6 +251,32 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->memberships;
     }
 
+    /**
+     * Adhésion active (payée et non expirée), ou null.
+     */
+    public function getActiveMembership(): ?Membership
+    {
+        foreach ($this->memberships as $membership) {
+            if ($membership->isActive() && !$membership->isExpired()) {
+                return $membership;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Date de fin de validité affichée : celle de l'adhésion active
+     * (fiable, = paiement + 1 an), avec repli sur l'ancien champ
+     * membershipValidUntil pour les données antérieures.
+     */
+    public function getMembershipValidDate(): ?\DateTimeInterface
+    {
+        $active = $this->getActiveMembership();
+
+        return $active?->getExpiresAt() ?? $this->membershipValidUntil;
+    }
+
     public function addMembership(Membership $membership): self
     {
         if (!$this->memberships->contains($membership)) {
