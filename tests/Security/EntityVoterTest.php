@@ -2,6 +2,7 @@
 
 namespace App\Tests\Security;
 
+use App\Entity\Membership;
 use App\Entity\User;
 use App\Enum\OfficeFunction;
 use App\Security\EntityVoter;
@@ -20,6 +21,32 @@ class EntityVoterTest extends TestCase
     }
 
     /**
+     * Crée un utilisateur avec une fonction de bureau et une adhésion active
+     * L'adhésion est valide : démarrée il y a 1 mois, expire dans 11 mois
+     */
+    private function createOfficeUser(OfficeFunction $function): User
+    {
+        $user = new User();
+        $user->setOfficeFunction($function);
+        
+        // Créer une adhésion active et non expirée
+        $membership = new Membership();
+        $membership->setIsActive(true);
+        $membership->setStartedAt((new \DateTimeImmutable())->sub(new \DateInterval('P1M')));
+        $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P11M')));
+        $membership->setUser($user);
+        
+        // Ajouter l'adhésion à l'utilisateur
+        $reflection = new \ReflectionClass($user);
+        $property = $reflection->getProperty('memberships');
+        $property->setAccessible(true);
+        $memberships = new \Doctrine\Common\Collections\ArrayCollection([$membership]);
+        $property->setValue($user, $memberships);
+        
+        return $user;
+    }
+
+    /**
      * Crée un token pour les tests
      */
     private function createToken(User $user): TestBrowserToken
@@ -30,8 +57,7 @@ class EntityVoterTest extends TestCase
     // Tests pour VIEW
     public function testViewAllowedForPresident(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::President);
+        $user = $this->createOfficeUser(OfficeFunction::President);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::VIEW]);
@@ -40,8 +66,7 @@ class EntityVoterTest extends TestCase
 
     public function testViewAllowedForTreasurer(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Treasurer);
+        $user = $this->createOfficeUser(OfficeFunction::Treasurer);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::VIEW]);
@@ -50,8 +75,7 @@ class EntityVoterTest extends TestCase
 
     public function testViewAllowedForSecretary(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $user = $this->createOfficeUser(OfficeFunction::Secretary);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::VIEW]);
@@ -60,8 +84,7 @@ class EntityVoterTest extends TestCase
 
     public function testViewAllowedForActiveMember(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $user = $this->createOfficeUser(OfficeFunction::ActiveMember);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::VIEW]);
@@ -70,6 +93,7 @@ class EntityVoterTest extends TestCase
 
     public function testViewDeniedForNone(): void
     {
+        // Utilisateur sans fonction (pas membre actif)
         $user = new User();
         $user->setOfficeFunction(OfficeFunction::None);
         $token = $this->createToken($user);
@@ -90,8 +114,7 @@ class EntityVoterTest extends TestCase
     // Tests pour CREATE
     public function testCreateAllowedForPresident(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::President);
+        $user = $this->createOfficeUser(OfficeFunction::President);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::CREATE]);
@@ -100,8 +123,7 @@ class EntityVoterTest extends TestCase
 
     public function testCreateAllowedForTreasurer(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Treasurer);
+        $user = $this->createOfficeUser(OfficeFunction::Treasurer);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::CREATE]);
@@ -110,8 +132,7 @@ class EntityVoterTest extends TestCase
 
     public function testCreateAllowedForSecretary(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $user = $this->createOfficeUser(OfficeFunction::Secretary);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::CREATE]);
@@ -120,8 +141,7 @@ class EntityVoterTest extends TestCase
 
     public function testCreateDeniedForActiveMember(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $user = $this->createOfficeUser(OfficeFunction::ActiveMember);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::CREATE]);
@@ -141,8 +161,7 @@ class EntityVoterTest extends TestCase
     // Tests pour EDIT
     public function testEditAllowedForPresident(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::President);
+        $user = $this->createOfficeUser(OfficeFunction::President);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::EDIT]);
@@ -151,8 +170,7 @@ class EntityVoterTest extends TestCase
 
     public function testEditAllowedForSecretary(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $user = $this->createOfficeUser(OfficeFunction::Secretary);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::EDIT]);
@@ -161,8 +179,7 @@ class EntityVoterTest extends TestCase
 
     public function testEditDeniedForTreasurer(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Treasurer);
+        $user = $this->createOfficeUser(OfficeFunction::Treasurer);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::EDIT]);
@@ -171,8 +188,7 @@ class EntityVoterTest extends TestCase
 
     public function testEditDeniedForActiveMember(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $user = $this->createOfficeUser(OfficeFunction::ActiveMember);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::EDIT]);
@@ -192,8 +208,7 @@ class EntityVoterTest extends TestCase
     // Tests pour DELETE
     public function testDeleteAllowedForPresident(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::President);
+        $user = $this->createOfficeUser(OfficeFunction::President);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::DELETE]);
@@ -202,8 +217,7 @@ class EntityVoterTest extends TestCase
 
     public function testTreasurerCannotDelete(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Treasurer);
+        $user = $this->createOfficeUser(OfficeFunction::Treasurer);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::DELETE]);
@@ -212,8 +226,7 @@ class EntityVoterTest extends TestCase
 
     public function testSecretaryCannotDelete(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::Secretary);
+        $user = $this->createOfficeUser(OfficeFunction::Secretary);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::DELETE]);
@@ -222,8 +235,7 @@ class EntityVoterTest extends TestCase
 
     public function testActiveMemberCannotDelete(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::ActiveMember);
+        $user = $this->createOfficeUser(OfficeFunction::ActiveMember);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, [EntityVoter::DELETE]);
@@ -243,8 +255,7 @@ class EntityVoterTest extends TestCase
     // Test pour vérifier que les attributs non supportés retournent ACCESS_ABSTAIN
     public function testUnsupportedAttributeReturnsAbstain(): void
     {
-        $user = new User();
-        $user->setOfficeFunction(OfficeFunction::President);
+        $user = $this->createOfficeUser(OfficeFunction::President);
         $token = $this->createToken($user);
 
         $result = $this->voter->vote($token, null, ['UNSUPPORTED_ATTRIBUTE']);

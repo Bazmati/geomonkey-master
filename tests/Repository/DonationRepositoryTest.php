@@ -6,6 +6,7 @@ use App\Entity\Donation;
 use App\Repository\DonationRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
@@ -25,8 +26,6 @@ class DonationRepositoryTest extends TestCase
             ->method('getManagerForClass')
             ->willReturn($this->em);
         
-        $classMetadata = $this->createMock(ClassMetadata::class);
-        
         $this->registry
             ->method('getManager')
             ->willReturn($this->em);
@@ -35,7 +34,33 @@ class DonationRepositoryTest extends TestCase
             ->method('getRepository')
             ->willReturn($this->repository ?? null);
         
+        // Fix ClassMetadata mock - return real ClassMetadata with proper name property
+        $this->em
+            ->method('getClassMetadata')
+            ->willReturn(new ClassMetadata(Donation::class));
+        
+        // Ensure createQueryBuilder returns a QueryBuilder with select/from returning self
+        $this->em
+            ->method('createQueryBuilder')
+            ->willReturn($this->createQueryBuilderMock());
+        
         $this->repository = new DonationRepository($this->registry);
+    }
+
+    /**
+     * Helper to create a properly stubbed QueryBuilder mock
+     */
+    private function createQueryBuilderMock(): QueryBuilder
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+        
+        $qb->method('select')
+            ->willReturnSelf();
+        
+        $qb->method('from')
+            ->willReturnSelf();
+        
+        return $qb;
     }
 
     public function testGetPaidTotalForYear(): void

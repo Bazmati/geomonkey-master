@@ -18,9 +18,7 @@ use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\HttpFoundation\Session\Storage\MockArraySessionStorage;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
-use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
  * Tests unitaires pour les méthodes register et unregister du EventController
@@ -35,7 +33,7 @@ class EventControllerTest extends TestCase
     private EventParticipantRepository $participantRepo;
     private EntityManagerInterface $em;
     private CsrfTokenManagerInterface $csrfTokenManager;
-    private EventController $controller;
+    private Session $session;
 
     protected function setUp(): void
     {
@@ -45,21 +43,40 @@ class EventControllerTest extends TestCase
         $this->em = $this->createMock(EntityManagerInterface::class);
         $this->csrfTokenManager = $this->createMock(CsrfTokenManagerInterface::class);
         
-        // Créer une session mock pour les flash messages
-        $session = new Session(new MockArraySessionStorage());
+        // Créer une session réelle pour les flash messages
+        $this->session = new Session(new MockArraySessionStorage());
+    }
+
+    /**
+     * Crée une instance du contrôleur avec un user mock
+     */
+    private function createControllerWithUser(?User $user): EventController
+    {
+        // Créer une classe anonyme qui étend EventController et permet de mock getUser()
+        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em) extends EventController {
+            private ?User $mockUser;
+            
+            public function setMockUser(?User $user): void
+            {
+                $this->mockUser = $user;
+            }
+            
+            public function getUser(): ?User
+            {
+                return $this->mockUser;
+            }
+            
+            // Expose protected session property for test setup
+            public function setTestSession(Session $session): void
+            {
+                $this->session = $session;
+            }
+        };
         
-        $this->controller = new EventController(
-            $this->membershipRepo,
-            $this->imageManager,
-            $this->participantRepo,
-            $this->em
-        );
+        $controller->setTestSession($this->session);
+        $controller->setMockUser($user);
         
-        // Injecter la session
-        $reflection = new \ReflectionClass($this->controller);
-        $property = $reflection->getProperty('session');
-        $property->setAccessible(true);
-        $property->setValue($this->controller, $session);
+        return $controller;
     }
 
     public function testRegisterWithoutUser(): void
@@ -78,18 +95,8 @@ class EventControllerTest extends TestCase
             ->method('getRepository')
             ->willReturn($eventRepo);
         
-        // Créer une requête
-        $request = $this->createMock(Request::class);
-        $request->method('query')->willReturn($this->createMock(Request::class));
-        
-        // Configurer le contrôleur pour retourner null comme user
-        $user = null;
-        
-        // Utiliser la réflexion pour définir le user
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('getUser');
-        $method->setAccessible(true);
-        $method->invoke($this->controller, $request);
+        // Créer un contrôleur avec null comme user
+        $controller = $this->createControllerWithUser(null);
         
         // Pour l'instant, nous allons juste vérifier que la méthode ne lève pas d'exception
         // sans user, elle devrait rediriger vers la page de login
@@ -145,19 +152,18 @@ class EventControllerTest extends TestCase
             ->method('getRepository')
             ->willReturn($eventRepo);
         
-        // Pour un test unitaire pur, nous ne pouvons pas tester la redirection
-        // Mais nous pouvons vérifier que hasActiveMembership est appelé
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
+        
+        // Vérifier que hasActiveMembership est appelé avec le bon user
+        // Note: On ne peut pas facilement tester la redirection sans un environnement Symfony complet
+        // Mais on peut vérifier que la méthode isViewerActiveMember retourne false
+        $this->assertFalse($controller->isViewerActiveMember());
         
         $this->membershipRepo
             ->expects($this->once())
             ->method('hasActiveMembership')
             ->with($user);
-        
-        // Ce test est incomplet car nous ne pouvons pas facilement tester
-        // le comportement complet sans un environnement Symfony
-        $this->markTestIncomplete(
-            'Ce test nécessite un environnement Symfony complet pour tester les flash messages et redirections.'
-        );
     }
 
     public function testRegisterLogicEventAlreadyStarted(): void
@@ -179,6 +185,9 @@ class EventControllerTest extends TestCase
         $this->em
             ->method('getRepository')
             ->willReturn($eventRepo);
+        
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
         
         // Vérifier que la méthode vérifie si l'événement a commencé
         // mais nous ne pouvons pas tester la redirection
@@ -211,6 +220,10 @@ class EventControllerTest extends TestCase
         $this->em
             ->method('getRepository')
             ->willReturn($eventRepo);
+        
+        // Créer un contrôleur avec le user
+        $user = $this->createMock(User::class);
+        $controller = $this->createControllerWithUser($user);
         
         $this->participantRepo
             ->expects($this->once())
@@ -247,6 +260,9 @@ class EventControllerTest extends TestCase
         $this->em
             ->method('getRepository')
             ->willReturn($eventRepo);
+        
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
         
         $this->participantRepo
             ->expects($this->once())
@@ -303,6 +319,9 @@ class EventControllerTest extends TestCase
             ->expects($this->once())
             ->method('flush');
         
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
+        
         $this->markTestIncomplete(
             'Ce test nécessite un environnement Symfony complet pour tester la création du participant.'
         );
@@ -333,6 +352,9 @@ class EventControllerTest extends TestCase
         $this->em
             ->method('getRepository')
             ->willReturn($eventRepo);
+        
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
         
         $this->participantRepo
             ->expects($this->once())
@@ -381,15 +403,45 @@ class EventControllerTest extends TestCase
             ->method('generate')
             ->willReturn('http://localhost:8000/events/1');
         
-        // Injecter urlGenerator
-        $reflection = new \ReflectionClass($this->controller);
-        $property = $reflection->getProperty('urlGenerator');
-        $property->setAccessible(true);
-        $property->setValue($this->controller, $urlGenerator);
+        // Créer une classe anonyme avec urlGenerator
+        $controller = new class($this->membershipRepo, $this->imageManager, $this->participantRepo, $this->em) extends EventController {
+            private ?User $mockUser;
+            private UrlGeneratorInterface $urlGenerator;
+            
+            public function setMockUser(?User $user): void
+            {
+                $this->mockUser = $user;
+            }
+            
+            public function setUrlGenerator(UrlGeneratorInterface $urlGenerator): void
+            {
+                $this->urlGenerator = $urlGenerator;
+            }
+            
+            public function getUser(): ?User
+            {
+                return $this->mockUser;
+            }
+            
+            // Getter pour urlGenerator (nécessaire car la méthode ics l'utilise)
+            public function getUrlGenerator(): UrlGeneratorInterface
+            {
+                return $this->urlGenerator;
+            }
+            
+            // Expose protected session property for test setup
+            public function setTestSession(Session $session): void
+            {
+                $this->session = $session;
+            }
+        };
+        
+        $controller->setTestSession($this->session);
+        $controller->setUrlGenerator($urlGenerator);
         
         // Appeler la méthode ics
         try {
-            $result = $this->controller->ics(1);
+            $result = $controller->ics(1);
             
             $this->assertEquals(200, $result->getStatusCode());
             $this->assertStringContainsString('BEGIN:VCALENDAR', $result->getContent());
@@ -423,18 +475,11 @@ class EventControllerTest extends TestCase
             ->with($user)
             ->willReturn(true);
         
-        // Utiliser la réflexion pour appeler la méthode privée
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('isViewerActiveMember');
-        $method->setAccessible(true);
-        
-        // Configurer le user dans le contrôleur
-        $property = $reflection->getProperty('user');
-        $property->setAccessible(true);
-        $property->setValue($this->controller, $user);
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
         
         // Appeler la méthode
-        $result = $method->invoke($this->controller);
+        $result = $controller->isViewerActiveMember();
         
         $this->assertTrue($result);
         
@@ -446,15 +491,11 @@ class EventControllerTest extends TestCase
 
     public function testIsViewerActiveMemberWithoutUser(): void
     {
-        // Utiliser la réflexion pour appeler la méthode privée
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('isViewerActiveMember');
-        $method->setAccessible(true);
-        
-        // Ne pas configurer de user (null par défaut)
+        // Créer un contrôleur sans user
+        $controller = $this->createControllerWithUser(null);
         
         // Appeler la méthode
-        $result = $method->invoke($this->controller);
+        $result = $controller->isViewerActiveMember();
         
         $this->assertFalse($result);
         
@@ -474,18 +515,11 @@ class EventControllerTest extends TestCase
             ->with($user)
             ->willReturn(false);
         
-        // Utiliser la réflexion pour appeler la méthode privée
-        $reflection = new \ReflectionClass($this->controller);
-        $method = $reflection->getMethod('isViewerActiveMember');
-        $method->setAccessible(true);
-        
-        // Configurer le user dans le contrôleur
-        $property = $reflection->getProperty('user');
-        $property->setAccessible(true);
-        $property->setValue($this->controller, $user);
+        // Créer un contrôleur avec le user
+        $controller = $this->createControllerWithUser($user);
         
         // Appeler la méthode
-        $result = $method->invoke($this->controller);
+        $result = $controller->isViewerActiveMember();
         
         $this->assertFalse($result);
     }

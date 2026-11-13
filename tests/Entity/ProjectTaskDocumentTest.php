@@ -107,7 +107,6 @@ class ProjectTaskDocumentTest extends TestCase
         // Configurer un ID pour la tâche
         $reflection = new \ReflectionClass($task);
         $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
         $property->setValue($task, 123);
         
         $document->setTask($task);
@@ -134,7 +133,6 @@ class ProjectTaskDocumentTest extends TestCase
         
         $reflection = new \ReflectionClass($task);
         $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
         $property->setValue($task, 123);
         
         $document->setTask($task);
@@ -269,7 +267,6 @@ class ProjectTaskDocumentTest extends TestCase
         
         $reflection = new \ReflectionClass($task);
         $property = $reflection->getProperty('id');
-        $property->setAccessible(true);
         $property->setValue($task, 123);
         
         $date = new \DateTimeImmutable('2024-01-15 10:30:00');

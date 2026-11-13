@@ -5,7 +5,7 @@
 {% set page_title = page_title|default(null) %}
 
 <div class="admin-topbar sticky-top">
-    <div class="d-flex align-items-center justify-content-between p-3">
+    <div class="d-flex align-items-center justify-content-between p-3 w-100">
         {# gauche : titre + breadcrumb #}
         <div class="d-flex align-items-center gap-3">
             <button class="btn btn-outline-gm-yellow d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')" 
@@ -13,11 +13,11 @@
                 <i class="bi bi-list"></i>
             </button>
             <div>
-                {% if page_title %}
+                {# {% if page_title %}
                     <h1 class="h4 mb-0 text-truncate">{{ page_title }}</h1>
                 {% else %}
                     <h1 class="h4 mb-0 text-truncate">{{ route|replace({'_': ' '})|title }}</h1>
-                {% endif %}
+                {% endif %} #}
                 {{ breadcrumb() }}
             </div>
         </div>

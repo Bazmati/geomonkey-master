@@ -7,6 +7,7 @@ use App\Entity\User;
 use App\Repository\MembershipRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
@@ -29,7 +30,33 @@ class MembershipRepositoryTest extends TestCase
             ->method('getManager')
             ->willReturn($this->em);
         
+        // Fix ClassMetadata mock - return real ClassMetadata with proper name property
+        $this->em
+            ->method('getClassMetadata')
+            ->willReturn(new ClassMetadata(Membership::class));
+        
+        // Ensure createQueryBuilder returns a QueryBuilder with select/from returning self
+        $this->em
+            ->method('createQueryBuilder')
+            ->willReturn($this->createQueryBuilderMock());
+        
         $this->repository = new MembershipRepository($this->registry);
+    }
+
+    /**
+     * Helper to create a properly stubbed QueryBuilder mock
+     */
+    private function createQueryBuilderMock(): QueryBuilder
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+        
+        $qb->method('select')
+            ->willReturnSelf();
+        
+        $qb->method('from')
+            ->willReturnSelf();
+        
+        return $qb;
     }
 
     public function testFindLastActiveByUser(): void

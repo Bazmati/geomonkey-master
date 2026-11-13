@@ -5,6 +5,8 @@ namespace App\Tests\Repository;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\ORM\QueryBuilder;
 use Doctrine\Persistence\ManagerRegistry;
 use PHPUnit\Framework\TestCase;
 
@@ -27,7 +29,23 @@ class EventRepositoryTest extends TestCase
             ->method('getManager')
             ->willReturn($this->em);
         
+        // Fix ClassMetadata mock - return real ClassMetadata with proper name property
+        $this->em
+            ->method('getClassMetadata')
+            ->willReturn(new ClassMetadata(Event::class));
+        
         $this->repository = new EventRepository($this->registry);
+    }
+
+    /**
+     * Creates a properly configured QueryBuilder mock with select/from returning self
+     */
+    private function createQueryBuilder(): QueryBuilder
+    {
+        $qb = $this->createMock(QueryBuilder::class);
+        $qb->method('select')->willReturnSelf();
+        $qb->method('from')->willReturnSelf();
+        return $qb;
     }
 
     public function testFindVisibleForActiveMemberAllEvents(): void
