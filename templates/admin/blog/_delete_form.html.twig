@@ -1,10 +1,8 @@
-{# Formulaire inline de suppression — incluse depuis index.html.twig #}
-<form method="post"
-      action="{{ path('app_admin_blog_delete', {'id': post.id}) }}"
-      class="d-inline"
-      onsubmit="return confirm('Supprimer définitivement l\'article « ' + '{{ post.title|e('js') }}' + ' ?\nCette action est irréversible.');">
-    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-    <button class="btn btn-sm btn-outline-danger" type="submit" title="Supprimer">
-        <i class="bi bi-trash-fill"></i>
-    </button>
-</form>
+{# Bouton + modal de suppression (homogène avec les autres CRUD) #}
+{{ include('front/partials/_delete_button.html.twig', {
+    id: post.id,
+    path: path('app_admin_blog_delete', {'id': post.id}),
+    entity_type: 'article',
+    confirm_message: 'Êtes-vous sûr de vouloir supprimer l\'article « ' ~ post.title ~ ' » ? Cette action est irréversible.',
+    csrf_token: csrf_token('delete' ~ post.id)
+}) }}

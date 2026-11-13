@@ -3,13 +3,14 @@
 {% set entity_type = entity_type|default('element') %}
 {% set confirm_message = confirm_message|default('Êtes-vous sûr de vouloir supprimer cet ' ~ entity_type ~ ' ? Cette action est irréversible.') %}
 {% set suffix = suffix|default('') %}
+{% set icon = icon|default('bi-trash-fill') %}
 
 <button type="button" 
         class="btn btn-sm btn-outline-danger"
         data-bs-toggle="modal" 
         data-bs-target="#deleteModal-{{ id }}{{ suffix }}"
         title="Supprimer {{ entity_type|capitalize }}">
-    <i class="bi bi-trash-fill"></i>
+    <i class="bi {{ icon }}"></i>
 </button>
 
 <!-- Delete Modal -->
@@ -18,7 +19,7 @@
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="deleteModalLabel-{{ id }}{{ suffix }}">
-                    <i class="bi bi-trash-fill me-2"></i>
+                    <i class="bi {{ icon }} me-2"></i>
                     Supprimer {{ entity_type|capitalize }}
                 </h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>

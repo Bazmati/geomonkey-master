@@ -107,12 +107,14 @@
                                                 {% endif %}
                                                 {# Retirer consentement #}
                                                 {% if is_granted('GALLERY_IMAGE_EDIT', image) %}
-                                                    <form method="post" action="{{ path('app_admin_gallery_image_withdraw_consent', {'id': image.id}) }}" class="d-inline" onsubmit="return confirm('Êtes-vous sûr de vouloir retirer le consentement RGPD ? L\\'image sera rétrogradée.');">
-                                                        <input type="hidden" name="_token" value="{{ csrf_token('withdraw_consent' ~ image.id) }}">
-                                                        <button class="btn btn-sm btn-outline-danger" type="submit" title="Retirer consentement">
-                                                            <i class="bi bi-shield-slash-fill"></i>
-                                                        </button>
-                                                    </form>
+                                                    {{ include('front/partials/_delete_button.html.twig', {
+                                                        id: image.id ~ '-consent',
+                                                        path: path('app_admin_gallery_image_withdraw_consent', {'id': image.id}),
+                                                        entity_type: 'consentement RGPD',
+                                                        confirm_message: 'Êtes-vous sûr de vouloir retirer le consentement RGPD ? L\'image sera rétrogradée.',
+                                                        csrf_token: csrf_token('withdraw_consent' ~ image.id),
+                                                        icon: 'bi-shield-slash-fill'
+                                                    }) }}
                                                 {% endif %}
                                                 {# Supprimer #}
                                                 {% if is_granted('GALLERY_IMAGE_DELETE', image) %}
