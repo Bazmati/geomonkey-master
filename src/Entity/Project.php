@@ -62,7 +62,7 @@ class Project implements ImageableInterface
     /**
      * Événements rattachés à ce projet (propriétaire de la relation).
      */
-    #[ORM\ManyToMany(targetEntity: Event::class)]
+    #[ORM\ManyToMany(targetEntity: Event::class, inversedBy: 'projects')]
     private Collection $events;
 
     /**

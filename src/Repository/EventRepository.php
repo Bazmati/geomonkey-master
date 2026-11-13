@@ -57,6 +57,23 @@ class EventRepository extends ServiceEntityRepository
     }
 
     /**
+     * Prochains événements publiés (pour le dashboard admin).
+     *
+     * @return Event[]
+     */
+    public function findUpcoming(int $limit = 5): array
+    {
+        return $this->createQueryBuilder('e')
+            ->andWhere('e.isPublished = true')
+            ->andWhere('e.startDate >= :now')
+            ->setParameter('now', new \DateTimeImmutable())
+            ->orderBy('e.startDate', 'ASC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
      * Un événement publié, visible selon le statut de membre de l'internaute.
      * Le front ne doit JAMAIS servir un événement non publié, même avec l'ID deviné.
      */

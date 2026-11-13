@@ -209,10 +209,17 @@ class Event implements ImageableInterface
     #[ORM\OneToMany(targetEntity: EventParticipant::class, mappedBy: 'event', cascade: ['persist'], orphanRemoval: true)]
     private Collection $participants;
 
+    /**
+     * Projets rattachés à cet événement (côté inverse, propriétaire = Project).
+     */
+    #[ORM\ManyToMany(targetEntity: Project::class, mappedBy: 'events')]
+    private Collection $projects;
+
     public function __construct()
     {
         $this->galleryImages = new ArrayCollection();
         $this->participants = new ArrayCollection();
+        $this->projects = new ArrayCollection();
     }
 
     public function getImageFile(): ?File
@@ -264,6 +271,31 @@ class Event implements ImageableInterface
     public function getParticipants(): Collection
     {
         return $this->participants;
+    }
+
+    // Projets liés (côté inverse de Project.events)
+    public function getProjects(): Collection
+    {
+        return $this->projects;
+    }
+
+    public function addProject(Project $project): static
+    {
+        if (!$this->projects->contains($project)) {
+            $this->projects->add($project);
+            $project->addEvent($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProject(Project $project): static
+    {
+        if ($this->projects->removeElement($project)) {
+            $project->removeEvent($this);
+        }
+
+        return $this;
     }
 
     /**

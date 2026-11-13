@@ -119,6 +119,17 @@
             </div>
         {% endif %}
 
+        {% if event.projects|length > 0 %}
+            <hr class="my-5">
+            <h3><i class="bi bi-kanban"></i> Projets liés</h3>
+            <ul class="list-unstyled">
+                {% for project in event.projects|filter(project => project.isPublished) %}
+                    <li><i class="bi bi-folder"></i>
+                        <a href="{{ path('app_project_show', {'slug': project.slug}) }}">{{ project.title }}</a></li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
         {% if event.blogPosts|length > 0 %}
             <hr class="my-5">
             <h3><i class="bi bi-newspaper"></i> Articles liés</h3>
