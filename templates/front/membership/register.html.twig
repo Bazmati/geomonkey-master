@@ -1,133 +1,188 @@
 {# templates/front/membership/register.html.twig #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Inscription - GéoMonkey{% endblock %}
+{% block title %}Rejoindre GéoMonkey - Adhésion{% endblock %}
+
+{% block meta %}
+    <meta name="description" content="Rejoins l'association GéoMonkey : adhésion annuelle, accès aux événements réservés, projets collectifs et à une bande de passionnés.">
+{% endblock %}
 
 {% block body %}
-    {% include 'partials/_navbar.html.twig' %}
-    
+{% include 'partials/_navbar.html.twig' %}
+
+{# ===== Fond vidéo en boucle (fallback : aurores animées CSS) ===== #}
+<div class="gm-join-bg" aria-hidden="true">
+    <div class="gm-join-aurora gm-join-aurora-green"></div>
+    <div class="gm-join-aurora gm-join-aurora-yellow"></div>
+    <video class="gm-join-video" autoplay muted loop playsinline preload="metadata" tabindex="-1">
+        <source src="{{ asset('videos/adhesion.mp4') }}" type="video/mp4">
+        <source src="{{ asset('videos/adhesion.webm') }}" type="video/webm">
+    </video>
+    <div class="gm-join-veil"></div>
+</div>
+
+<main class="gm-join position-relative">
     <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-6 col-md-8">
-                <div class="card shadow-sm border-warning">
-                    <div class="card-header bg-gm-warning text-gm-bg text-center">
-                        <h2 class="mb-0"><i class="bi bi-person-plus me-2"></i>Rejoindre GéoMonkey</h2>
-                    </div>
-                    
-                    <div class="card-body bg-gm-surface text-gm-text">
-                        <div class="alert alert-gm-info mb-4">
-                            <i class="bi bi-info-circle me-2"></i>
-                            <strong>Bienvenue !</strong> L'adhésion annuelle à GéoMonkey coûte 
-                            <strong class="text-gm-text">{{ "%.2f"|format(membershipFee) }} €</strong>.
-                        </div>
+        <div class="row g-5 align-items-center justify-content-center min-vh-90 py-4">
 
-                        {{ form_start(form) }}
-                            <div class="row g-3">
-                                <div class="col-md-6 mb-3">
-                                    {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-gm-light">
-                                            <i class="bi bi-person text-gm-text"></i>
-                                        </span>
-                                        {{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Prénom'}}) }}
-                                    </div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.firstName) }}
-                                    </div>
+            {# ===== Colonne pitch : pourquoi rejoindre ===== #}
+            <div class="col-lg-5 text-center text-lg-start">
+                <span class="badge home-hero-badge mb-3">
+                    <i class="bi bi-stars me-1"></i> Adhésion
+                </span>
+                <h1 class="gm-join-title mb-3">Et si tu rejoignais<br>la bande ?</h1>
+                <p class="gm-join-sub mb-4">
+                    Une assoc' de passionnés qui construit, bricole, fête et
+                    sort ensemble toute l'année. Il ne manque plus que toi.
+                </p>
+
+                <ul class="list-unstyled gm-join-benefits">
+                    <li>
+                        <i class="bi bi-calendar-event"></i>
+                        <div><strong>Événements réservés</strong><br>
+                        <span class="small">Sorties, ateliers et chantiers membres uniquement</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-kanban"></i>
+                        <div><strong>Projets collectifs</strong><br>
+                        <span class="small">Participe aux aventures en cours, prends des responsabilités</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-images"></i>
+                        <div><strong>Contenus complets</strong><br>
+                        <span class="small">Galerie étendue, suivi d'avancement et coulisses de l'assoc'</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-people"></i>
+                        <div><strong>Une bande sympa</strong><br>
+                        <span class="small">Tous les âges, tous les niveaux, zéro obligation de compétence</span></div>
+                    </li>
+                </ul>
+
+                <div class="gm-join-price mt-4">
+                    <span class="gm-join-price-value">{{ "%.2f"|format(membershipFee) }}&nbsp;€</span>
+                    <span class="gm-join-price-label">l'année d'adhésion,<br>aucun engagement caché</span>
+                </div>
+            </div>
+
+            {# ===== Colonne formulaire : carte verre dépoli ===== #}
+            <div class="col-lg-6 col-md-9">
+                <div class="gm-join-card">
+                    <h2 class="gm-join-card-title">
+                        <i class="bi bi-person-plus me-2"></i>Rejoindre GéoMonkey
+                    </h2>
+                    <p class="text-gm-muted small mb-4">
+                        Deux minutes de formulaire, et l'aventure commence.
+                    </p>
+
+                    {% for message in app.flashes('warning') %}
+                        <div class="alert alert-gm-warning">{{ message }}</div>
+                    {% endfor %}
+                    {% for message in app.flashes('danger') %}
+                        <div class="alert alert-gm-danger">{{ message }}</div>
+                    {% endfor %}
+
+                    {{ form_start(form) }}
+                        <div class="row g-3">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-gm-light"><i class="bi bi-person text-gm-text"></i></span>
+                                    {{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Prénom'}}) }}
                                 </div>
-                                
-                                <div class="col-md-6 mb-3">
-                                    {{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-gm-light">
-                                            <i class="bi bi-person text-gm-text"></i>
-                                        </span>
-                                        {{ form_widget(form.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Nom'}}) }}
-                                    </div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.lastName) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-3">
-                                    {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-gm-light">
-                                            <i class="bi bi-envelope text-gm-text"></i>
-                                        </span>
-                                        {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'votre@email.com'}}) }}
-                                    </div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.email) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-3">
-                                    {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                    <div class="input-group">
-                                        <span class="input-group-text bg-gm-light">
-                                            <i class="bi bi-lock text-gm-text"></i>
-                                        </span>
-                                        {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Mot de passe (min. 12 caractères)'}}) }}
-                                    </div>
-                                    <div class="form-text">Doit contenir au moins 12 caractères avec majuscules, minuscules, chiffres et symboles</div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.plainPassword) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-3">
-                                    {{ form_label(form.requestedFunction) }}
-                                    {{ form_widget(form.requestedFunction) }}
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.requestedFunction) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-3">
-                                    <div class="form-check">
-                                        {{ form_widget(form.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
-                                        {{ form_label(form.agreeTerms, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
-                                    </div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.agreeTerms) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-3">
-                                    <div class="form-check">
-                                        {{ form_widget(form.imageConsent, {'attr': {'class': 'form-check-input'}}) }}
-                                        {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2 text-gm-muted'}}) }}
-                                    </div>
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.imageConsent) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12 mb-4">
-                                    {# Cloudflare Turnstile CAPTCHA #}
-                                    {{ form_widget(form.cf_turnstile_response) }}
-                                    <div class="text-gm-danger">
-                                        {{ form_errors(form.cf_turnstile_response) }}
-                                    </div>
-                                </div>
-                                
-                                <div class="col-12">
-                                    <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8">
-                                        <i class="bi bi-person-plus-fill me-2"></i> S'inscrire
-                                    </button>
-                                </div>
+                                <div class="text-gm-danger">{{ form_errors(form.firstName) }}</div>
                             </div>
-                        {{ form_end(form) }}
 
-                        <div class="mt-4 text-center">
-                            <p class="text-gm-muted small">
-                                Déjà un compte ? <a href="{{ path('app_login') }}" class="text-gm-warning">Se connecter</a>
-                            </p>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-gm-light"><i class="bi bi-person text-gm-text"></i></span>
+                                    {{ form_widget(form.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Nom'}}) }}
+                                </div>
+                                <div class="text-gm-danger">{{ form_errors(form.lastName) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-gm-light"><i class="bi bi-envelope text-gm-text"></i></span>
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'votre@email.com'}}) }}
+                                </div>
+                                <div class="text-gm-danger">{{ form_errors(form.email) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
+                                <div class="input-group">
+                                    <span class="input-group-text bg-gm-light"><i class="bi bi-lock text-gm-text"></i></span>
+                                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Mot de passe (min. 12 caractères)'}}) }}
+                                </div>
+                                <div class="form-text">Doit contenir au moins 12 caractères avec majuscules, minuscules, chiffres et symboles</div>
+                                <div class="text-gm-danger">{{ form_errors(form.plainPassword) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                {{ form_label(form.requestedFunction) }}
+                                {{ form_widget(form.requestedFunction) }}
+                                <div class="text-gm-danger">{{ form_errors(form.requestedFunction) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    {{ form_widget(form.agreeTerms, {'attr': {'class': 'form-check-input'}}) }}
+                                    {{ form_label(form.agreeTerms, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
+                                </div>
+                                <div class="text-gm-danger">{{ form_errors(form.agreeTerms) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-3">
+                                <div class="form-check">
+                                    {{ form_widget(form.imageConsent, {'attr': {'class': 'form-check-input'}}) }}
+                                    {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label ms-2 text-gm-muted'}}) }}
+                                </div>
+                                <div class="text-gm-danger">{{ form_errors(form.imageConsent) }}</div>
+                            </div>
+
+                            <div class="col-12 mb-4">
+                                {# Cloudflare Turnstile CAPTCHA #}
+                                {{ form_widget(form.cf_turnstile_response) }}
+                                <div class="text-gm-danger">{{ form_errors(form.cf_turnstile_response) }}</div>
+                            </div>
+
+                            <div class="col-12">
+                                <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8">
+                                    <i class="bi bi-person-plus-fill me-2"></i> S'inscrire
+                                </button>
+                            </div>
                         </div>
+                    {{ form_end(form) }}
+
+                    <div class="mt-4 text-center">
+                        <p class="text-gm-muted small mb-0">
+                            Déjà un compte ? <a href="{{ path('app_login') }}" class="text-gm-warning">Se connecter</a>
+                        </p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</main>
+
+<script>
+(function () {
+    var v = document.querySelector('.gm-join-video');
+
+    // La vidéo n'apparaît en fond QUE si le fichier charge réellement
+    // (sinon le fond reste l'aurore animée CSS — jamais de trou noir)
+    if (v) {
+        v.addEventListener('canplay', function () { v.classList.add('is-playing'); }, { once: true });
+        // Respect de prefers-reduced-motion : on fige la vidéo
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            v.pause();
+            v.removeAttribute('autoplay');
+            v.classList.remove('is-playing');
+        }
+    }
+})();
+</script>
 {% endblock %}

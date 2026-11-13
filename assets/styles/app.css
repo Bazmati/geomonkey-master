@@ -1990,3 +1990,144 @@ body > footer,
 @media (prefers-reduced-motion: reduce) {
     .gm-event-aside { position: static; }
 }
+
+/* ============================================================
+   FRONT — Adhésion : vidéo de fond en boucle + carte verre dépoli
+   ============================================================ */
+
+/* Fond plein écran, fixe, derrière tout le contenu */
+.gm-join-bg {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    background: var(--gm-bg);
+}
+
+/* Aurores animées : toujours là, servent de fallback
+   si aucun fichier vidéo n'est présent */
+.gm-join-aurora {
+    position: absolute;
+    width: 70vmax;
+    height: 70vmax;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: .35;
+    animation: gmAurora 22s ease-in-out infinite alternate;
+}
+.gm-join-aurora-green {
+    background: radial-gradient(circle, var(--gm-green), transparent 65%);
+    top: -25vmax; left: -15vmax;
+}
+.gm-join-aurora-yellow {
+    background: radial-gradient(circle, var(--gm-yellow), transparent 65%);
+    bottom: -30vmax; right: -20vmax;
+    animation-delay: -11s;
+}
+@keyframes gmAurora {
+    0%   { transform: translate(0, 0) scale(1); }
+    50%  { transform: translate(8vmax, 6vmax) scale(1.15); }
+    100% { transform: translate(-6vmax, -4vmax) scale(.95); }
+}
+
+/* La vidéo, par-dessus les aurores : invisible tant que
+   public/videos/adhesion.mp4 n'existe pas (le fond reste l'aurore) */
+.gm-join-video {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;                 /* révélée par JS si la vidéo charge */
+    transition: opacity 1.2s ease;
+}
+.gm-join-video.is-playing { opacity: .55; }
+
+/* Voile sombre pour garantir la lisibilité du texte */
+.gm-join-veil {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 70% 30%, rgba(28, 28, 26, .25), transparent 60%),
+        linear-gradient(180deg, rgba(28, 28, 26, .82), rgba(28, 28, 26, .88));
+}
+
+/* Textes */
+.gm-join-title {
+    color: var(--gm-white);
+    font-size: clamp(2.1rem, 5vw, 3.2rem);
+    font-weight: 800;
+    line-height: 1.1;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+}
+.gm-join-sub {
+    color: var(--gm-gray-200);
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    max-width: 30rem;
+}
+
+/* Liste des avantages */
+.gm-join-benefits li {
+    display: flex;
+    align-items: flex-start;
+    gap: .9rem;
+    margin-bottom: 1.1rem;
+    color: var(--gm-gray-200);
+}
+.gm-join-benefits i {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    width: 2.6rem;
+    height: 2.6rem;
+    border-radius: .8rem;
+    font-size: 1.15rem;
+    color: var(--gm-green);
+    background: color-mix(in srgb, var(--gm-green) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gm-green) 35%, transparent);
+}
+.gm-join-benefits strong { color: var(--gm-white); }
+
+/* Prix */
+.gm-join-price {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+.gm-join-price-value {
+    font-size: 2.4rem;
+    font-weight: 800;
+    color: var(--gm-yellow);
+    line-height: 1;
+}
+.gm-join-price-label {
+    color: var(--gm-gray-300);
+    font-size: .95rem;
+    line-height: 1.25;
+}
+
+/* Carte formulaire : verre dépoli au-dessus de la vidéo */
+.gm-join-card {
+    background: rgba(36, 36, 34, .72);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid color-mix(in srgb, var(--gm-yellow) 35%, var(--gm-gray-900));
+    border-radius: 1.5rem;
+    padding: 2rem 1.8rem;
+    box-shadow: 0 1rem 3rem rgba(0, 0, 0, .5);
+    animation: gmFadeUp .5s ease both;
+}
+.gm-join-card-title {
+    color: var(--gm-yellow);
+    font-weight: 800;
+    margin-bottom: .4rem;
+}
+.min-vh-90 { min-height: 90vh; }
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .gm-join-aurora { animation: none !important; }
+    .gm-join-card { animation: none !important; }
+    .gm-join-video { transition: none !important; }
+}

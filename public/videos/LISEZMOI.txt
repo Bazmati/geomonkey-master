@@ -1,0 +1,2 @@
+Dépose ici ta vidéo de fond pour la page adhésion : adhesion.mp4 (et optionnellement adhesion.webm)
+Sans fichier, un fond aurores animées prend le relais.

@@ -17,6 +17,8 @@
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
 
+{% set hero_img = image_url(event, 'large') %}
+
 {# ===== Hero : image de fond + titre par-dessus ===== #}
 <header class="pres-show-hero {{ hero_img ? '' : 'pres-hero' }}">
     {% if hero_img %}
