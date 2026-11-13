@@ -125,8 +125,13 @@ footer {
 .form-control,
 .form-select {
     background: var(--gm-gray-800);
-    border-color: var(--gm-gray-700);
+    border-color: var(--gm-gray-500);   /* bordure bien visible sur le fond sombre */
     color: var(--gm-white);
+}
+
+.form-control:hover:not(:focus),
+.form-select:hover:not(:focus) {
+    border-color: var(--gm-gray-300);
 }
 
 .form-control:focus,
@@ -143,7 +148,7 @@ footer {
 
 .form-control[type="file"] {
     background: var(--gm-gray-800);
-    border-color: var(--gm-gray-700);
+    border-color: var(--gm-gray-500);
     color: var(--gm-white);
 }
 
@@ -675,9 +680,14 @@ body > footer,
    on neutralise la marge du conteneur de flashs qui
    créait un scroll parasite de quelques pixels.
    (le conteneur est vide quand il n'y a pas de message) */
-body.admin-body > .container.mt-3:empty {
-    display: none;
-    margin: 0;
+/* --------------------------------------------
+   FLASHES ADMIN : sous la topbar, pleine largeur du contenu
+   -------------------------------------------- */
+.admin-flashes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem 1.5rem 0;
 }
 
 /* --------------------------------------------
