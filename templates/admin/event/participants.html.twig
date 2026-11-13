@@ -67,6 +67,7 @@
                                 {% for participant in participants %}
                                     <tr>
                                         <td data-label="Participant">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-person'} %}
                                             <strong>{{ participant.user.firstName }} {{ participant.user.lastName }}</strong>
                                             <br><span class="text-gm-muted small">{{ participant.user.email }}</span>
                                         </td>

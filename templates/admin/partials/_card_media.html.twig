@@ -1,0 +1,18 @@
+{# templates/admin/partials/_card_media.html.twig #}
+{# Bannière image (ou icône de repli) pour les cartes mobiles.
+   Usage :
+     {% include 'admin/partials/_card_media.html.twig' with {
+         media: image_url(post, 'medium'),   // null => icône
+         icon: 'bi-newspaper',               // icône de repli
+     } %}
+   Pour les cartes mobiles écrites à la main (bloc d-md-none),
+   passer wrapper: 'gm-card-banner' (styles toujours visibles). #}
+{% set wrapper = wrapper|default('gm-card-media') %}
+{% set icon = icon|default('bi-image') %}
+<div class="{{ wrapper }}">
+    {% if media|default(null) %}
+        <img src="{{ media }}" alt="" loading="lazy">
+    {% else %}
+        <div class="gm-card-media-empty"><i class="bi {{ icon }}" aria-hidden="true"></i></div>
+    {% endif %}
+</div>

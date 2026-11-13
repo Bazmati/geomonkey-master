@@ -32,6 +32,7 @@
                                 {% for user in pendingUsers %}
                                     <tr>
                                         <td data-label="Nom">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-person-plus'} %}
                                             <strong>{{ user.firstName }} {{ user.lastName }}</strong>
                                         </td>
                                         <td data-label="Email">{{ user.email }}</td>

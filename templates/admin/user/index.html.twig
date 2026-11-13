@@ -36,7 +36,10 @@
         <tbody>
         {% for user in users %}
             <tr>
-                <td data-label="Nom">{{ user.lastName }} {{ user.firstName }}</td>
+                <td data-label="Nom">
+                {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-person-badge'} %}
+                {{ user.lastName }} {{ user.firstName }}
+            </td>
                 <td data-label="Email">{{ user.email }}</td>
                 <td data-label="Fonction">{{ user.officeFunction.value }}</td>
                 <td data-label="Rôle">

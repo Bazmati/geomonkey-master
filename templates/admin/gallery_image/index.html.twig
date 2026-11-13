@@ -44,6 +44,7 @@
                                     <tr>
                                         <td data-label="ID">{{ image.id }}</td>
                                         <td data-label="Titre">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: image_url(image, 'medium'), icon: 'bi-image'} %}
                                             <strong>{{ image.title }}</strong>
                                             {% if image.description %}
                                                 <br><small class="text-gm-muted">{{ image.description|truncate(50) }}</small>

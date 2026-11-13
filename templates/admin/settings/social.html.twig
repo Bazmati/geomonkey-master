@@ -33,7 +33,8 @@
                                 {% set icon = setting.platform.icon() %}
                                 {% set label = setting.platform.label() %}
                                 <tr>
-                                    <td data-label="Réseau"><i class="bi {{ icon }} fs-4"></i> <strong>{{ label }}</strong></td>
+                                    <td data-label="Réseau">
+                                        {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-share'} %}<i class="bi {{ icon }} fs-4"></i> <strong>{{ label }}</strong></td>
                                     <td data-label="Statut">
                                         <span class="badge bg-{{ setting.enabled ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                             {{ setting.enabled ? 'Activé' : 'Désactivé' }}

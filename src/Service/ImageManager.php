@@ -338,6 +338,17 @@ class ImageManager
             }
         }
         
+        // Dernier repli : chemin PLAT hérité (uploads/<path>/<uuid>.<ext>),
+        // utilisé par les anciens uploads avant la mise en place des miniatures
+        // par taille (ex. anciens articles de blog référencés par le front).
+        $flatBasePath = 'uploads/' . $imagePath . '/' . $uuid;
+        foreach ($extensions as $ext) {
+            $flatPath = $this->publicDir . '/' . $flatBasePath . $ext;
+            if (file_exists($flatPath)) {
+                return $this->urlCache[$cacheKey] = '/' . $flatBasePath . $ext;
+            }
+        }
+
         // Si rien ne fonctionne, retourner null
         return null;
     }

@@ -37,7 +37,10 @@
                                 {% for category in categories %}
                                     <tr>
                                         <td data-label="ID">{{ category.id }}</td>
-                                        <td data-label="Nom">{{ category.name }}</td>
+                                        <td data-label="Nom">
+                                        {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-folder'} %}
+                                        {{ category.name }}
+                                    </td>
                                         <td data-label="Slug"><code>{{ category.slug }}</code></td>
                                         <td data-label="Articles">{{ category.posts|length }}</td>
                                         <td data-label="Actions">

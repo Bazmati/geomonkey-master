@@ -40,7 +40,10 @@
                                 {% for page in pages %}
                                     <tr>
                                         <td data-label="Position">{{ page.position }}</td>
-                                        <td data-label="Titre"><strong>{{ page.title }}</strong></td>
+                                        <td data-label="Titre">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-file-text'} %}
+                                            <strong>{{ page.title }}</strong>
+                                        </td>
                                         <td data-label="Slug"><code>{{ page.slug }}</code></td>
                                         <td data-label="Image">
                                             {% if page.galleryImage %}

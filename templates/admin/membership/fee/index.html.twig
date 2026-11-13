@@ -81,6 +81,7 @@
                                 {% for fee in history %}
                                     <tr class="{% if fee == currentFee %}table-active-gm{% endif %}">
                                         <td data-label="Montant">
+                                        {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-cash-coin'} %}
                                             <strong>{{ "%.2f"|format(fee.amount / 100) }} €</strong>
                                         </td>
                                         <td data-label="Date de mise à jour">{{ fee.updatedAt|date('d/m/Y H:i') }}</td>

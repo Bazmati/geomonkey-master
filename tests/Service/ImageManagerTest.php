@@ -271,6 +271,32 @@ class ImageManagerTest extends TestCase
         $this->assertSame('/uploads/events/88/medium/url-test-uuid.webp', $this->imageManager->getUrl($event, 'medium'));
     }
 
+    public function testGetUrlFallsBackToFlatLegacyPath(): void
+    {
+        $event = new Event();
+        $event->setTitle('T');
+        $event->setDescription('D');
+        $r = new \ReflectionClass($event);
+        $r->getProperty('id')->setValue($event, 89);
+        $event->setImage('legacy-flat-uuid');
+
+        // Aucun fichier dans les dossiers par taille : getUrl doit retourner null
+        $this->assertNull($this->imageManager->getUrl($event, 'medium'));
+
+        // On crée le fichier PLAT (anciens uploads, sans sous-dossier de taille)
+        $dir = "{$this->publicDir}/uploads/events";
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+        file_put_contents("{$this->publicDir}/uploads/events/legacy-flat-uuid.jpg", 'fake');
+
+        $this->assertSame(
+            '/uploads/events/legacy-flat-uuid.jpg',
+            $this->imageManager->getUrl($event, 'medium'),
+            'getUrl doit retomber sur le chemin plat hérité quand aucune miniature n\'existe'
+        );
+    }
+
     public function testDeleteForEntityDeletesOnlyGivenUuid(): void
     {
         // simule 2 images pour la même entité (id 99)

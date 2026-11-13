@@ -43,7 +43,10 @@
                             <tbody>
                                 {% for post in posts %}
                                     <tr>
-                                        <td data-label="Titre"><strong>{{ post.title }}</strong></td>
+                                        <td data-label="Titre">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: image_url(post, 'medium'), icon: 'bi-newspaper'} %}
+                                            <strong>{{ post.title }}</strong>
+                                        </td>
                                         <td data-label="Slug"><code>{{ post.slug }}</code></td>
                                         <td data-label="Auteur">{{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : '—' }}</td>
                                         <td data-label="Statut">
