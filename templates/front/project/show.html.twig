@@ -13,77 +13,117 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<article class="py-5">
-    <div class="container max-w-800">
 
-        {{ breadcrumb() }}
+{% set hero_img = image_url(project, 'large') %}
 
-        <h1 class="mb-3">{{ project.title }}</h1>
-
-        <p class="text-muted">
-            <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
+{# ===== Hero : image de fond + titre par-dessus ===== #}
+<header class="pres-show-hero {{ hero_img ? '' : 'pres-hero' }}">
+    {% if hero_img %}
+        <div class="pres-show-hero-bg" style="background-image: url('{{ hero_img }}')"></div>
+        <div class="pres-show-hero-overlay"></div>
+    {% endif %}
+    <div class="container position-relative">
+        <span class="badge {{ project.status.badgeClass }} mb-3">
+            <i class="bi bi-kanban me-1"></i> {{ project.status.label }}
+        </span>
+        <h1 class="pres-show-hero-title">{{ project.title }}</h1>
+        <p class="pres-show-hero-excerpt">
             {% if project.startDate %}
-                &nbsp;·&nbsp; <i class="bi bi-calendar"></i>
+                <i class="bi bi-calendar me-1"></i>
                 {{ project.startDate|date('d/m/Y') }}{% if project.endDate %} — {{ project.endDate|date('d/m/Y') }}{% endif %}
+                &nbsp;·&nbsp;
             {% endif %}
+            {{ project.description|striptags|slice(0, 140) }}{% if project.description|striptags|length > 140 %}…{% endif %}
         </p>
-
-        {% if project.status.value != 'termine' %}
-            <div class="bg-gm-surface border-gm-yellow rounded p-3 d-flex align-items-start gap-2 mb-4">
-                <i class="bi bi-stars fs-5"></i>
-                <div>
-                    {{ project.status.publicTeaser }}
-                    <a href="{{ path('app_membership_register') }}" class="fst-italic">En savoir plus sur l'adhésion…</a>
-                </div>
-            </div>
-        {% endif %}
-
-        {% if app.user %}
-            <p class="mb-4">
-                <a href="{{ path('app_project_board', {'slug': project.slug}) }}" class="btn btn-gm-green">
-                    <i class="bi bi-kanban"></i> Voir l'avancement du projet
-                </a>
-            </p>
-        {% endif %}
-
-        {% if project.hasImage %}
-            {{ image_tag(project, 'large', "Illustration du projet " ~ project.title, 'img-fluid rounded mb-4') }}
-        {% endif %}
-
-        <div class="article-content">
-            {{ project.description|nl2br }}
-        </div>
-
-        {% if project.events|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-calendar-event"></i> Événements liés à ce projet</h3>
-            <ul class="list-unstyled">
-                {% for event in project.events %}
-                    {% if event.isPublished %}
-                        <li class="mb-2">
-                            <i class="bi bi-arrow-right-short"></i>
-                            <a href="{{ path('app_event_show', {'id': event.id}) }}">{{ event.title }}</a>
-                            <span class="text-muted small">— {{ event.startDate|date('d/m/Y') }}</span>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% endif %}
-
-        {% if project.blogPosts|length > 0 %}
-            <hr class="my-5">
-            <h3><i class="bi bi-newspaper"></i> Articles liés à ce projet</h3>
-            <ul class="list-unstyled">
-                {% for post in project.blogPosts %}
-                    {% if post.isPublished %}
-                        <li class="mb-2">
-                            <i class="bi bi-arrow-right-short"></i>
-                            <a href="{{ path('app_blog_show', {'slug': post.slug}) }}">{{ post.title }}</a>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% endif %}
     </div>
-</article>
+</header>
+
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+
+            {# Accroche selon le statut #}
+            {% if project.status.value != 'termine' %}
+                <div class="bg-gm-surface border-gm-yellow rounded p-3 d-flex align-items-start gap-2 mb-4">
+                    <i class="bi bi-stars fs-5"></i>
+                    <div>
+                        {{ project.status.publicTeaser }}
+                        <a href="{{ path('app_membership_register') }}" class="fst-italic">En savoir plus sur l'adhésion…</a>
+                    </div>
+                </div>
+            {% endif %}
+
+            {# Lien vers le tableau de suivi interne #}
+            {% if app.user %}
+                <p class="mb-4">
+                    <a href="{{ path('app_project_board', {'slug': project.slug}) }}" class="btn btn-gm-green">
+                        <i class="bi bi-kanban"></i> Voir l'avancement du projet
+                    </a>
+                </p>
+            {% endif %}
+
+            {# Description du projet #}
+            <article class="pres-show-content">
+                <div class="article-content mb-0">
+                    {{ project.description|nl2br }}
+                </div>
+
+                {% if project.leader %}
+                    <hr class="my-4">
+                    <p class="text-muted small mb-0">
+                        <i class="bi bi-person-badge me-1"></i>
+                        Porté par <strong class="text-gm-text">{{ project.leader.firstName }} {{ project.leader.lastName }}</strong>
+                        {% if project.status.value != 'termine' %}— rejoignez l'aventure !{% endif %}
+                    </p>
+                {% endif %}
+            </article>
+
+            {# Événements liés #}
+            {% set related_events = project.events|filter(e => e.isPublished) %}
+            {% if related_events|length > 0 %}
+                <section class="mt-5">
+                    <h2 class="h4 mb-3"><i class="bi bi-calendar-event text-gm-green"></i> Événements liés</h2>
+                    {% for event in related_events %}
+                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="proj-related mb-2">
+                            <i class="bi bi-calendar-event fs-5 text-gm-green"></i>
+                            <span class="flex-grow-1">
+                                <strong>{{ event.title }}</strong><br>
+                                <span class="text-muted small">{{ event.startDate|date('d/m/Y') }}</span>
+                            </span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+            {# Articles liés #}
+            {% set related_posts = project.blogPosts|filter(p => p.isPublished) %}
+            {% if related_posts|length > 0 %}
+                <section class="mt-5">
+                    <h2 class="h4 mb-3"><i class="bi bi-newspaper text-gm-yellow"></i> Articles liés</h2>
+                    {% for post in related_posts %}
+                        <a href="{{ path('app_blog_show', {'slug': post.slug}) }}" class="proj-related mb-2">
+                            <i class="bi bi-newspaper fs-5 text-gm-yellow"></i>
+                            <span class="flex-grow-1">
+                                <strong>{{ post.title }}</strong>
+                            </span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                    {% endfor %}
+                </section>
+            {% endif %}
+
+            {# CTA adhésion pour les projets vivants #}
+            {% if project.status.value != 'termine' %}
+                <div class="text-center mt-5">
+                    <a href="{{ path('app_membership_register') }}" class="btn btn-gm-green btn-lg">
+                        <i class="bi bi-people me-1"></i> Je participe à ce projet
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</main>
 {% endblock %}

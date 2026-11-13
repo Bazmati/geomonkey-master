@@ -1600,3 +1600,50 @@ body > footer,
 .admin-main {
     overflow-x: hidden;
 }
+
+/* ============================================================
+   FRONT — Projets : cartes de la liste et liens de la fiche
+   ============================================================ */
+
+/* Lien "Découvrir le projet" dans les cartes */
+.proj-card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    color: var(--gm-green);
+    font-weight: 600;
+    font-size: .95rem;
+    margin-top: .9rem;
+}
+.proj-card-cta i { transition: transform .2s ease; }
+.home-card:hover .proj-card-cta {
+    color: color-mix(in srgb, var(--gm-green) 70%, var(--gm-white));
+}
+.home-card:hover .proj-card-cta i { transform: translateX(.3rem); }
+
+/* Liens "événements / articles liés" sur la fiche projet */
+.proj-related {
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+    padding: .8rem 1rem;
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: .8rem;
+    text-decoration: none;
+    color: var(--gm-text);
+    transition: border-color .2s ease, transform .2s ease, color .2s ease;
+}
+.proj-related:hover {
+    border-color: color-mix(in srgb, var(--gm-green) 50%, var(--gm-gray-900));
+    transform: translateX(.25rem);
+    color: var(--gm-white);
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .proj-card-cta i,
+    .proj-related { transition: none !important; }
+    .home-card:hover .proj-card-cta i { transform: none; }
+    .proj-related:hover { transform: none; }
+}

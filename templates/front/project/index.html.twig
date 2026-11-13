@@ -8,52 +8,111 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<section class="py-5 bg-surface">
-    <div class="container">
 
-        {{ breadcrumb() }}
-
-        <h1 class="mb-4"><i class="bi bi-kanban"></i> Nos projets</h1>
-
-        {% if projects is empty %}
-            <div class="alert alert-gm-info">
-                <i class="bi bi-info-circle"></i> Aucun projet à afficher pour le moment. Revenez bientôt !
-            </div>
-        {% else %}
-            <div class="row g-4">
-                {% for project in projects %}
-                    <div class="col-md-6 col-lg-4">
-                        <div class="card h-100 shadow-sm">
-                            {% if project.hasImage %}
-                                {{ image_tag(project, 'medium', 'Illustration du projet ' ~ project.title, 'card-img-top') }}
-                            {% endif %}
-                            <div class="card-body d-flex flex-column">
-                                <div class="mb-2">
-                                    <span class="badge {{ project.status.badgeClass }}">{{ project.status.label }}</span>
-                                </div>
-                                <h5 class="card-title">{{ project.title }}</h5>
-                                {% if project.startDate %}
-                                    <p class="card-text text-muted small">
-                                        <i class="bi bi-calendar"></i>
-                                        Démarré le {{ project.startDate|date('d/m/Y') }}
-                                        {% if project.endDate %} — {{ project.endDate|date('d/m/Y') }}{% endif %}
-                                    </p>
-                                {% endif %}
-                                <p class="card-text text-muted small">
-                                    {{ project.description|striptags|slice(0, 120) }}{% if project.description|length > 120 %}…{% endif %}
-                                </p>
-                                <div class="mt-auto">
-                                    <a href="{{ path('app_project_show', {'slug': project.slug}) }}"
-                                       class="btn btn-success btn-sm">
-                                        Voir le projet <i class="bi bi-arrow-right"></i>
-                                    </a>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+{# ===== Hero de section ===== #}
+<header class="pres-hero">
+    <div class="container position-relative text-center">
+        <span class="badge home-hero-badge mb-3">
+            <i class="bi bi-kanban me-1"></i> Nos projets
+        </span>
+        <h1 class="pres-hero-title">Des idées qui prennent vie</h1>
+        <p class="home-hero-sub mx-auto mb-0">
+            Chaque projet GéoMonkey est une aventure collective : des événements
+            culturels imaginés, construits et vécus par des bénévoles de tous
+            les âges. Suis l'avancement de nos chantiers en cours et plonge
+            dans nos aventures déjà vécues.
+        </p>
     </div>
-</section>
+</header>
+
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    {% set ongoing = projects|filter(p => p.status.value == 'en_cours') %}
+    {% set planned = projects|filter(p => p.status.value == 'planifie') %}
+    {% set done    = projects|filter(p => p.status.value == 'termine') %}
+
+    {% if projects is empty %}
+        <div class="alert alert-gm-info">
+            <i class="bi bi-info-circle me-2"></i>
+            Aucun projet à afficher pour le moment — mais ça ne va pas durer !
+            <a href="{{ path('app_membership_register') }}" class="alert-link">Rejoins l'association</a>
+            pour être au cœur de la prochaine aventure.
+        </div>
+    {% endif %}
+
+    {% macro project_cards(items, delay_start = 0) %}
+        {% for project in items %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <a href="{{ path('app_project_show', {'slug': project.slug}) }}"
+                   class="text-decoration-none h-100 d-block">
+                    <article class="home-card position-relative gmFadeUp"
+                             style="animation-delay: {{ (loop.index0 + delay_start) * 60 }}ms">
+                        {% if project.hasImage %}
+                            {{ image_tag(project, 'medium', 'Illustration du projet ' ~ project.title, 'home-card-img') }}
+                        {% else %}
+                            <div class="home-card-img home-card-img-empty"><i class="bi bi-kanban"></i></div>
+                        {% endif %}
+                        <span class="badge {{ project.status.badgeClass }} position-absolute top-0 end-0 m-2">
+                            {{ project.status.label }}
+                        </span>
+                        <div class="home-card-body">
+                            <h2 class="h5 text-light mb-2">{{ project.title }}</h2>
+                            {% if project.startDate %}
+                                <p class="text-muted small mb-2">
+                                    <i class="bi bi-calendar me-1"></i>
+                                    {{ project.startDate|date('d/m/Y') }}{% if project.endDate %} — {{ project.endDate|date('d/m/Y') }}{% endif %}
+                                </p>
+                            {% endif %}
+                            <p class="text-muted small mb-0">
+                                {{ project.description|striptags|slice(0, 130) }}{% if project.description|striptags|length > 130 %}…{% endif %}
+                            </p>
+                            <span class="proj-card-cta">
+                                Découvrir le projet <i class="bi bi-arrow-right"></i>
+                            </span>
+                        </div>
+                    </article>
+                </a>
+            </div>
+        {% endfor %}
+    {% endmacro %}
+
+    {% import _self as proj %}
+
+    {% if ongoing is not empty %}
+        <section class="mb-5">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <span class="badge bg-gm-green text-gm-white fs-6"><i class="bi bi-arrow-repeat"></i> En cours</span>
+                <span class="text-muted small">{{ ongoing|length }} chantier{{ ongoing|length > 1 ? 's' }} en pleine effervescence</span>
+            </div>
+            <div class="row g-4">
+                {{ proj.project_cards(ongoing) }}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if planned is not empty %}
+        <section class="mb-5">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <span class="badge bg-gm-warning text-gm-bg fs-6"><i class="bi bi-rocket-takeoff"></i> En préparation</span>
+                <span class="text-muted small">Les futures aventures en préparation</span>
+            </div>
+            <div class="row g-4">
+                {{ proj.project_cards(planned, ongoing|length) }}
+            </div>
+        </section>
+    {% endif %}
+
+    {% if done is not empty %}
+        <section class="mb-2">
+            <div class="d-flex align-items-center gap-2 mb-4">
+                <span class="badge bg-secondary text-white fs-6"><i class="bi bi-trophy"></i> Terminés</span>
+                <span class="text-muted small">Nos aventures déjà vécues</span>
+            </div>
+            <div class="row g-4">
+                {{ proj.project_cards(done, ongoing|length + planned|length) }}
+            </div>
+        </section>
+    {% endif %}
+</main>
 {% endblock %}
