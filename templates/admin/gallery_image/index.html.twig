@@ -26,7 +26,7 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-gm table-striped table-hover">
+                        <table class="table-mobile-cards table table-gm table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -42,14 +42,14 @@
                             <tbody>
                                 {% for image in gallery_images %}
                                     <tr>
-                                        <td>{{ image.id }}</td>
-                                        <td>
+                                        <td data-label="ID">{{ image.id }}</td>
+                                        <td data-label="Titre">
                                             <strong>{{ image.title }}</strong>
                                             {% if image.description %}
                                                 <br><small class="text-gm-muted">{{ image.description|truncate(50) }}</small>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td data-label="Visibilité">
                                             {% set visibilityValue = image.visibility.value %}
                                             <span class="badge bg-{{
                                                 visibilityValue == 'public' ? 'gm-green' :
@@ -60,7 +60,7 @@
                                                 {{ {'public': 'Publique', 'membres': 'Membres', 'participants': 'Participants', 'bureau': 'Bureau'}[visibilityValue] }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Consentement RGPD">
                                             {% if image.hasValidConsent() %}
                                                 <i class="bi bi-check-circle-fill text-gm-green" title="Consentement valide et daté"></i>
                                             {% elseif image.rgpdConsent %}
@@ -69,20 +69,20 @@
                                                 <i class="bi bi-x-circle-fill text-gm-danger" title="Pas de consentement"></i>
                                             {% endif %}
                                         </td>
-                                        <td>
+                                        <td data-label="Publiée">
                                             <span class="badge bg-{{ image.isPublished ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                                 {{ image.isPublished ? 'Oui' : 'Non' }}
                                             </span>
                                         </td>
-                                        <td>
+                                        <td data-label="Téléchargée par">
                                             {% if image.uploadedBy %}
                                                 {{ image.uploadedBy.email }}
                                             {% else %}
                                                 <span class="text-gm-muted">Inconnu</span>
                                             {% endif %}
                                         </td>
-                                        <td>{{ image.createdAt|date('d/m/Y H:i') }}</td>
-                                        <td>
+                                        <td data-label="Date">{{ image.createdAt|date('d/m/Y H:i') }}</td>
+                                        <td data-label="Actions">
                                             <div class="d-flex gap-1">
                                                 {# Lien vers l'image (si publiée) #}
                                                 {% if image.isPublished %}

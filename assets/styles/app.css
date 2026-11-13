@@ -758,3 +758,64 @@ body > footer,
 .btn:active:not(:disabled):not(.btn-static) {
     transform: scale(0.98);
 }
+
+/* ============================================================
+   TABLEAUX ADMIN → CARTES SUR MOBILE (pattern générique)
+   Prérequis : <table class="... table-mobile-cards"> et
+   data-label="..." sur chaque <td>. Sous 768px, l'entête
+   disparaît et chaque ligne devient une carte.
+   ============================================================ */
+@media (max-width: 767.98px) {
+    .table-mobile-cards thead {
+        display: none;
+    }
+
+    .table-mobile-cards,
+    .table-mobile-cards tbody,
+    .table-mobile-cards tr,
+    .table-mobile-cards td {
+        display: block;
+        width: 100%;
+    }
+
+    .table-mobile-cards tr {
+        background: var(--gm-surface);
+        border: 1px solid var(--gm-gray-900);
+        border-radius: 0.5rem;
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .table-mobile-cards td {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.4rem 0;
+        border: none;
+        text-align: right;
+        white-space: normal;
+    }
+
+    /* Cellule sans data-label (ex. ligne vide colspan) : pas d'étiquette */
+    .table-mobile-cards td:not([data-label])::before {
+        display: none;
+    }
+
+    .table-mobile-cards td::before {
+        content: attr(data-label);
+        font-weight: 600;
+        color: var(--gm-gray-300);
+        text-align: left;
+        flex-shrink: 0;
+    }
+
+    /* Colonne Actions : boutons alignés à gauche, séparés */
+    .table-mobile-cards td[data-label="Actions"] {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+        border-top: 1px solid var(--gm-gray-900);
+        margin-top: 0.5rem;
+        padding-top: 0.75rem;
+    }
+}

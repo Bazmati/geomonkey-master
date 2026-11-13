@@ -19,7 +19,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-gm table-hover mb-0">
+                        <table class="table-mobile-cards table table-gm table-hover mb-0">
                             <thead>
                                 <tr>
                                     <th>Nom</th>
@@ -31,12 +31,12 @@
                             <tbody>
                                 {% for user in pendingUsers %}
                                     <tr>
-                                        <td>
+                                        <td data-label="Nom">
                                             <strong>{{ user.firstName }} {{ user.lastName }}</strong>
                                         </td>
-                                        <td>{{ user.email }}</td>
-                                        <td>{{ user.createdAt|date('d/m/Y H:i') }}</td>
-                                        <td>
+                                        <td data-label="Email">{{ user.email }}</td>
+                                        <td data-label="Date d'inscription">{{ user.createdAt|date('d/m/Y H:i') }}</td>
+                                        <td data-label="Actions">
                                             <form method="post" 
                                                   action="{{ path('app_admin_membership_validate', {'id': user.id}) }}"
                                                   class="d-inline">

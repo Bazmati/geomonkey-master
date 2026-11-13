@@ -68,7 +68,7 @@
                 </div>
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-gm table-striped mb-0">
+                        <table class="table-mobile-cards table table-gm table-striped mb-0">
                             <thead>
                                 <tr>
                                     <th>Montant</th>
@@ -80,12 +80,12 @@
                             <tbody>
                                 {% for fee in history %}
                                     <tr class="{% if fee == currentFee %}table-active-gm{% endif %}">
-                                        <td>
+                                        <td data-label="Montant">
                                             <strong>{{ "%.2f"|format(fee.amount / 100) }} €</strong>
                                         </td>
-                                        <td>{{ fee.updatedAt|date('d/m/Y H:i') }}</td>
-                                        <td>{{ fee.effectiveFrom ? fee.effectiveFrom|date('d/m/Y') : '-' }}</td>
-                                        <td>{{ fee.notes ?: '-' }}</td>
+                                        <td data-label="Date de mise à jour">{{ fee.updatedAt|date('d/m/Y H:i') }}</td>
+                                        <td data-label="Date d'effet">{{ fee.effectiveFrom ? fee.effectiveFrom|date('d/m/Y') : '-' }}</td>
+                                        <td data-label="Notes">{{ fee.notes ?: '-' }}</td>
                                     </tr>
                                 {% endfor %}
                             </tbody>

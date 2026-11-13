@@ -20,7 +20,7 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-gm table-striped table-hover">
+                        <table class="table-mobile-cards table table-gm table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -33,11 +33,11 @@
                             <tbody>
                                 {% for tag in tags %}
                                     <tr>
-                                        <td>{{ tag.id }}</td>
-                                        <td>{{ tag.name }}</td>
-                                        <td><code>{{ tag.slug }}</code></td>
-                                        <td>{{ tag.posts|length }}</td>
-                                        <td>
+                                        <td data-label="ID">{{ tag.id }}</td>
+                                        <td data-label="Nom">{{ tag.name }}</td>
+                                        <td data-label="Slug"><code>{{ tag.slug }}</code></td>
+                                        <td data-label="Articles">{{ tag.posts|length }}</td>
+                                        <td data-label="Actions">
                                             <div class="d-flex gap-1">
                                                 <a href="{{ path('admin_blog_tag_edit', {'id': tag.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>

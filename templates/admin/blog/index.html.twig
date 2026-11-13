@@ -28,7 +28,7 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-gm table-striped table-hover">
+                        <table class="table-mobile-cards table table-gm table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>Titre</th>
@@ -43,17 +43,17 @@
                             <tbody>
                                 {% for post in posts %}
                                     <tr>
-                                        <td><strong>{{ post.title }}</strong></td>
-                                        <td><code>{{ post.slug }}</code></td>
-                                        <td>{{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : '—' }}</td>
-                                        <td>
+                                        <td data-label="Titre"><strong>{{ post.title }}</strong></td>
+                                        <td data-label="Slug"><code>{{ post.slug }}</code></td>
+                                        <td data-label="Auteur">{{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : '—' }}</td>
+                                        <td data-label="Statut">
                                             <span class="badge bg-{{ post.isPublished ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                                 {{ post.isPublished ? 'En ligne' : 'Brouillon' }}
                                             </span>
                                         </td>
-                                        <td>{{ post.createdAt|date('d/m/Y H:i') }}</td>
-                                        <td>{{ post.publishedAt ? post.publishedAt|date('d/m/Y H:i') : '—' }}</td>
-                                        <td>
+                                        <td data-label="Créé le">{{ post.createdAt|date('d/m/Y H:i') }}</td>
+                                        <td data-label="Mise en ligne">{{ post.publishedAt ? post.publishedAt|date('d/m/Y H:i') : '—' }}</td>
+                                        <td data-label="Actions">
                                             <div class="d-flex gap-1">
                                                 {% if post.isPublished %}
                                                     <a href="{{ path('app_blog_show', {'slug': post.slug}) }}"

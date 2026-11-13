@@ -22,7 +22,7 @@
 </div>
 
 <div class="table-responsive">
-    <table class="table table-gm table-hover align-middle">
+    <table class="table-mobile-cards table table-gm table-hover align-middle">
         <thead>
             <tr>
                 <th>Nom</th>
@@ -36,24 +36,24 @@
         <tbody>
         {% for user in users %}
             <tr>
-                <td>{{ user.lastName }} {{ user.firstName }}</td>
-                <td>{{ user.email }}</td>
-                <td>{{ user.officeFunction.value }}</td>
-                <td>
+                <td data-label="Nom">{{ user.lastName }} {{ user.firstName }}</td>
+                <td data-label="Email">{{ user.email }}</td>
+                <td data-label="Fonction">{{ user.officeFunction.value }}</td>
+                <td data-label="Rôle">
                     {% if 'ROLE_ADMIN' in user.roles %}
                         <span class="badge bg-gm-warning text-gm-bg">Admin</span>
                     {% else %}
                         <span class="badge bg-gm-gray-600 text-gm-white">Membre</span>
                     {% endif %}
                 </td>
-                <td>
+                <td data-label="Adhésion">
                     {% if user.hasActiveMembership() %}
                         <span class="badge bg-gm-green text-gm-white">Valide jusqu'au {{ user.membershipValidUntil|date('d/m/Y') }}</span>
                     {% else %}
                         <span class="badge bg-gm-danger text-gm-white">Expirée</span>
                     {% endif %}
                 </td>
-                <td class="text-end">
+                <td class="text-end" data-label="Actions">
                     <a href="{{ path('app_admin_user_edit', {id: user.id}) }}"
                        class="btn btn-sm btn-outline-gm-yellow"><i class="bi bi-pencil"></i></a>
                     {% include 'front/partials/_delete_button.html.twig' with {

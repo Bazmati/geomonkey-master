@@ -23,7 +23,7 @@
                     </div>
                 {% else %}
                     <div class="table-responsive">
-                        <table class="table table-gm table-striped table-hover">
+                        <table class="table-mobile-cards table table-gm table-striped table-hover">
                             <thead>
                                 <tr>
                                     <th>ID</th>
@@ -36,11 +36,11 @@
                             <tbody>
                                 {% for category in categories %}
                                     <tr>
-                                        <td>{{ category.id }}</td>
-                                        <td>{{ category.name }}</td>
-                                        <td><code>{{ category.slug }}</code></td>
-                                        <td>{{ category.posts|length }}</td>
-                                        <td>
+                                        <td data-label="ID">{{ category.id }}</td>
+                                        <td data-label="Nom">{{ category.name }}</td>
+                                        <td data-label="Slug"><code>{{ category.slug }}</code></td>
+                                        <td data-label="Articles">{{ category.posts|length }}</td>
+                                        <td data-label="Actions">
                                             <div class="d-flex gap-1">
                                                 <a href="{{ path('admin_blog_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>

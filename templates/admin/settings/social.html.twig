@@ -17,7 +17,7 @@
         <div class="card shadow-sm">
             <div class="card-body">
                 <div class="table-responsive">
-                    <table class="table table-gm table-striped table-hover align-middle">
+                    <table class="table-mobile-cards table table-gm table-striped table-hover align-middle">
                         <thead>
                             <tr>
                                 <th>Réseau</th>
@@ -33,13 +33,13 @@
                                 {% set icon = setting.platform.icon() %}
                                 {% set label = setting.platform.label() %}
                                 <tr>
-                                    <td><i class="bi {{ icon }} fs-4"></i> <strong>{{ label }}</strong></td>
-                                    <td>
+                                    <td data-label="Réseau"><i class="bi {{ icon }} fs-4"></i> <strong>{{ label }}</strong></td>
+                                    <td data-label="Statut">
                                         <span class="badge bg-{{ setting.enabled ? 'gm-green' : 'gm-gray-600' }} text-gm-white">
                                             {{ setting.enabled ? 'Activé' : 'Désactivé' }}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Partage">
                                         {% if platform.supportsShareUrl is defined %}
                                             {# placeholder non utilisé : voir share_buttons #}
                                         {% endif %}
@@ -51,7 +51,7 @@
                                             {% endif %}
                                         </span>
                                     </td>
-                                    <td>
+                                    <td data-label="Publication auto">
                                         {% if not setting.platform.supportsAutoPublish() %}
                                             <span class="text-gm-muted small">Non disponible sur ce réseau</span>
                                         {% else %}
@@ -75,7 +75,7 @@
                                             {% endif %}
                                         {% endif %}
                                     </td>
-                                    <td>
+                                    <td data-label="Identifiant cible">
                                         <form method="post"
                                               action="{{ path('app_admin_social_external_id', {'id': setting.id}) }}"
                                               class="d-flex gap-1">
@@ -89,7 +89,7 @@
                                             </button>
                                         </form>
                                     </td>
-                                    <td>
+                                    <td data-label="Actions">
                                         <form method="post"
                                               action="{{ path('app_admin_social_toggle', {'id': setting.id}) }}"
                                               class="d-inline">
