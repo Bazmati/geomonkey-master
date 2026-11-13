@@ -180,13 +180,14 @@ class MembershipRepositoryTest extends TestCase
             ->with('m.expiresAt < :now')
             ->willReturnSelf();
         
+        // Capturer les appels setParameter pour vérification
+        $capturedParams = [];
         $queryBuilder
             ->method('setParameter')
-            ->withConsecutive(
-                ['active', true],
-                ['now', $this->isInstanceOf(\DateTimeImmutable::class)]
-            )
-            ->willReturnSelf();
+            ->willReturnCallback(function ($name, $value) use (&$capturedParams, $queryBuilder) {
+                $capturedParams[] = [$name, $value];
+                return $queryBuilder;
+            });
         
         $queryBuilder
             ->method('getQuery')
@@ -197,6 +198,13 @@ class MembershipRepositoryTest extends TestCase
             ->willReturn([]);
         
         $this->repository->findExpiredAndActive();
+        
+        // Vérifier les paramètres capturés
+        $this->assertCount(2, $capturedParams);
+        $this->assertSame('active', $capturedParams[0][0]);
+        $this->assertSame(true, $capturedParams[0][1]);
+        $this->assertSame('now', $capturedParams[1][0]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $capturedParams[1][1]);
     }
 
     public function testFindAboutToExpireWithoutReminder(): void

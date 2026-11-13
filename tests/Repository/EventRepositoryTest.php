@@ -347,13 +347,14 @@ class EventRepositoryTest extends TestCase
             ->method('andWhere')
             ->with('e.isPublished = true');
         
+        // Capturer les appels setParameter pour vérification
+        $capturedParams = [];
         $qb
             ->method('setParameter')
-            ->withConsecutive(
-                ['id', $id],
-                ['now', $this->isInstanceOf(\DateTimeImmutable::class)]
-            )
-            ->willReturnSelf();
+            ->willReturnCallback(function ($name, $value) use (&$capturedParams, $qb) {
+                $capturedParams[] = [$name, $value];
+                return $qb;
+            });
         
         $qb
             ->method('getQuery')
@@ -364,6 +365,13 @@ class EventRepositoryTest extends TestCase
             ->willReturn($event);
         
         $result = $this->repository->findOneVisibleBy($id, $isActiveMember);
+        
+        // Vérifier les paramètres capturés
+        $this->assertCount(2, $capturedParams);
+        $this->assertSame('id', $capturedParams[0][0]);
+        $this->assertSame($id, $capturedParams[0][1]);
+        $this->assertSame('now', $capturedParams[1][0]);
+        $this->assertInstanceOf(\DateTimeImmutable::class, $capturedParams[1][1]);
         
         $this->assertSame($event, $result);
     }
