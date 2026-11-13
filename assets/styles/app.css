@@ -1070,3 +1070,49 @@ body > footer,
 
 /* Dashboard : 5e compteur de la cascade */
 .admin-fade-group > *:nth-child(5) { animation-delay: .32s; }
+
+/* ============================================================
+   BREADCRUMB MOBILE — lien parent uniquement (anti-débordement)
+   Desktop : fil complet inchangé. <768px : seul le lien parent
+   reste visible (chevron jaune + libellé), il agit comme un
+   bouton retour. La page active est masquée (display:none).
+   ============================================================ */
+.admin-topbar .gm-breadcrumb {
+    min-width: 0;
+}
+.admin-topbar .gm-breadcrumb .breadcrumb {
+    flex-wrap: nowrap;
+    overflow: hidden;
+}
+.admin-topbar .gm-breadcrumb .breadcrumb-item a {
+    white-space: nowrap;
+}
+
+@media (max-width: 767.98px) {
+    /* Ne garder que le lien parent (l'avant-dernier item) */
+    .gm-breadcrumb .breadcrumb-item {
+        display: none;
+    }
+    .gm-breadcrumb .breadcrumb-item:nth-last-child(2) {
+        display: flex;
+        align-items: center;
+    }
+    /* Remplacer le séparateur "/" par un chevron retour jaune */
+    .gm-breadcrumb .breadcrumb-item:nth-last-child(2)::before {
+        content: '\F285';
+        font-family: 'bootstrap-icons';
+        font-size: .95rem;
+        line-height: 1;
+        color: var(--gm-yellow);
+        margin-right: .3rem;
+        float: none;
+        padding-right: 0;
+    }
+    /* Lien parent tronqué proprement si vraiment trop long */
+    .gm-breadcrumb .breadcrumb-item:nth-last-child(2) a {
+        display: block;
+        max-width: 55vw;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+}
