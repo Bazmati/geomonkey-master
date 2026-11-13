@@ -1129,10 +1129,13 @@ body > footer,
     align-items: center;
     overflow: hidden;
     /* Hero 100% dégradés palette : aucune image requise.
-       Pour activer une photo, déposer public/images/background.jpg puis
-       dé-commenter la ligne url() ci-dessous (couche au-dessus des dégradés). */
+       Pour activer une photo de fond : déposer le fichier dans
+       assets/images/background.jpg (il DOIT exister, sinon AssetMapper
+       refuse de compiler), puis ajouter une couche image en première
+       position du background-image ci-dessous. NB : ne jamais référencer
+       une image absente dans ce fichier, même en commentaire :
+       AssetMapper le détecte et fait échouer la compilation. */
     background-image:
-        /* url('../images/background.jpg'), */
         radial-gradient(ellipse at 25% 15%, rgba(0, 160, 64, .35), transparent 55%),
         radial-gradient(ellipse at 80% 85%, rgba(224, 192, 32, .18), transparent 50%),
         linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
@@ -1485,4 +1488,115 @@ body > footer,
         animation: none !important;
         transition: none !important;
     }
+}
+
+/* ============================================================
+   ADMIN — uniformisation du style "dashboard" sur toutes les pages
+   (aucune modification de template nécessaire)
+   ============================================================ */
+
+/* Apparition douce de chaque page admin */
+.admin-content {
+    animation: gmFadeUp .4s ease both;
+}
+
+/* Signature des titres : trait jaune qui se dessine sous le h1 vert */
+.admin-content h1.text-gm-green {
+    position: relative;
+    padding-bottom: .45rem;
+}
+.admin-content h1.text-gm-green::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 4px;
+    width: 46px;
+    border-radius: 999px;
+    background: var(--gm-yellow);
+    animation: gmUnderlineGrow .45s .15s ease both;
+}
+@keyframes gmUnderlineGrow {
+    from { width: 0; }
+    to   { width: 46px; }
+}
+
+/* Cards conteneurs (listes) : coins arrondis + élévation au survol */
+.admin-content .card.shadow-sm {
+    border-radius: .9rem;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.admin-content .card.shadow-sm:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .35) !important;
+    border-color: color-mix(in srgb, var(--gm-green) 45%, var(--gm-gray-900));
+}
+.admin-content .card.shadow-sm > .card-header:first-child {
+    border-radius: .9rem .9rem 0 0;
+}
+
+/* Lignes de tableaux : surbrillance verte discrète au survol */
+.admin-content tbody tr {
+    transition: background-color .15s ease;
+}
+.admin-content tbody tr:hover td {
+    background-color: color-mix(in srgb, var(--gm-green) 7%, transparent);
+}
+
+/* Accessibilité : couper toutes les animations de cette couche */
+@media (prefers-reduced-motion: reduce) {
+    .admin-content,
+    .admin-content h1.text-gm-green::after {
+        animation: none !important;
+    }
+}
+/* ============================================================
+   TOPBAR & DASHBOARD — anti-débordement mobile (iPhone SE)
+   ============================================================ */
+
+/* Utilitaire : autoriser un enfant flex/grid à rétrécir */
+.gm-minw-0 { min-width: 0; }
+
+/* Topbar : padding compact sur mobile, contenu autorisé à rétrécir */
+.admin-topbar-inner {
+    padding: .75rem 1rem;
+}
+.admin-topbar-inner .btn {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 767.98px) {
+    .admin-topbar-inner {
+        padding: .5rem .75rem;
+        gap: .5rem;
+    }
+    .admin-topbar-inner .d-flex {
+        gap: .5rem !important;
+    }
+    /* Lien parent du fil d'Ariane : largeur encadrée */
+    .gm-breadcrumb .breadcrumb-item:nth-last-child(2) a {
+        max-width: 40vw;
+    }
+}
+
+/* Compteurs : taille de police fluide (pas de dépassement en 2 colonnes) */
+.stat-value {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+}
+
+/* Hero dashboard : padding réduit sur mobile */
+@media (max-width: 767.98px) {
+    .dash-hero {
+        padding: 1.1rem 1.25rem;
+        border-radius: .75rem;
+    }
+    .dash-hero-title {
+        font-size: 1.4rem;
+    }
+}
+
+/* Ceinture de sécurité : le contenu admin n'a jamais besoin de
+   défiler horizontalement (la sidebar mobile est un drawer fixe) */
+.admin-main {
+    overflow-x: hidden;
 }
