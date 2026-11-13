@@ -1116,3 +1116,54 @@ body > footer,
         text-overflow: ellipsis;
     }
 }
+
+/* ============================================================
+   TOPBAR & DASHBOARD — anti-débordement mobile (iPhone SE)
+   ============================================================ */
+
+/* Utilitaire : autoriser un enfant flex/grid à rétrécir */
+.gm-minw-0 { min-width: 0; }
+
+/* Topbar : padding compact sur mobile, contenu autorisé à rétrécir */
+.admin-topbar-inner {
+    padding: .75rem 1rem;
+}
+.admin-topbar-inner .btn {
+    flex: 0 0 auto;
+}
+
+@media (max-width: 767.98px) {
+    .admin-topbar-inner {
+        padding: .5rem .75rem;
+        gap: .5rem;
+    }
+    .admin-topbar-inner .d-flex {
+        gap: .5rem !important;
+    }
+    /* Lien parent du fil d'Ariane : largeur encadrée */
+    .gm-breadcrumb .breadcrumb-item:nth-last-child(2) a {
+        max-width: 40vw;
+    }
+}
+
+/* Compteurs : taille de police fluide (pas de dépassement en 2 colonnes) */
+.stat-value {
+    font-size: clamp(1.75rem, 7vw, 2.5rem);
+}
+
+/* Hero dashboard : padding réduit sur mobile */
+@media (max-width: 767.98px) {
+    .dash-hero {
+        padding: 1.1rem 1.25rem;
+        border-radius: .75rem;
+    }
+    .dash-hero-title {
+        font-size: 1.4rem;
+    }
+}
+
+/* Ceinture de sécurité : le contenu admin n'a jamais besoin de
+   défiler horizontalement (la sidebar mobile est un drawer fixe) */
+.admin-main {
+    overflow-x: hidden;
+}

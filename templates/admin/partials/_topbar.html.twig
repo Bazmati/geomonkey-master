@@ -5,18 +5,18 @@
 {% set page_title = page_title|default(null) %}
 
 <div class="admin-topbar sticky-top">
-    <div class="d-flex align-items-center justify-content-between p-3 w-100">
+    <div class="admin-topbar-inner d-flex align-items-center justify-content-between w-100">
         {# gauche : titre + breadcrumb #}
-        <div class="d-flex align-items-center gap-3">
-            <button type="button" class="btn btn-outline-gm-yellow d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')" 
+        <div class="d-flex align-items-center gap-3 gm-minw-0">
+            <button type="button" class="btn btn-outline-gm-yellow d-lg-none" onclick="document.querySelector('.admin-shell').classList.toggle('sidebar-open')"
                     aria-label="Toggle sidebar" aria-expanded="false">
                 <i class="bi bi-list"></i>
             </button>
-            <div>
+            <div class="gm-minw-0">
                 {{ breadcrumb() }}
             </div>
         </div>
-        
+
         {# droite : bouton retour + futur slot recherche #}
         <div class="d-flex align-items-center gap-2">
             {# Slot pour barre de recherche globale (Ctrl+K) #}
@@ -30,7 +30,7 @@
                 <kbd class="d-none d-lg-inline gm-kbd">Ctrl K</kbd>
             </button>
             <a href="{{ path('app_home') }}" class="btn btn-gm-yellow btn-sm" aria-label="Retour au site public">
-                <i class="bi bi-arrow-left"></i> Site public
+                <i class="bi bi-arrow-left"></i> <span class="d-none d-sm-inline">Site public</span>
             </a>
         </div>
     </div>
