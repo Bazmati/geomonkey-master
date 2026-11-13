@@ -164,7 +164,8 @@
                                             path: path('admin_events_delete', {'id': event.id}),
                                             entity_type: 'événement',
                                             confirm_message: 'Êtes-vous sûr de vouloir supprimer cet événement ?',
-                                            csrf_token: csrf_token('delete' ~ event.id)
+                                            csrf_token: csrf_token('delete' ~ event.id),
+                                            suffix: 'm'
                                         } %}
                                     </div>
                                 </div>

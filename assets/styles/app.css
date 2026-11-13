@@ -690,6 +690,10 @@ body > footer,
     padding: 1rem 1.5rem 0;
 }
 
+.admin-flashes:empty {
+    display: none;
+}
+
 /* --------------------------------------------
    2. RADIOS / CHECKBOX : PLUS DE CHEVAUCHEMENT
    Chaque .form-check devient un flex : la case reste à

@@ -3,13 +3,14 @@
 {# Usage: include with { path: 'route_name', id: entity.id, entity_type: 'EntityName', csrf_token: csrf_token('delete' ~ id) } #}
 {% set entity_type = entity_type|default('element') %}
 {% set confirm_message = confirm_message|default('Êtes-vous sûr de vouloir supprimer cet ' ~ entity_type ~ ' ? Cette action est irréversible.') %}
+{% set suffix = suffix|default('') %}
 
 <!-- Delete Modal -->
-<div class="modal fade" id="deleteModal-{{ id }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ id }}" aria-hidden="true">
+<div class="modal fade" id="deleteModal-{{ id }}{{ suffix }}" tabindex="-1" aria-labelledby="deleteModalLabel-{{ id }}{{ suffix }}" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">
-                <h5 class="modal-title" id="deleteModalLabel-{{ id }}">
+                <h5 class="modal-title" id="deleteModalLabel-{{ id }}{{ suffix }}">
                     <i class="bi bi-trash-fill me-2"></i>
                     Supprimer {{ entity_type|capitalize }}
                 </h5>
@@ -37,7 +38,7 @@
 <button type="button" 
         class="btn btn-danger btn-sm"
         data-bs-toggle="modal" 
-        data-bs-target="#deleteModal-{{ id }}"
+        data-bs-target="#deleteModal-{{ id }}{{ suffix }}"
         title="Supprimer">
     <i class="bi bi-trash-fill"></i>
 </button>

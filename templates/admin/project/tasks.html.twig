@@ -75,15 +75,13 @@
                                                             <a href="{{ path('admin_projects_task_document_download', {document: document.id}) }}">
                                                                 <i class="bi {{ document.icon }}"></i> {{ document.originalName }}
                                                             </a>
-                                                            <form method="post"
-                                                                  action="{{ path('admin_projects_task_document_delete', {document: document.id}) }}"
-                                                                  class="d-inline ms-1"
-                                                                  onsubmit="return confirm('Retirer le document « {{ document.originalName|e('js') }} » ?');">
-                                                                <input type="hidden" name="_token" value="{{ csrf_token('task-doc-delete' ~ document.id) }}">
-                                                                <button type="submit" class="btn btn-sm btn-outline-gm-gray py-0 px-1" title="Retirer ce document">
-                                                                    <i class="bi bi-x"></i>
-                                                                </button>
-                                                            </form>
+                                                            {% include 'front/partials/_delete_button.html.twig' with {
+                                                                id: document.id,
+                                                                path: path('admin_projects_task_document_delete', {document: document.id}),
+                                                                entity_type: 'document',
+                                                                confirm_message: 'Retirer le document « ' ~ document.originalName ~ ' » de cette tâche ?',
+                                                                csrf_token: csrf_token('task-doc-delete' ~ document.id)
+                                                            } %}
                                                         </li>
                                                     {% endfor %}
                                                 </ul>
@@ -96,15 +94,13 @@
                                                 <a href="{{ path('admin_projects_task_edit', {taskId: task.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
                                                     <i class="bi bi-pencil-fill"></i>
                                                 </a>
-                                                <form method="post"
-                                                      action="{{ path('admin_projects_task_delete', {taskId: task.id}) }}"
-                                                      class="d-inline"
-                                                      onsubmit="return confirm('Supprimer la tâche « {{ task.title|e('js') }} » ?');">
-                                                    <input type="hidden" name="_token" value="{{ csrf_token('task-delete' ~ task.id) }}">
-                                                    <button type="submit" class="btn btn-sm btn-outline-gm-gray" title="Supprimer">
-                                                        <i class="bi bi-trash"></i>
-                                                    </button>
-                                                </form>
+                                                {% include 'front/partials/_delete_button.html.twig' with {
+                                                    id: task.id,
+                                                    path: path('admin_projects_task_delete', {taskId: task.id}),
+                                                    entity_type: 'tâche',
+                                                    confirm_message: 'Êtes-vous sûr de vouloir supprimer la tâche « ' ~ task.title ~ ' » ?',
+                                                    csrf_token: csrf_token('task-delete' ~ task.id)
+                                                } %}
                                             </div>
                                         </td>
                                     </tr>
@@ -140,15 +136,14 @@
                                         <a href="{{ path('admin_projects_task_edit', {taskId: task.id}) }}" class="btn btn-sm btn-gm-yellow">
                                             <i class="bi bi-pencil-fill"></i> Modifier
                                         </a>
-                                        <form method="post"
-                                              action="{{ path('admin_projects_task_delete', {taskId: task.id}) }}"
-                                              class="d-inline"
-                                              onsubmit="return confirm('Supprimer la tâche « {{ task.title|e('js') }} » ?');">
-                                            <input type="hidden" name="_token" value="{{ csrf_token('task-delete' ~ task.id) }}">
-                                            <button type="submit" class="btn btn-sm btn-outline-gm-gray">
-                                                <i class="bi bi-trash"></i> Supprimer
-                                            </button>
-                                        </form>
+                                        {% include 'front/partials/_delete_button.html.twig' with {
+                                            id: task.id,
+                                            path: path('admin_projects_task_delete', {taskId: task.id}),
+                                            entity_type: 'tâche',
+                                            confirm_message: 'Êtes-vous sûr de vouloir supprimer la tâche « ' ~ task.title ~ ' » ?',
+                                            csrf_token: csrf_token('task-delete' ~ task.id),
+                                            suffix: 'm'
+                                        } %}
                                     </div>
                                 </div>
                             </div>

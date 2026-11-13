@@ -26,33 +26,33 @@
             {# Topbar sticky : titre + breadcrumb + bouton retour #}
             {% include 'admin/partials/_topbar.html.twig' %}
             
-            {# Messages flash : sous la topbar (titre + breadcrumb) #}
-            {% if app.flashes|length %}
+            {# Messages flash : sous la topbar (titre + breadcrumb)
+               NB : pas de "if app.flashes" ici — getFlashes() CONSOMME le flash
+               bag (all()), un double appel viderait les messages avant l'affichage. #}
                 <div class="admin-flashes">
-                    {% set gm_alert_classes = {
-                        success: 'alert-gm-success',
-                        error: 'alert-gm-danger',
-                        danger: 'alert-gm-danger',
-                        warning: 'alert-gm-warning',
-                        info: 'alert-gm-info',
-                    } %}
-                    {% set gm_alert_icons = {
-                        success: 'bi-check-circle-fill',
-                        error: 'bi-exclamation-circle-fill',
-                        danger: 'bi-exclamation-circle-fill',
-                        warning: 'bi-exclamation-triangle-fill',
-                        info: 'bi-info-circle-fill',
-                    } %}
-                    {% for type, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="alert {{ gm_alert_classes[type] ?? 'alert-gm-info' }} alert-dismissible fade show mb-0" role="alert">
-                                <i class="bi {{ gm_alert_icons[type] ?? 'bi-info-circle-fill' }} me-2" aria-hidden="true"></i>{{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                            </div>
-                        {% endfor %}
+                {% set gm_alert_classes = {
+                    success: 'alert-gm-success',
+                    error: 'alert-gm-danger',
+                    danger: 'alert-gm-danger',
+                    warning: 'alert-gm-warning',
+                    info: 'alert-gm-info',
+                } %}
+                {% set gm_alert_icons = {
+                    success: 'bi-check-circle-fill',
+                    error: 'bi-exclamation-circle-fill',
+                    danger: 'bi-exclamation-circle-fill',
+                    warning: 'bi-exclamation-triangle-fill',
+                    info: 'bi-info-circle-fill',
+                } %}
+                {% for type, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert {{ gm_alert_classes[type] ?? 'alert-gm-info' }} alert-dismissible fade show mb-0" role="alert">
+                            <i class="bi {{ gm_alert_icons[type] ?? 'bi-info-circle-fill' }} me-2" aria-hidden="true"></i>{{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                        </div>
                     {% endfor %}
+                {% endfor %}
                 </div>
-            {% endif %}
             
             {# Contenu principal : scrolle #}
             <div class="admin-content">
