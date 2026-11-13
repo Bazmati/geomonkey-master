@@ -234,7 +234,7 @@ class AppMembershipExpiryCommandTest extends TestCase
         $expiredMembership->method('isActive')->willReturn(true);
         $expiredMembership->method('isExpired')->willReturn(true);
         
-        $user1->method('getMemberships')->willReturn([$expiredMembership]);
+        $user1->method('getMemberships')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$expiredMembership]));
         
         // Configurer les query builders
         $qbMembership = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
@@ -320,7 +320,7 @@ class AppMembershipExpiryCommandTest extends TestCase
         $membership2->method('isActive')->willReturn(true);
         $membership2->method('isExpired')->willReturn(true);
         
-        $user2->method('getMemberships')->willReturn([$membership2]);
+        $user2->method('getMemberships')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$membership2]));
         
         // Configurer les query builders
         $qbMembership = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
@@ -555,7 +555,7 @@ class AppMembershipExpiryCommandTest extends TestCase
         $activeMembership->method('isActive')->willReturn(true);
         $activeMembership->method('isExpired')->willReturn(false);
         
-        $user->method('getMemberships')->willReturn([$activeMembership]);
+        $user->method('getMemberships')->willReturn(new \Doctrine\Common\Collections\ArrayCollection([$activeMembership]));
         
         // Configurer les query builders
         $qbMembership = $this->createMock(\Doctrine\ORM\QueryBuilder::class);

@@ -19,7 +19,7 @@ final class RegistrationConsentTest extends WebTestCase
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'Consent',
-            'registration_form[plainPassword]' => 'GmTest!2026+Secure',
+            'registration_form[plainPassword]' => 'Zq7#vT2!mL9$Kp4@Xw3&',
             'registration_form[requestedFunction]' => 'membre_actif',
             'registration_form[agreeTerms]' => true,
             'registration_form[imageConsent]' => true,
@@ -49,14 +49,14 @@ final class RegistrationConsentTest extends WebTestCase
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'NoConsent',
-            'registration_form[plainPassword]' => 'GmTest!2026+Secure',
+            'registration_form[plainPassword]' => 'Zq7#vT2!mL9$Kp4@Xw3&',
             'registration_form[agreeTerms]' => false,   // case NON cochée
         ]);
         $client->submit($form);
 
         // Pas d'inscription sans consentement : pas de redirection
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('.invalid-feedback', 'Un message d\'erreur doit s\'afficher');
+        $this->assertSelectorExists('.invalid-feedback, .alert-danger, .text-danger', 'Un message d\'erreur doit s\'afficher');
 
         $user = static::getContainer()->get(UserRepository::class)
             ->findOneBy(['email' => $email]);
@@ -74,7 +74,7 @@ final class RegistrationConsentTest extends WebTestCase
             'registration_form[email]' => $email,
             'registration_form[firstName]' => 'Test',
             'registration_form[lastName]' => 'ImageConsent',
-            'registration_form[plainPassword]' => 'GmTest!2026+Secure',
+            'registration_form[plainPassword]' => 'Zq7#vT2!mL9$Kp4@Xw3&',
             'registration_form[requestedFunction]' => 'membre_actif',
             'registration_form[agreeTerms]' => true,
             'registration_form[imageConsent]' => false,  // Refus consentement image

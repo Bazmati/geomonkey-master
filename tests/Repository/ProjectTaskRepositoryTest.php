@@ -2,394 +2,100 @@
 
 namespace App\Tests\Repository;
 
+use App\Entity\Project;
 use App\Entity\ProjectTask;
+use App\Enum\ProjectStatus;
+use App\Enum\ProjectTaskState;
 use App\Repository\ProjectTaskRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ProjectTaskRepositoryTest extends TestCase
+/**
+ * Tests d'intégration de ProjectTaskRepository sur la vraie BDD de test
+ * (rollback automatique par DAMADoctrineTestBundle).
+ */
+class ProjectTaskRepositoryTest extends KernelTestCase
 {
     private ProjectTaskRepository $repository;
-    private ManagerRegistry $registry;
-    private EntityManagerInterface $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        
-        $this->registry
-            ->method('getManagerForClass')
-            ->willReturn($this->em);
-        
-        $this->registry
-            ->method('getManager')
-            ->willReturn($this->em);
-        
-        // Fix ClassMetadata mock - return real ClassMetadata with proper name property
-        $this->em
-            ->method('getClassMetadata')
-            ->willReturn(new ClassMetadata(ProjectTask::class));
-        
-        // Ensure createQueryBuilder returns a QueryBuilder with select/from returning self
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilderMock());
-        
-        $this->repository = new ProjectTaskRepository($this->registry);
+        self::bootKernel();
+        $this->em = static::getContainer()->get('doctrine')->getManager();
+        $this->repository = static::getContainer()->get(ProjectTaskRepository::class);
     }
 
-    /**
-     * Helper to create a properly stubbed QueryBuilder mock
-     */
-    private function createQueryBuilderMock(): QueryBuilder
+    protected function tearDown(): void
     {
-        $qb = $this->createMock(QueryBuilder::class);
-        
-        $qb->method('select')
-            ->willReturnSelf();
-        
-        $qb->method('from')
-            ->willReturnSelf();
-        
-        return $qb;
+        $this->em->close();
+        parent::tearDown();
+    }
+
+    private function createProject(string $slug): Project
+    {
+        $project = new Project();
+        $project->setTitle('Projet ' . $slug);
+        $project->setSlug($slug);
+        $project->setDescription('Description ' . $slug);
+        $project->setStatus(ProjectStatus::InProgress);
+        $project->setIsPublished(true);
+        $this->em->persist($project);
+
+        return $project;
+    }
+
+    private function createTask(Project $project, string $title, int $position): ProjectTask
+    {
+        $task = new ProjectTask();
+        $task->setProject($project);
+        $task->setTitle($title);
+        $task->setState(ProjectTaskState::Todo);
+        $task->setPosition($position);
+        $this->em->persist($task);
+
+        return $task;
     }
 
     public function testGetNextPositionWithNoTasks(): void
     {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // MAX(...) retourne null quand il n'y a pas de résultats
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(null);
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        // null + 1 = 1 (car cast en int)
-        $this->assertEquals(1, $result);
+        $project = $this->createProject('projet-vide');
+        $this->em->flush();
+
+        $this->assertSame(1, $this->repository->getNextPosition($project->getId()));
     }
 
     public function testGetNextPositionWithExistingTasks(): void
     {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // MAX(...) retourne 5 (il y a 5 tâches avec positions 0-5)
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(5);
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        $this->assertEquals(6, $result);
-    }
+        $project = $this->createProject('projet-plein');
+        $this->createTask($project, 'Tâche 1', 1);
+        $this->createTask($project, 'Tâche 2', 2);
+        $this->createTask($project, 'Tâche 3', 5);
+        $this->em->flush();
 
-    public function testGetNextPositionWithMaxAtZero(): void
-    {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // MAX(...) retourne 0 (toutes les tâches sont à position 0)
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(0);
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        $this->assertEquals(1, $result);
-    }
-
-    public function testGetNextPositionWithNegativeMax(): void
-    {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // MAX(...) retourne -5 (cas bizarre mais possible)
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(-5);
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        // -5 + 1 = -4
-        $this->assertEquals(-4, $result);
-    }
-
-    public function testGetNextPositionSelectsMaxPosition(): void
-    {
-        $projectId = 123;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        // Vérifier que select est appelé avec MAX(t.position)
-        $queryBuilder
-            ->expects($this->once())
-            ->method('select')
-            ->with('MAX(t.position)');
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->with('projectId', $projectId)
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(10);
-        
-        $this->repository->getNextPosition($projectId);
+        $this->assertSame(6, $this->repository->getNextPosition($project->getId()), 'MAX(position) + 1, pas COUNT + 1');
     }
 
     public function testGetNextPositionFiltersByProject(): void
     {
-        $projectId = 456;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        // Vérifier que andWhere filtre par project
-        $queryBuilder
-            ->expects($this->once())
-            ->method('andWhere')
-            ->with('t.project = :projectId');
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->with('projectId', $projectId)
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(0);
-        
-        $this->repository->getNextPosition($projectId);
-    }
+        $projectA = $this->createProject('projet-a');
+        $projectB = $this->createProject('projet-b');
+        $this->createTask($projectB, 'Tâche B1', 10);
+        $this->createTask($projectB, 'Tâche B2', 20);
+        $this->em->flush();
 
-    public function testGetNextPositionSetsParameter(): void
-    {
-        $projectId = 789;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        // Vérifier que setParameter est appelé avec le bon paramètre
-        $queryBuilder
-            ->expects($this->once())
-            ->method('setParameter')
-            ->with('projectId', $projectId);
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(0);
-        
-        $this->repository->getNextPosition($projectId);
+        $this->assertSame(1, $this->repository->getNextPosition($projectA->getId()), 'Les tâches d\'un autre projet ne comptent pas');
+        $this->assertSame(21, $this->repository->getNextPosition($projectB->getId()));
     }
 
     public function testGetNextPositionReturnsInt(): void
     {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(100);
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        $this->assertIsInt($result);
-        $this->assertEquals(101, $result);
-    }
+        $project = $this->createProject('projet-int');
+        $this->createTask($project, 'Tâche', 100);
+        $this->em->flush();
 
-    public function testGetNextPositionWithStringMax(): void
-    {
-        $projectId = 1;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // MAX(...) retourne une chaîne
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn('5');
-        
-        $result = $this->repository->getNextPosition($projectId);
-        
-        // Le cast en int convertit '5' en 5, puis +1 = 6
-        $this->assertEquals(6, $result);
+        $result = $this->repository->getNextPosition($project->getId());
+
+        $this->assertIsInt($result);
+        $this->assertSame(101, $result);
     }
 }

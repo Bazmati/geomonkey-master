@@ -2,6 +2,7 @@
 
 namespace App\Tests\Controller\Admin;
 
+use App\Entity\Membership;
 use App\Entity\User;
 use App\Enum\OfficeFunction;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
@@ -26,6 +27,17 @@ final class UserControllerTest extends WebTestCase
         $admin->setRoles(['ROLE_ADMIN']);
         $admin->setOfficeFunction(OfficeFunction::President);
         $admin->setRoles(['ROLE_ADMIN']);
+
+        // Le EntityVoter exige une adhésion active (défense en profondeur),
+        // sinon le président est rétrogradé en OfficeFunction::None -> /access-denied
+        $membership = new Membership();
+        $membership->setIsActive(true);
+        $membership->setAmount(1500);
+        $membership->setStartedAt((new \DateTimeImmutable())->sub(new \DateInterval('P1M')));
+        $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P11M')));
+        $membership->setUser($admin);
+        $em->persist($membership);
+
         $em->persist($admin);
         $em->flush();
 

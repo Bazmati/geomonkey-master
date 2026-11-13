@@ -4,373 +4,94 @@ namespace App\Tests\Repository;
 
 use App\Entity\Donation;
 use App\Repository\DonationRepository;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\QueryBuilder;
-use Doctrine\Persistence\ManagerRegistry;
-use PHPUnit\Framework\TestCase;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class DonationRepositoryTest extends TestCase
+/**
+ * Tests d'intégration de DonationRepository sur la vraie BDD de test
+ * (rollback automatique par DAMADoctrineTestBundle).
+ */
+class DonationRepositoryTest extends KernelTestCase
 {
     private DonationRepository $repository;
-    private ManagerRegistry $registry;
-    private EntityManagerInterface $em;
+    private \Doctrine\ORM\EntityManagerInterface $em;
 
     protected function setUp(): void
     {
-        $this->em = $this->createMock(EntityManagerInterface::class);
-        $this->registry = $this->createMock(ManagerRegistry::class);
-        
-        // Configurer le mock du registry
-        $this->registry
-            ->method('getManagerForClass')
-            ->willReturn($this->em);
-        
-        $this->registry
-            ->method('getManager')
-            ->willReturn($this->em);
-        
-        $this->registry
-            ->method('getRepository')
-            ->willReturn($this->repository ?? null);
-        
-        // Fix ClassMetadata mock - return real ClassMetadata with proper name property
-        $this->em
-            ->method('getClassMetadata')
-            ->willReturn(new ClassMetadata(Donation::class));
-        
-        // Ensure createQueryBuilder returns a QueryBuilder with select/from returning self
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($this->createQueryBuilderMock());
-        
-        $this->repository = new DonationRepository($this->registry);
+        self::bootKernel();
+        $this->em = static::getContainer()->get('doctrine')->getManager();
+        $this->repository = static::getContainer()->get(DonationRepository::class);
+    }
+
+    protected function tearDown(): void
+    {
+        $this->em->close();
+        parent::tearDown();
     }
 
     /**
-     * Helper to create a properly stubbed QueryBuilder mock
+     * createdAt est posé à "maintenant" par le constructeur : on le force
+     * par réflexion pour tester le filtrage par année.
      */
-    private function createQueryBuilderMock(): QueryBuilder
+    private function createDonation(int $amount, string $status, ?\DateTimeImmutable $createdAt): Donation
     {
-        $qb = $this->createMock(QueryBuilder::class);
-        
-        $qb->method('select')
-            ->willReturnSelf();
-        
-        $qb->method('from')
-            ->willReturnSelf();
-        
-        return $qb;
+        $donation = new Donation();
+        $donation->setAmount($amount);
+        $donation->setPaymentStatus($status);
+
+        if (null !== $createdAt) {
+            $property = new \ReflectionProperty(Donation::class, 'createdAt');
+            $property->setValue($donation, $createdAt);
+        }
+
+        $this->em->persist($donation);
+
+        return $donation;
     }
 
     public function testGetPaidTotalForYear(): void
     {
-        // Créer des données de test
-        $year = 2024;
-        
-        // Configurer le QueryBuilder mock
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        // Cas 1: Total avec des dons
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(15000); // 150,00€ en centimes
-        
-        $result = $this->repository->getPaidTotalForYear($year);
-        
-        $this->assertEquals(15000, $result);
-        
-        // Cas 2: Aucun don
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(null);
-        
-        $result = $this->repository->getPaidTotalForYear($year);
-        
-        $this->assertEquals(0, $result);
+        $this->createDonation(1500, Donation::STATUS_PAID, new \DateTimeImmutable('2026-02-15 12:00:00'));
+        $this->createDonation(2500, Donation::STATUS_PAID, new \DateTimeImmutable('2026-06-01 12:00:00'));
+        $this->em->flush();
+
+        $this->assertSame(4000, $this->repository->getPaidTotalForYear(2026));
     }
 
-    public function testGetPaidTotalForYearWithNoResults(): void
+    public function testGetPaidTotalForYearIgnoresOtherStatusesAndYears(): void
     {
-        $year = 2025;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(null);
-        
-        $result = $this->repository->getPaidTotalForYear($year);
-        
-        $this->assertEquals(0, $result);
+        $this->createDonation(1000, Donation::STATUS_PAID, new \DateTimeImmutable('2026-03-01 12:00:00'));
+        $this->createDonation(9999, Donation::STATUS_PENDING, new \DateTimeImmutable('2026-03-02 12:00:00'));
+        $this->createDonation(9999, Donation::STATUS_FAILED, new \DateTimeImmutable('2026-03-03 12:00:00'));
+        $this->createDonation(9999, Donation::STATUS_PAID, new \DateTimeImmutable('2025-03-01 12:00:00'));
+        $this->em->flush();
+
+        $this->assertSame(1000, $this->repository->getPaidTotalForYear(2026));
+    }
+
+    public function testGetPaidTotalForYearWithNoDonations(): void
+    {
+        $this->assertSame(0, $this->repository->getPaidTotalForYear(2030));
     }
 
     public function testFindPaidForYear(): void
     {
-        $year = 2024;
-        
-        // Créer des dons mocks
-        $donation1 = $this->createMock(Donation::class);
-        $donation2 = $this->createMock(Donation::class);
-        $expectedDonations = [$donation1, $donation2];
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('orderBy')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getResult')
-            ->willReturn($expectedDonations);
-        
-        $result = $this->repository->findPaidForYear($year);
-        
+        $oldest = $this->createDonation(1000, Donation::STATUS_PAID, new \DateTimeImmutable('2026-01-10 12:00:00'));
+        $newest = $this->createDonation(2000, Donation::STATUS_PAID, new \DateTimeImmutable('2026-09-20 12:00:00'));
+        $pending = $this->createDonation(3000, Donation::STATUS_PENDING, new \DateTimeImmutable('2026-05-05 12:00:00'));
+        $otherYear = $this->createDonation(4000, Donation::STATUS_PAID, new \DateTimeImmutable('2024-05-05 12:00:00'));
+        $this->em->flush();
+
+        $result = $this->repository->findPaidForYear(2026);
+
         $this->assertCount(2, $result);
-        $this->assertSame($donation1, $result[0]);
-        $this->assertSame($donation2, $result[1]);
+        $this->assertSame($newest, $result[0], 'Tri par date de création décroissante');
+        $this->assertSame($oldest, $result[1]);
+        $this->assertNotContains($pending, $result);
+        $this->assertNotContains($otherYear, $result);
     }
 
-    public function testFindPaidForYearWithNoResults(): void
+    public function testFindPaidForYearWithNoDonations(): void
     {
-        $year = 2025;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('orderBy')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getResult')
-            ->willReturn([]);
-        
-        $result = $this->repository->findPaidForYear($year);
-        
-        $this->assertEmpty($result);
-        $this->assertIsArray($result);
-    }
-
-    public function testFindPaidForYearOrdersByDateDescending(): void
-    {
-        $year = 2024;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        // Vérifier que orderBy est appelé avec DESC
-        $queryBuilder
-            ->expects($this->once())
-            ->method('orderBy')
-            ->with('d.createdAt', 'DESC');
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getResult')
-            ->willReturn([]);
-        
-        $this->repository->findPaidForYear($year);
-    }
-
-    public function testFindPaidForYearFiltersByStatus(): void
-    {
-        $year = 2024;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        // Vérifier que le filtre sur paymentStatus est appliqué
-        $queryBuilder
-            ->expects($this->atLeastOnce())
-            ->method('setParameter')
-            ->with('status', Donation::STATUS_PAID);
-        
-        $queryBuilder
-            ->method('orderBy')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getResult')
-            ->willReturn([]);
-        
-        $this->repository->findPaidForYear($year);
-    }
-
-    public function testGetPaidTotalForYearFiltersByStatus(): void
-    {
-        $year = 2024;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        // Vérifier que le filtre sur paymentStatus est appliqué
-        $queryBuilder
-            ->expects($this->atLeastOnce())
-            ->method('setParameter')
-            ->with('status', Donation::STATUS_PAID);
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(0);
-        
-        $this->repository->getPaidTotalForYear($year);
-    }
-
-    public function testGetPaidTotalForYearFiltersByDateRange(): void
-    {
-        $year = 2024;
-        
-        $queryBuilder = $this->createMock(\Doctrine\ORM\QueryBuilder::class);
-        $query = $this->createMock(\Doctrine\ORM\Query::class);
-        
-        $this->em
-            ->method('createQueryBuilder')
-            ->willReturn($queryBuilder);
-        
-        $queryBuilder
-            ->method('select')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('andWhere')
-            ->willReturnSelf();
-        
-        $queryBuilder
-            ->method('setParameter')
-            ->willReturnSelf();
-        
-        // Vérifier que les paramètres de date sont corrects
-        $queryBuilder
-            ->expects($this->exactly(3)) // start, end, status
-            ->method('setParameter');
-        
-        $queryBuilder
-            ->method('getQuery')
-            ->willReturn($query);
-        
-        $query
-            ->method('getSingleScalarResult')
-            ->willReturn(0);
-        
-        $this->repository->getPaidTotalForYear($year);
+        $this->assertSame([], $this->repository->findPaidForYear(2031));
     }
 }
