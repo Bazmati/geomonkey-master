@@ -126,18 +126,14 @@
                     <h2 class="h4 mb-3"><i class="bi bi-bookmarks text-gm-green"></i> À lire aussi</h2>
                     <div class="row g-4">
                         {% for r in related %}
+                            {% set r_img = image_url(r, 'medium') %}
                             <div class="col-md-4">
                                 <a href="{{ path('app_blog_show', {'slug': r.slug}) }}"
                                    class="text-decoration-none h-100 d-block">
-                                    <article class="home-card h-100">
-                                        {% if r.hasImage %}
-                                            {{ image_tag(r, 'medium', 'Illustration de l\'article ' ~ r.title, 'home-card-img') }}
-                                        {% else %}
-                                            <div class="home-card-img home-card-img-empty"><i class="bi bi-newspaper"></i></div>
-                                        {% endif %}
-                                        <div class="home-card-body">
-                                            <h3 class="h6 text-light mb-2">{{ r.title }}</h3>
-                                            <p class="text-muted small mb-0">{{ r.excerpt(90) }}</p>
+                                    <article class="blog-card blog-card-mini h-100 {{ r_img ? '' : 'blog-card-noimg' }}"
+                                             {% if r_img %}style="background-image: url('{{ r_img }}')"{% endif %}>
+                                        <div class="blog-card-overlay">
+                                            <h3 class="blog-card-title h6">{{ r.title }}</h3>
                                             <span class="proj-card-cta">
                                                 Lire <i class="bi bi-arrow-right"></i>
                                             </span>

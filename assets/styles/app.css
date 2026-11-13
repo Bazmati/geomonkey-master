@@ -1652,45 +1652,50 @@ body > footer,
    FRONT — Blog : À la une, fiche article, fin d'article
    ============================================================ */
 
-/* ----- Carte "À la une" de la liste ----- */
-.blog-featured {
+/* ----- Cartes articles : image en fond + dégradé + texte par-dessus ----- */
+.blog-card {
+    position: relative;
     display: flex;
-    flex-direction: column;
-    background: var(--gm-surface);
+    align-items: flex-end;
+    min-height: 320px;
     border: 1px solid var(--gm-gray-900);
     border-radius: 1.25rem;
     overflow: hidden;
-    text-decoration: none;
+    background-color: var(--gm-surface);
+    background-size: cover;
+    background-position: center;
     transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
 }
-.blog-featured:hover {
+.blog-card:hover {
     transform: translateY(-4px);
     border-color: color-mix(in srgb, var(--gm-green) 50%, var(--gm-gray-900));
     box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .4);
 }
-.blog-featured-img {
+.blog-card-noimg {
+    background-image:
+        radial-gradient(ellipse at 20% 15%, rgba(0, 160, 64, .25), transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(224, 192, 32, .14), transparent 50%),
+        linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
+}
+.blog-card-overlay {
+    position: relative;
     width: 100%;
-    height: 260px;
-    object-fit: cover;
+    padding: 1.2rem 1.3rem 1.3rem;
+    background: linear-gradient(180deg, transparent 0%, rgba(28, 28, 26, .82) 40%, rgba(28, 28, 26, .96) 100%);
 }
-.blog-featured-img-empty {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 2.6rem;
-    color: var(--gm-gray-500);
-    background: rgba(255, 255, 255, .04);
-}
-.blog-featured-body {
-    padding: 1.4rem 1.5rem 1.5rem;
-    flex: 1 1 auto;
-}
-.blog-featured-title {
+.blog-card-title {
     color: var(--gm-white);
-    font-size: clamp(1.3rem, 3vw, 1.8rem);
     font-weight: 800;
-    margin-bottom: .5rem;
+    text-shadow: 0 2px 16px rgba(0, 0, 0, .55);
 }
+.blog-card-featured .blog-card-title { font-size: clamp(1.3rem, 3vw, 1.8rem); }
+.blog-card-excerpt { color: var(--gm-gray-200); margin-bottom: .35rem; }
+.blog-card-meta { color: var(--gm-gray-300); font-size: .85rem; margin-bottom: 0; }
+/* La une : plus imposante */
+.blog-card-featured { min-height: 400px; }
+.blog-card-featured .blog-card-overlay { padding: 1.6rem 1.7rem 1.7rem; }
+/* Mini-cartes "À lire aussi" */
+.blog-card-mini { min-height: 220px; }
 
 /* ----- Fiche article ----- */
 .blog-lead {
@@ -1724,16 +1729,14 @@ body > footer,
     color: var(--gm-bg);
 }
 
-/* ----- À la une en horizontal sur grand écran ----- */
+/* ----- La une : plus haute sur grand écran ----- */
 @media (min-width: 992px) {
-    .blog-featured { flex-direction: row; }
-    .blog-featured-img,
-    .blog-featured-img-empty { width: 52%; height: auto; min-height: 320px; flex: 0 0 52%; }
-    .blog-featured-body { display: flex; flex-direction: column; justify-content: center; }
+    .blog-card-featured { min-height: 460px; }
+    .blog-card { min-height: 340px; }
 }
 
 /* Accessibilité */
 @media (prefers-reduced-motion: reduce) {
-    .blog-featured, .gm-tag-pill { transition: none !important; }
-    .blog-featured:hover { transform: none; }
+    .blog-card, .gm-tag-pill { transition: none !important; }
+    .blog-card:hover { transform: none; }
 }

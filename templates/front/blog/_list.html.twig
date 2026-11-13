@@ -1,31 +1,29 @@
 {# Liste d'articles réutilisable : reçoit "posts"
-   1er article = carte "À la une" horizontale, les suivants = grille #}
+   1er article = carte "À la une" horizontale, les suivants = grille
+   Image = fond plein cadre + dégradé + texte par-dessus #}
 {% if posts is empty %}
     <div class="alert alert-gm-info">
         <i class="bi bi-info-circle me-2"></i> Aucun article publié pour le moment. Revenez bientôt !
     </div>
 {% else %}
     {% set featured = posts|first %}
+    {% set featured_img = image_url(featured, 'large') %}
 
     {# ===== À la une ===== #}
     <a href="{{ path('app_blog_show', {'slug': featured.slug}) }}"
        class="text-decoration-none">
-        <article class="blog-featured gmFadeUp">
-            {% if featured.hasImage %}
-                {{ image_tag(featured, 'large', 'Illustration de l\'article ' ~ featured.title, 'blog-featured-img') }}
-            {% else %}
-                <div class="blog-featured-img blog-featured-img-empty"><i class="bi bi-newspaper"></i></div>
-            {% endif %}
-            <div class="blog-featured-body">
+        <article class="blog-card blog-card-featured {{ featured_img ? '' : 'blog-card-noimg' }} gmFadeUp"
+                 {% if featured_img %}style="background-image: url('{{ featured_img }}')"{% endif %}>
+            <div class="blog-card-overlay">
                 <span class="badge bg-gm-yellow text-gm-bg mb-2">
                     <i class="bi bi-star me-1"></i> À la une
                     {% if featured.category %} · {{ featured.category.name }}{% endif %}
                 </span>
-                <h2 class="blog-featured-title">{{ featured.title }}</h2>
-                <p class="text-muted mb-2">
+                <h2 class="blog-card-title">{{ featured.title }}</h2>
+                <p class="blog-card-excerpt mb-2">
                     {{ featured.summary ?? featured.excerpt(160) }}
                 </p>
-                <p class="text-muted small mb-0">
+                <p class="blog-card-meta mb-2">
                     <i class="bi bi-person"></i>
                     {{ featured.author ? (featured.author.firstName ~ ' ' ~ featured.author.lastName) : 'Bureau' }}
                     · <i class="bi bi-calendar"></i> {{ (featured.publishedAt ?? featured.createdAt)|date('d/m/Y') }}
@@ -43,27 +41,18 @@
     {% if rest|length > 0 %}
         <div class="row g-4 mt-1">
             {% for post in rest %}
+                {% set img = image_url(post, 'medium') %}
                 <div class="col-md-6 col-lg-4">
                     <a href="{{ path('app_blog_show', {'slug': post.slug}) }}"
                        class="text-decoration-none h-100 d-block">
-                        <article class="home-card position-relative gmFadeUp"
-                                 style="animation-delay: {{ loop.index0 * 60 }}ms">
-                            {% if post.hasImage %}
-                                {{ image_tag(post, 'medium', 'Illustration de l\'article ' ~ post.title, 'home-card-img') }}
-                            {% else %}
-                                <div class="home-card-img home-card-img-empty"><i class="bi bi-newspaper"></i></div>
-                            {% endif %}
-                            {% if post.category %}
-                                <span class="badge bg-gm-green text-gm-white position-absolute top-0 end-0 m-2">
-                                    {{ post.category.name }}
-                                </span>
-                            {% endif %}
-                            <div class="home-card-body">
-                                <h3 class="h5 text-light mb-2">{{ post.title }}</h3>
-                                <p class="text-muted small mb-2">
-                                    {{ post.summary ?? post.excerpt(120) }}
-                                </p>
-                                <p class="text-muted small mb-0">
+                        <article class="blog-card h-100 {{ img ? '' : 'blog-card-noimg' }} gmFadeUp"
+                                 style="animation-delay: {{ loop.index0 * 60 }}ms{% if img %}; background-image: url('{{ img }}'){% endif %}">
+                            <div class="blog-card-overlay">
+                                {% if post.category %}
+                                    <span class="badge bg-gm-green text-gm-white mb-2">{{ post.category.name }}</span>
+                                {% endif %}
+                                <h3 class="blog-card-title">{{ post.title }}</h3>
+                                <p class="blog-card-meta mb-2">
                                     <i class="bi bi-person"></i>
                                     {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
                                     · {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
