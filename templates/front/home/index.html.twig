@@ -1,175 +1,308 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}GéoMonkey - Accueil{% endblock %}
+{% block title %}GéoMonkey — Créer des événements culturels qui font rêver{% endblock %}
+{% block meta_description %}GéoMonkey : association culturelle et conviviale. Concerts, ateliers, rencontres et projets créatifs, pour les jeunes et les moins jeunes. Rejoins-nous !{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
-    <header class="hero-section py-5">
-        <div class="container py-5">
-            <div class="row align-items-center g-5">
-                <div class="col-lg-7">
-                    <span class="badge text-bg-warning text-dark mb-3">Association culturelle & conviviale</span>
-                    <h1 class="display-4 fw-bold text-warning mb-3">
-                        Bienvenue chez GéoMonkey
+    {# ================= HERO : l'envie de rêve ================= #}
+    <header class="home-hero">
+        <div class="home-hero-overlay"></div>
+        <div class="container position-relative">
+            <div class="row align-items-center justify-content-center text-center">
+                <div class="col-lg-9">
+                    <span class="badge home-hero-badge mb-4">
+                        <i class="bi bi-stars me-1"></i> Association culturelle &amp; conviviale
+                    </span>
+                    <h1 class="home-hero-title mb-4">
+                        Créer des événements culturels
+                        <span class="home-hero-highlight">qui font rêver</span>
                     </h1>
-                    <p class="lead mb-4">
-                        GéoMonkey organise des événements culturels, artisanaux et conviviaux.
-                        Notre site centralise l’actualité, la présentation de l’association et les futures inscriptions.
+                    <p class="home-hero-sub mb-4">
+                        Concerts, ateliers, rencontres et projets créatifs —
+                        GéoMonkey rassemble les jeunes et les moins jeunes
+                        pour faire vivre la culture ensemble. Pas besoin d'être un pro :
+                        juste l'envie de créer et de partager.
                     </p>
-                    <div class="d-flex flex-wrap gap-3">
-                        {#<a href="{{ path('app_events') }}" class="btn btn-warning btn-lg fw-semibold">Voir les événements</a>
-                        <a href="{{ path('app_about') }}" class="btn btn-outline-light btn-lg">Découvrir l’association</a>#}
+                    <div class="d-flex flex-wrap justify-content-center gap-3">
+                        <a href="{{ path('app_event_index') }}" class="btn btn-warning btn-lg fw-semibold px-4">
+                            <i class="bi bi-calendar2-event me-2"></i>Nos événements
+                        </a>
+                        <a href="{{ path('app_membership_register') }}" class="btn btn-success btn-lg fw-semibold px-4">
+                            <i class="bi bi-person-plus me-2"></i>Rejoindre l'aventure
+                        </a>
                     </div>
-                </div>
-
-                <div class="col-lg-5 text-center">
-                    <img src="{{ asset('images/logo.png') }}" alt="Logo GeoMonkey" class="img-fluid hero-logo">
+                    <p class="home-hero-hint mt-4 mb-0">
+                        <i class="bi bi-emoji-smile me-1"></i>
+                        Ouvert à tous · Adhésion à prix doux · Ambiance bonne enfant
+                    </p>
                 </div>
             </div>
         </div>
     </header>
 
-    <main>
+    {# ================= PILIERS : ce qui nous anime ================= #}
+    <section class="py-5">
+        <div class="container">
+            <div class="row g-4 home-fade-group text-center">
+                <div class="col-md-4">
+                    <div class="home-pillar">
+                        <div class="home-pillar-icon text-success"><i class="bi bi-palette2"></i></div>
+                        <h2 class="h4 text-warning">Créer</h2>
+                        <p class="text-muted mb-0">Des concerts, des ateliers, des projets artistiques — tout commence par une idée et l'envie de la concrétiser.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="home-pillar">
+                        <div class="home-pillar-icon text-warning"><i class="bi bi-people-fill"></i></div>
+                        <h2 class="h4 text-warning">Partager</h2>
+                        <p class="text-muted mb-0">La culture n'a de goût que si on la partage. Ici, chaque génération apporte sa couleur.</p>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="home-pillar">
+                        <div class="home-pillar-icon text-danger"><i class="bi bi-balloon-heart-fill"></i></div>
+                        <h2 class="h4 text-warning">Fêter</h2>
+                        <p class="text-muted mb-0">Des moments conviviaux, de la musique, des rencontres — la vie associative qui fait du bien.</p>
+                    </div>
+                </div>
+            </div>
+
+            {# Chiffres clés animés #}
+            <div class="row row-cols-2 row-cols-lg-4 g-3 mt-4 text-center">
+                <div class="col">
+                    <p class="home-stat-value text-success" data-count="{{ stats.events }}">0</p>
+                    <p class="home-stat-label">événements organisés</p>
+                </div>
+                <div class="col">
+                    <p class="home-stat-value text-warning" data-count="{{ stats.projects }}">0</p>
+                    <p class="home-stat-label">projets menés</p>
+                </div>
+                <div class="col">
+                    <p class="home-stat-value text-warning" data-count="{{ stats.members }}">0</p>
+                    <p class="home-stat-label">membres motivés</p>
+                </div>
+                <div class="col">
+                    <p class="home-stat-value text-success" data-count="{{ stats.posts }}">0</p>
+                    <p class="home-stat-label">actualités publiées</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {# ================= PROCHAINS ÉVÉNEMENTS ================= #}
+    <section class="py-5 home-alt">
+        <div class="container">
+            <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                <div>
+                    <h2 class="text-warning fw-bold mb-1">Ça arrive bientôt</h2>
+                    <p class="text-muted mb-0">Les prochains rendez-vous de l'asso — inscriptions ouvertes.</p>
+                </div>
+                <a href="{{ path('app_event_index') }}" class="btn btn-outline-warning btn-sm">
+                    Tout le programme <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+
+            {% if upcomingEvents is empty %}
+                <div class="text-center py-5 text-muted">
+                    <i class="bi bi-moon-stars fs-1"></i>
+                    <p class="mt-2 mb-0">Le programme se prépare en coulisses…<br>
+                    <a href="{{ path('app_membership_register') }}" class="link-warning">Rejoins-nous</a> pour être tenu au courant en premier !</p>
+                </div>
+            {% else %}
+                <div class="row g-4">
+                    {% for event in upcomingEvents %}
+                        <div class="col-md-6 col-lg-4">
+                            <a href="{{ path('app_event_show', {id: event.id}) }}" class="text-decoration-none">
+                                <article class="home-card h-100">
+                                    {% set media = image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null) %}
+                                    {% if media %}
+                                        <img src="{{ media }}" alt="" loading="lazy" class="home-card-img">
+                                    {% else %}
+                                        <div class="home-card-img home-card-img-empty">
+                                            <i class="bi bi-calendar2-event"></i>
+                                        </div>
+                                    {% endif %}
+                                    <div class="home-card-body">
+                                        <div class="d-flex justify-content-between align-items-start gap-2">
+                                            <h3 class="h5 text-light mb-1">{{ event.title }}</h3>
+                                            <span class="home-date-chip">
+                                                <span class="fw-bold">{{ event.startDate ? event.startDate|date('d') }}</span>
+                                                <span class="small">{{ event.startDate ? event.startDate|date('M')|upper : '?' }}</span>
+                                            </span>
+                                        </div>
+                                        <p class="text-muted small mb-2">
+                                            <i class="bi bi-clock me-1"></i>{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '—' }}
+                                            {% if event.location %} · <i class="bi bi-geo-alt me-1"></i>{{ event.location }}{% endif %}
+                                        </p>
+                                        {% if event.isMembersOnly %}
+                                            <span class="badge border-warning text-warning"><i class="bi bi-lock me-1"></i>Membres</span>
+                                        {% else %}
+                                            <span class="badge border-success text-success"><i class="bi bi-unlock me-1"></i>Ouvert à tous</span>
+                                        {% endif %}
+                                    </div>
+                                </article>
+                            </a>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    </section>
+
+    {# ================= PROJETS EN COURS ================= #}
+    {% if ongoingProjects is not empty %}
         <section class="py-5">
             <div class="container">
-                <div class="row mb-4">
-                    <div class="col-lg-8">
-                        <h2 class="text-warning fw-bold">Présentation institutionnelle</h2>
-                        <p class="text-muted">
-                            Retrouvez ici les informations essentielles sur l’association et son identité.
-                        </p>
+                <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                    <div>
+                        <h2 class="text-warning fw-bold mb-1">Les projets qui avancent</h2>
+                        <p class="text-muted mb-0">Ce que l'asso construit en ce moment, en coulisses comme sur le devant de la scène.</p>
                     </div>
+                    <a href="{{ path('app_project_index') }}" class="btn btn-outline-warning btn-sm">
+                        Tous les projets <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
                 </div>
-
                 <div class="row g-4">
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
-                            <div class="card-body">
-                                <h3 class="h5 text-warning">Présentation + valeurs</h3>
-                                <p class="mb-0">Comprendre le projet, sa mission et ses valeurs fondatrices.</p>
-                            </div>
-                            <div class="card-footer bg-transparent border-success">
-                                {#<a href="{{ path('app_about') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
-                            </div>
+                    {% for project in ongoingProjects %}
+                        <div class="col-md-6 col-lg-4">
+                            <a href="{{ path('app_project_show', {slug: project.slug}) }}" class="text-decoration-none">
+                                <article class="home-card h-100">
+                                    {% set media = image_url(project, 'medium') ?? (project.galleryImages is not empty ? image_url(project.galleryImages|first, 'medium') : null) %}
+                                    {% if media %}
+                                        <img src="{{ media }}" alt="" loading="lazy" class="home-card-img">
+                                    {% else %}
+                                        <div class="home-card-img home-card-img-empty"><i class="bi bi-kanban"></i></div>
+                                    {% endif %}
+                                    <div class="home-card-body">
+                                        <span class="badge {{ project.status.badgeClass }} mb-2">{{ project.status.label }}</span>
+                                        <h3 class="h5 text-light mb-2">{{ project.title }}</h3>
+                                        <p class="text-muted small mb-0">{{ project.publicTeaser }}</p>
+                                    </div>
+                                </article>
+                            </a>
                         </div>
-                    </div>
-
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
-                            <div class="card-body">
-                                <h3 class="h5 text-warning">Historique</h3>
-                                <p class="mb-0">Les grandes étapes qui ont construit GéoMonkey.</p>
-                            </div>
-                            <div class="card-footer bg-transparent border-success">
-                                {#<a href="{{ path('app_history') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
-                            <div class="card-body">
-                                <h3 class="h5 text-warning">Équipe fondatrice</h3>
-                                <p class="mb-0">Les personnes à l’origine de l’association.</p>
-                            </div>
-                            <div class="card-footer bg-transparent border-success">
-                                {#<a href="{{ path('app_team') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-md-6 col-xl-3">
-                        <div class="card h-100 shadow-sm bg-dark text-light border-success">
-                            <div class="card-body">
-                                <h3 class="h5 text-warning">Galerie photos</h3>
-                                <p class="mb-0">Un aperçu visuel de nos événements et moments forts.</p>
-                            </div>
-                            <div class="card-footer bg-transparent border-success">
-                                {#<a href="{{ path('app_gallery') }}" class="link-warning text-decoration-none">Lire la suite</a>#}
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
+    {% endif %}
 
-        <section class="py-5 bg-surface">
+    {# ================= DERNIÈRES ACTUS ================= #}
+    {% if recentPosts is not empty %}
+        <section class="py-5 home-alt">
             <div class="container">
-                <div class="row align-items-start g-4">
-                    <div class="col-lg-7">
-                        <h2 class="text-warning fw-bold mb-4">Derniers événements</h2>
-
-                        <div class="row g-4">
-                            <div class="col-md-6">
-                                <div class="card h-100 bg-dark text-light border-warning">
-                                    <div class="card-body">
-                                        <span class="badge text-bg-success mb-2">À venir</span>
-                                        <h3 class="h5">Concert de printemps</h3>
-                                        <p class="mb-1">Date : à définir</p>
-                                        <p class="mb-0">Lieu : à définir</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div class="col-md-6">
-                                <div class="card h-100 bg-dark text-light border-warning">
-                                    <div class="card-body">
-                                        <span class="badge text-bg-secondary mb-2">Passé</span>
-                                        <h3 class="h5">Rencontre associative</h3>
-                                        <p class="mb-1">Date : à définir</p>
-                                        <p class="mb-0">Lieu : à définir</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        {# lien futur : page événement détaillée #}
-                        {# <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-outline-warning mt-3">Voir le détail</a> #}
+                <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                    <div>
+                        <h2 class="text-warning fw-bold mb-1">Le journal de l'asso</h2>
+                        <p class="text-muted mb-0">Nos dernières actualités, coulisses et souvenirs d'événements.</p>
                     </div>
-
-                    <div class="col-lg-5" id="newsletter">
-                        <div class="card bg-dark text-light border-success shadow-sm">
-                            <div class="card-body p-4">
-                                <h2 class="text-warning fw-bold">Newsletter</h2>
-                                <p>Inscris-toi pour recevoir les actualités de GéoMonkey.</p>
-
-                                <form method="post">
-                                    <div class="mb-3">
-                                        <label for="newsletter_email" class="form-label">Adresse email</label>
-                                        <input type="email" class="form-control" id="newsletter_email" name="email" placeholder="ton@email.fr">
+                    <a href="{{ path('app_blog_index') }}" class="btn btn-outline-warning btn-sm">
+                        Toutes les actus <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+                <div class="row g-4">
+                    {% for post in recentPosts %}
+                        <div class="col-md-6 col-lg-4">
+                            <a href="{{ path('app_blog_show', {slug: post.slug}) }}" class="text-decoration-none">
+                                <article class="home-card h-100">
+                                    {% set media = image_url(post, 'medium') ?? (post.galleryImages is not empty ? image_url(post.galleryImages|first, 'medium') : null) %}
+                                    {% if media %}
+                                        <img src="{{ media }}" alt="" loading="lazy" class="home-card-img">
+                                    {% else %}
+                                        <div class="home-card-img home-card-img-empty"><i class="bi bi-journal-text"></i></div>
+                                    {% endif %}
+                                    <div class="home-card-body">
+                                        {% if post.category %}
+                                            <span class="badge bg-success mb-2">{{ post.category.name }}</span>
+                                        {% endif %}
+                                        <h3 class="h5 text-light mb-2">{{ post.title }}</h3>
+                                        <p class="text-muted small mb-2">{{ post.summary ?? post.excerpt(120) }}</p>
+                                        <p class="small text-secondary mb-0">
+                                            <i class="bi bi-person me-1"></i>{{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
+                                            · {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
+                                        </p>
                                     </div>
-                                    <button type="submit" class="btn btn-success w-100 fw-semibold">
-                                        S’inscrire
-                                    </button>
-                                </form>
-
-                                {# lien futur : gestion consentement RGPD / double opt-in #}
-                            </div>
+                                </article>
+                            </a>
                         </div>
-                    </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
+    {% endif %}
 
-        {# Section Adhésion #}
-        <section class="py-5 bg-dark">
+    {# ================= GALERIE ================= #}
+    {% if galleryImages is not empty %}
+        <section class="py-5">
             <div class="container">
-                <div class="row align-items-center">
-                    <div class="col-lg-8 mb-4 mb-lg-0">
-                        <h2 class="text-warning fw-bold">Deviens membre de GéoMonkey</h2>
-                        <p class="text-light">
-                            Rejoins notre association et participe à nos événements culturels et conviviaux. 
-                            L'adhésion est ouverte à tous !
-                        </p>
+                <div class="d-flex flex-wrap justify-content-between align-items-end mb-4 gap-2">
+                    <div>
+                        <h2 class="text-warning fw-bold mb-1">L'asso en images</h2>
+                        <p class="text-muted mb-0">Quelques moments partagés — la suite est dans la galerie.</p>
                     </div>
-                    <div class="col-lg-4 text-lg-end">
-                        <a href="{{ path('app_membership_register') }}" class="btn btn-warning btn-lg fw-semibold">
-                            <i class="bi bi-person-plus me-2"></i>Faire une demande d'adhésion
-                        </a>
-                    </div>
+                    <a href="{{ path('app_gallery_index') }}" class="btn btn-outline-warning btn-sm">
+                        Voir la galerie <i class="bi bi-images ms-1"></i>
+                    </a>
+                </div>
+                <div class="row g-2 g-md-3">
+                    {% for image in galleryImages %}
+                        <div class="col-4 col-md-2">
+                            <a href="{{ path('app_gallery_index') }}">
+                                <img src="{{ image_url(image, 'medium') }}" alt="{{ image.alt }}" loading="lazy" class="home-mosaic">
+                            </a>
+                        </div>
+                    {% endfor %}
                 </div>
             </div>
         </section>
-    </main>
+    {% endif %}
+
+    {# ================= CTA ADHÉSION : le grand rêve ================= #}
+    <section class="home-cta">
+        <div class="container py-5 text-center">
+            <p class="home-cta-kicker mb-2">Prêt·e à nous rejoindre ?</p>
+            <h2 class="display-6 fw-bold text-white mb-3">
+                La culture, c'est mieux <span class="text-warning">quand on la vit ensemble</span>
+            </h2>
+            <p class="text-white-50 mb-4 col-lg-8 mx-auto">
+                Que tu aies 16 ans ou 76 ans, que tu viennes pour jouer, bricoler, photographier
+                ou juste rencontrer du monde — il y a toujours une place pour toi chez GéoMonkey.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{{ path('app_membership_register') }}" class="btn btn-warning btn-lg fw-semibold px-4">
+                    <i class="bi bi-person-plus me-2"></i>Devenir membre
+                </a>
+                <a href="{{ path('app_donation') }}" class="btn btn-outline-light btn-lg px-4">
+                    <i class="bi bi-heart me-2"></i>Soutenir l'asso
+                </a>
+            </div>
+        </div>
+    </section>
+
+    {# ================= NEWSLETTER ================= #}
+    <section class="py-5 home-alt">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-5" id="newsletter">
+                    <div class="card bg-dark text-light border-success shadow-sm">
+                        <div class="card-body p-4">
+                            <h2 class="text-warning fw-bold"><i class="bi bi-envelope-paper-heart me-2"></i>Newsletter</h2>
+                            <p class="text-muted">Reçois les news et les nouvelles dates avant tout le monde.</p>
+                            <form method="post">
+                                <div class="mb-3">
+                                    <label for="newsletter_email" class="form-label">Adresse email</label>
+                                    <input type="email" class="form-control" id="newsletter_email" name="email" placeholder="ton@email.fr" required>
+                                </div>
+                                <button type="submit" class="btn btn-success w-100 fw-semibold">
+                                    <i class="bi bi-send me-1"></i>S'inscrire
+                                </button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

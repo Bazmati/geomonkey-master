@@ -1118,52 +1118,220 @@ body > footer,
 }
 
 /* ============================================================
-   TOPBAR & DASHBOARD — anti-débordement mobile (iPhone SE)
+   FRONT — Page d'accueil : hero, piliers, cards, CTA adhésion
    ============================================================ */
 
-/* Utilitaire : autoriser un enfant flex/grid à rétrécir */
-.gm-minw-0 { min-width: 0; }
-
-/* Topbar : padding compact sur mobile, contenu autorisé à rétrécir */
-.admin-topbar-inner {
-    padding: .75rem 1rem;
+/* ----- Hero plein écran rêvé ----- */
+.home-hero {
+    position: relative;
+    min-height: 92vh;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+    /* Hero 100% dégradés palette : aucune image requise.
+       Pour activer une photo, déposer public/images/background.jpg puis
+       dé-commenter la ligne url() ci-dessous (couche au-dessus des dégradés). */
+    background-image:
+        /* url('../images/background.jpg'), */
+        radial-gradient(ellipse at 25% 15%, rgba(0, 160, 64, .35), transparent 55%),
+        radial-gradient(ellipse at 80% 85%, rgba(224, 192, 32, .18), transparent 50%),
+        linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
+    background-size: cover;
+    background-position: center;
 }
-.admin-topbar-inner .btn {
+.home-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(ellipse at 30% 20%, rgba(0, 160, 64, .25), transparent 60%),
+        linear-gradient(180deg, rgba(28, 28, 26, .82), rgba(28, 28, 26, .68) 45%, var(--gm-bg));
+}
+.home-hero-badge {
+    background: rgba(224, 192, 32, .12);
+    border: 1px solid rgba(224, 192, 32, .45);
+    color: var(--gm-yellow);
+    padding: .5rem 1rem;
+    border-radius: 999px;
+    font-size: .85rem;
+    letter-spacing: .04em;
+}
+.home-hero-title {
+    color: var(--gm-white);
+    font-size: clamp(2.1rem, 6vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.12;
+}
+.home-hero-highlight {
+    display: inline-block;
+    color: var(--gm-yellow);
+    position: relative;
+}
+.home-hero-highlight::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: .1em;
+    height: .32em;
+    background: rgba(224, 192, 32, .18);
+    border-radius: .2em;
+    z-index: -1;
+}
+.home-hero-sub {
+    color: var(--gm-gray-200);
+    font-size: clamp(1rem, 2.2vw, 1.2rem);
+    max-width: 46rem;
+    margin-inline: auto;
+}
+.home-hero-hint {
+    color: var(--gm-gray-300);
+    font-size: .9rem;
+}
+.home-hero > .container {
+    animation: gmFadeUp .7s ease both;
+}
+
+/* ----- Sections alternées (variation sombre subtile) ----- */
+.home-alt {
+    background: var(--gm-gray-700);
+}
+
+/* ----- Piliers ----- */
+.home-pillar {
+    padding: 1.5rem 1.25rem;
+    border-radius: 1rem;
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    transition: transform .2s ease, border-color .2s ease;
+    height: 100%;
+}
+.home-pillar:hover {
+    transform: translateY(-4px);
+    border-color: var(--gm-yellow);
+}
+.home-pillar-icon {
+    font-size: 2rem;
+    margin-bottom: .5rem;
+}
+.home-pillar-icon i {
+    background: var(--gm-surface);
+    padding: .8rem;
+    border-radius: .8rem;
+    border: 1px solid var(--gm-gray-900);
+}
+
+/* ----- Chiffres clés ----- */
+.home-stat-value {
+    font-size: clamp(1.9rem, 5vw, 2.8rem);
+    font-weight: 800;
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+.home-stat-label {
+    color: var(--gm-gray-300);
+    font-size: .85rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin: 0;
+}
+
+/* ----- Cards génériques (événements / projets / actus) ----- */
+.home-card {
+    display: flex;
+    flex-direction: column;
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1rem;
+    overflow: hidden;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    height: 100%;
+}
+.home-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--gm-green) 50%, var(--gm-gray-900));
+    box-shadow: 0 .6rem 1.5rem rgba(0, 0, 0, .4);
+}
+.home-card-img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    transition: transform .35s ease;
+}
+.home-card:hover .home-card-img {
+    transform: scale(1.05);
+}
+.home-card-img-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.4rem;
+    color: var(--gm-gray-500);
+    background: rgba(255, 255, 255, .04);
+}
+.home-card-body {
+    padding: 1rem 1.1rem 1.2rem;
+    flex: 1 1 auto;
+}
+.home-date-chip {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.05;
+    padding: .35rem .6rem;
+    border-radius: .6rem;
+    background: color-mix(in srgb, var(--gm-yellow) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gm-yellow) 40%, transparent);
+    color: var(--gm-yellow);
     flex: 0 0 auto;
+    white-space: nowrap;
 }
 
-@media (max-width: 767.98px) {
-    .admin-topbar-inner {
-        padding: .5rem .75rem;
-        gap: .5rem;
-    }
-    .admin-topbar-inner .d-flex {
-        gap: .5rem !important;
-    }
-    /* Lien parent du fil d'Ariane : largeur encadrée */
-    .gm-breadcrumb .breadcrumb-item:nth-last-child(2) a {
-        max-width: 40vw;
-    }
+/* ----- Mosaïque galerie ----- */
+.home-mosaic {
+    width: 100%;
+    aspect-ratio: 1;
+    object-fit: cover;
+    border-radius: .75rem;
+    border: 1px solid var(--gm-gray-900);
+    transition: transform .2s ease, border-color .2s ease;
+}
+.home-mosaic:hover {
+    transform: scale(1.04);
+    border-color: var(--gm-yellow);
 }
 
-/* Compteurs : taille de police fluide (pas de dépassement en 2 colonnes) */
-.stat-value {
-    font-size: clamp(1.75rem, 7vw, 2.5rem);
+/* ----- CTA adhésion : dégradé vert signature ----- */
+.home-cta {
+    background:
+        radial-gradient(rgba(255, 255, 255, .05) 1px, transparent 1.5px) 0 0 / 20px 20px,
+        linear-gradient(135deg, rgba(0, 160, 64, .32), transparent 60%),
+        var(--gm-bg);
+    border-top: 1px solid var(--gm-gray-900);
+    border-bottom: 1px solid var(--gm-gray-900);
+}
+.home-cta-kicker {
+    color: var(--gm-green);
+    text-transform: uppercase;
+    letter-spacing: .12em;
+    font-size: .8rem;
+    font-weight: 600;
 }
 
-/* Hero dashboard : padding réduit sur mobile */
-@media (max-width: 767.98px) {
-    .dash-hero {
-        padding: 1.1rem 1.25rem;
-        border-radius: .75rem;
-    }
-    .dash-hero-title {
-        font-size: 1.4rem;
-    }
+/* ----- Animations en cascade ----- */
+.home-fade-group > * {
+    animation: gmFadeUp .45s ease both;
 }
+.home-fade-group > *:nth-child(2) { animation-delay: .08s; }
+.home-fade-group > *:nth-child(3) { animation-delay: .16s; }
 
-/* Ceinture de sécurité : le contenu admin n'a jamais besoin de
-   défiler horizontalement (la sidebar mobile est un drawer fixe) */
-.admin-main {
-    overflow-x: hidden;
+@media (prefers-reduced-motion: reduce) {
+    .home-hero > .container,
+    .home-fade-group > *,
+    .home-card,
+    .home-pillar,
+    .home-mosaic {
+        animation: none !important;
+        transition: none !important;
+    }
 }

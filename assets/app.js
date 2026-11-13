@@ -8,7 +8,7 @@ console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 // ----- Dashboard : count-up des cartes stats -----
 document.addEventListener('DOMContentLoaded', () => {
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    document.querySelectorAll('.stat-value[data-count]').forEach((el) => {
+    document.querySelectorAll('.stat-value[data-count], .home-stat-value[data-count]').forEach((el) => {
         const target = parseInt(el.dataset.count, 10) || 0;
         if (reduceMotion) { el.textContent = target; return; }
         const duration = 600;
