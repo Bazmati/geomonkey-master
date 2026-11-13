@@ -6,6 +6,7 @@ use App\Entity\ProjectTask;
 use App\Entity\User;
 use App\Enum\ProjectTaskState;
 use App\Repository\ProjectRepository;
+use Doctrine\Bundle\DoctrineBundle\Attribute\MapEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -71,6 +72,7 @@ class ProjectController extends AbstractController
      * responsable désigné de la tâche (avec jeton CSRF).
      */
     #[Route('/{slug}/task/{task}/state', name: 'task_state', methods: ['POST'])]
+    #[MapEntity(mapping: ['task' => 'id'])]
     #[IsGranted('IS_AUTHENTICATED')]
     public function taskState(Request $request, string $slug, ProjectTask $task): Response
     {

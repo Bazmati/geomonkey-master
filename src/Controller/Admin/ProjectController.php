@@ -10,6 +10,7 @@ use App\Form\ProjectType;
 use App\Repository\ProjectTaskRepository;
 use App\Repository\ProjectRepository;
 use App\Service\ImageManager;
+use Doctrine\Bundle\DoctrineBundle\Attribute\MapEntity;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -192,6 +193,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/task/{taskId}/edit', name: 'admin_projects_task_edit', methods: ['GET', 'POST'])]
+    #[MapEntity(mapping: ['taskId' => 'id'])]
     #[IsGranted('ENTITY_EDIT', 'task')]
     public function taskEdit(
         Request $request,
@@ -219,6 +221,7 @@ final class ProjectController extends AbstractController
     }
 
     #[Route('/task/{taskId}', name: 'admin_projects_task_delete', methods: ['POST'])]
+    #[MapEntity(mapping: ['taskId' => 'id'])]
     #[IsGranted('ENTITY_EDIT', 'task')]
     public function taskDelete(
         Request $request,
@@ -243,6 +246,7 @@ final class ProjectController extends AbstractController
      * Retire un document uploadé d'une tâche (fichier + entité).
      */
     #[Route('/task-document/{document}', name: 'admin_projects_task_document_delete', methods: ['POST'])]
+    #[MapEntity(mapping: ['document' => 'id'])]
     #[IsGranted('ENTITY_EDIT', 'document')]
     public function taskDocumentDelete(
         Request $request,
