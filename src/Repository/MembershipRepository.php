@@ -68,6 +68,22 @@ class MembershipRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Vérifie si un utilisateur a une adhésion active (non expirée)
+     * C'est le garde-fou principal pour les accès membres-only
+     */
+    public function hasActiveMembership(User $user): bool
+    {
+        $membership = $this->findLastActiveByUser($user);
+        
+        if (!$membership) {
+            return false;
+        }
+        
+        // Vérifie aussi que l'adhésion n'est pas expirée
+        return !$membership->isExpired();
+    }
+
     //    /**
     //     * @return Membership[] Returns an array of Membership objects
     //     */
