@@ -1,15 +1,28 @@
 {% extends 'front/base.html.twig' %}
 
 {% block title %}Présentation - GéoMonkey{% endblock %}
+{% block meta_description %}Découvre GéoMonkey : notre mission, nos valeurs, notre histoire et notre équipe. Une association culturelle et conviviale ouverte à tous.{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
-    <div class="container py-5">
+    {# ===== Hero de section ===== #}
+    <header class="pres-hero">
+        <div class="container position-relative text-center">
+            <span class="badge home-hero-badge mb-3">
+                <i class="bi bi-info-circle me-1"></i> Qui sommes-nous ?
+            </span>
+            <h1 class="pres-hero-title">Présentation de GéoMonkey</h1>
+            <p class="home-hero-sub mx-auto mb-0">
+                Une assoc' qui rassemble les jeunes et les moins jeunes autour
+                de projets culturels qui font vibrer. Découvre qui nous sommes,
+                ce qui nous anime, et ce qu'on t'a réservé.
+            </p>
+        </div>
+    </header>
 
+    <main class="container py-5">
         {{ breadcrumb() }}
-        
-        <h1 class="text-warning mb-4"><i class="bi bi-info-circle me-2"></i>Présentation de GéoMonkey</h1>
 
         {% if pages is empty %}
             <div class="alert alert-gm-info">
@@ -17,20 +30,30 @@
                 La présentation arrive bientôt !
             </div>
         {% else %}
-            {% for page in pages %}
-                <div class="card shadow-sm mb-4 border-warning">
-                    <div class="card-body">
-                        <h2 class="text-warning">
-                            <i class="bi bi-pin-angle me-2"></i>{{ page.title }}
-                        </h2>
-                        <p class="text-white pre-line">{{ page.content|slice(0, 300) }}{% if page.content|length > 300 %}…{% endif %}</p>
-                        <a href="{{ path('app_presentation_show', {'slug': page.slug}) }}"
-                           class="btn btn-outline-warning btn-sm">
-                            Lire la page complète <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                </div>
-            {% endfor %}
+            <div class="pres-list">
+                {% for page in pages %}
+                    {% set media = page.galleryImage and page.galleryImage.isPublished
+                        ? image_url(page.galleryImage, 'large') : null %}
+                    <a href="{{ path('app_presentation_show', {'slug': page.slug}) }}"
+                       class="text-decoration-none">
+                        <article class="pres-card {{ media ? '' : 'pres-card-noimg' }}"
+                                 {% if media %}style="background-image: url('{{ media }}')"{% endif %}>
+                            <div class="pres-card-overlay">
+                                <span class="pres-card-num">{{ '%02d'|format(loop.index) }}</span>
+                                <div class="pres-card-text">
+                                    <h2 class="pres-card-title">{{ page.title }}</h2>
+                                    <p class="pres-card-excerpt mb-0">
+                                        {{ page.content|slice(0, 180)|trim }}{% if page.content|length > 180 %}…{% endif %}
+                                    </p>
+                                    <span class="pres-card-cta">
+                                        Lire la page <i class="bi bi-arrow-right ms-1"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </article>
+                    </a>
+                {% endfor %}
+            </div>
         {% endif %}
-    </div>
+    </main>
 {% endblock %}

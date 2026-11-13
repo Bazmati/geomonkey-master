@@ -1129,13 +1129,10 @@ body > footer,
     align-items: center;
     overflow: hidden;
     /* Hero 100% dégradés palette : aucune image requise.
-       Pour activer une photo de fond : déposer le fichier dans
-       assets/images/background.jpg (il DOIT exister, sinon AssetMapper
-       refuse de compiler), puis ajouter une couche image en première
-       position du background-image ci-dessous (chemin relatif :
-       deux points slash images slash background punto jpg — sans quoi
-       le simple fait de l'écrire ici fait échouer la compilation !). */
+       Pour activer une photo, déposer public/images/background.jpg puis
+       dé-commenter la ligne url() ci-dessous (couche au-dessus des dégradés). */
     background-image:
+        /* url('../images/background.jpg'), */
         radial-gradient(ellipse at 25% 15%, rgba(0, 160, 64, .35), transparent 55%),
         radial-gradient(ellipse at 80% 85%, rgba(224, 192, 32, .18), transparent 50%),
         linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
@@ -1334,6 +1331,157 @@ body > footer,
     .home-card,
     .home-pillar,
     .home-mosaic {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ============================================================
+   FRONT — Présentation : hero, cartes-bandeaux, page article
+   ============================================================ */
+
+/* ----- Hero de la liste ----- */
+.pres-hero {
+    position: relative;
+    padding: 5.5rem 0 4rem;
+    overflow: hidden;
+    background-image:
+        radial-gradient(ellipse at 20% 10%, rgba(0, 160, 64, .3), transparent 55%),
+        radial-gradient(ellipse at 85% 90%, rgba(224, 192, 32, .16), transparent 50%),
+        linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
+}
+.pres-hero-title {
+    color: var(--gm-white);
+    font-size: clamp(1.9rem, 5vw, 3rem);
+    font-weight: 800;
+    margin-bottom: .75rem;
+}
+
+/* ----- Cartes-bandeaux : image de fond + texte par-dessus ----- */
+.pres-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+.pres-card {
+    position: relative;
+    min-height: 300px;
+    border-radius: 1.25rem;
+    background-size: cover;
+    background-position: center;
+    border: 1px solid var(--gm-gray-900);
+    overflow: hidden;
+    transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease;
+    animation: gmFadeUp .45s ease both;
+}
+.pres-card:hover {
+    transform: translateY(-4px);
+    border-color: color-mix(in srgb, var(--gm-yellow) 55%, var(--gm-gray-900));
+    box-shadow: 0 .75rem 1.75rem rgba(0, 0, 0, .45);
+}
+.pres-card-noimg {
+    background-image:
+        radial-gradient(ellipse at 15% 15%, rgba(0, 160, 64, .28), transparent 55%),
+        radial-gradient(ellipse at 85% 85%, rgba(224, 192, 32, .2), transparent 50%),
+        linear-gradient(160deg, var(--gm-gray-700), var(--gm-surface));
+}
+.pres-card-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: flex-end;
+    gap: 1.5rem;
+    padding: 2rem;
+    background: linear-gradient(180deg, rgba(28, 28, 26, .1) 20%, rgba(28, 28, 26, .92));
+}
+.pres-card-num {
+    font-size: clamp(2.2rem, 6vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1;
+    color: transparent;
+    -webkit-text-stroke: 1.5px var(--gm-yellow);
+    flex: 0 0 auto;
+    align-self: flex-end;
+    padding-bottom: .2rem;
+}
+.pres-card-text { min-width: 0; }
+.pres-card-title {
+    color: var(--gm-white);
+    font-weight: 700;
+    font-size: clamp(1.3rem, 3.5vw, 1.8rem);
+    margin-bottom: .35rem;
+}
+.pres-card-excerpt {
+    color: var(--gm-gray-200);
+    max-width: 46rem;
+    margin-bottom: .6rem;
+}
+.pres-card-cta {
+    color: var(--gm-yellow);
+    font-size: .9rem;
+    font-weight: 600;
+}
+.pres-card:hover .pres-card-cta i {
+    transform: translateX(4px);
+    display: inline-block;
+    transition: transform .2s ease;
+}
+
+/* ----- Page article : hero image + titre par-dessus ----- */
+.pres-show-hero {
+    position: relative;
+    min-height: 55vh;
+    display: flex;
+    align-items: flex-end;
+    padding: 4rem 0 3rem;
+    overflow: hidden;
+}
+.pres-show-hero-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    animation: gmSlowZoom 12s ease both;
+}
+.pres-show-hero-overlay {
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(180deg, rgba(28, 28, 26, .35), rgba(28, 28, 26, .9)),
+        radial-gradient(ellipse at 25% 25%, rgba(0, 160, 64, .18), transparent 60%);
+}
+.pres-show-hero-title {
+    color: var(--gm-white);
+    font-size: clamp(2rem, 5.5vw, 3.4rem);
+    font-weight: 800;
+    margin-bottom: .75rem;
+    text-shadow: 0 2px 24px rgba(0, 0, 0, .6);
+}
+.pres-show-hero-excerpt {
+    color: var(--gm-gray-200);
+    font-size: clamp(1rem, 2.2vw, 1.15rem);
+    max-width: 44rem;
+    text-shadow: 0 1px 12px rgba(0, 0, 0, .7);
+}
+@keyframes gmSlowZoom {
+    from { transform: scale(1); }
+    to   { transform: scale(1.06); }
+}
+
+/* ----- Contenu de la page ----- */
+.pres-show-content {
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1.25rem;
+    padding: 2.5rem;
+    animation: gmFadeUp .5s ease both;
+}
+
+/* Accessibilité */
+@media (prefers-reduced-motion: reduce) {
+    .pres-card,
+    .pres-show-content,
+    .pres-show-hero-bg {
         animation: none !important;
         transition: none !important;
     }

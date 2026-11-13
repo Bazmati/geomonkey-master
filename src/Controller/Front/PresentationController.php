@@ -27,14 +27,29 @@ class PresentationController extends AbstractController
 
     #[Route('/{slug}', name: 'show', methods: ['GET'])]
     public function show(
-        #[MapEntity(mapping: ['slug' => 'slug'])] PresentationPage $page
+        #[MapEntity(mapping: ['slug' => 'slug'])] PresentationPage $page,
+        PresentationPageRepository $repo,
     ): Response {
         if (!$page->isActive()) {
             throw $this->createNotFoundException();
         }
 
+        // Pages voisines (navigation précédent / suivant)
+        $all = $repo->findActiveOrdered();
+        $position = null;
+        foreach ($all as $i => $activePage) {
+            if ($activePage->getId() === $page->getId()) {
+                $position = $i;
+                break;
+            }
+        }
+        $prev = null !== $position && $position > 0 ? $all[$position - 1] : null;
+        $next = null !== $position && $position < \count($all) - 1 ? $all[$position + 1] : null;
+
         return $this->render('front/presentation/show.html.twig', [
             'page' => $page,
+            'prev' => $prev,
+            'next' => $next,
             'image_url' => $page->getGalleryImage()?->isPublished()
                 ? $this->imageManager->getUrl($page->getGalleryImage(), 'large')
                 : null,

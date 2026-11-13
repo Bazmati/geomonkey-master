@@ -1,36 +1,64 @@
 {% extends 'front/base.html.twig' %}
 
 {% block title %}{{ page.title }} - GéoMonkey{% endblock %}
+{% block meta_description %}{{ page.content|slice(0, 155)|trim }}…{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
 
-    {{ breadcrumb() }}
+    {# ===== Hero : image de fond + titre et descriptif par-dessus ===== #}
+    <header class="pres-show-hero {{ image_url ? '' : 'pres-hero' }}">
+        {% if image_url %}
+            <div class="pres-show-hero-bg" style="background-image: url('{{ image_url }}')"></div>
+        {% endif %}
+        <div class="pres-show-hero-overlay"></div>
+        <div class="container position-relative">
+            <h1 class="pres-show-hero-title">{{ page.title }}</h1>
+            <p class="pres-show-hero-excerpt mb-0">
+                {{ page.content|slice(0, 160)|trim }}{% if page.content|length > 160 %}…{% endif %}
+            </p>
+        </div>
+    </header>
 
-    <div class="container py-5">
+    <main class="container py-5">
+        {{ breadcrumb() }}
+
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm border-warning">
-                    <div class="card-header bg-warning text-dark text-center">
-                        <h2 class="mb-0"><i class="bi bi-info-circle me-2"></i>{{ page.title }}</h2>
-                    </div>
-                    <div class="card-body">
-                    {% if page.galleryImage and page.galleryImage.isPublished and image_url %}
-                        <div class="text-center mb-4">
-                            <img src="{{ asset(image_url) }}"
-                                alt="{{ page.galleryImage.alt }}"
-                                class="img-fluid rounded max-h-400" loading="lazy">
-                        </div>
-                    {% endif %}
+                <article class="pres-show-content">
+                    <p class="pre-line mb-0">{{ page.content }}</p>
+                </article>
 
-                        <p class="text-white pre-line">{{ page.content }}</p>
-
-                        <a href="{{ path('app_presentation_index') }}" class="btn btn-outline-warning mt-3">
-                            <i class="bi bi-arrow-left me-1"></i> Retour à la présentation
+                {# Navigation précédent / suivant #}
+                <nav class="d-flex justify-content-between gap-3 mt-4" aria-label="Navigation entre les pages">
+                    {% if prev %}
+                        <a href="{{ path('app_presentation_show', {'slug': prev.slug}) }}"
+                           class="btn btn-outline-warning btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i>{{ prev.title|slice(0, 25) }}{% if prev.title|length > 25 %}…{% endif %}
                         </a>
-                    </div>
-                </div>
+                    {% else %}
+                        <span></span>
+                    {% endif %}
+                    {% if next %}
+                        <a href="{{ path('app_presentation_show', {'slug': next.slug}) }}"
+                           class="btn btn-outline-warning btn-sm text-end">
+                            {{ next.title|slice(0, 25) }}{% if next.title|length > 25 %}…{% endif %}<i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    {% endif %}
+                </nav>
+
+                {# CTA adhésion #}
+                <section class="home-cta rounded-3 mt-5 py-4 text-center">
+                    <h2 class="h5 text-white mb-2">Ça te plaît ? Il reste une place pour toi.</h2>
+                    <p class="text-white-50 small mb-3">Rejoins GéoMonkey et participe au prochain chapitre de l'aventure.</p>
+                    <a href="{{ path('app_membership_register') }}" class="btn btn-warning fw-semibold">
+                        <i class="bi bi-person-plus me-1"></i>Devenir membre
+                    </a>
+                    <a href="{{ path('app_presentation_index') }}" class="btn btn-outline-light ms-2">
+                        <i class="bi bi-arrow-left me-1"></i>Toute la présentation
+                    </a>
+                </section>
             </div>
         </div>
-    </div>
+    </main>
 {% endblock %}
