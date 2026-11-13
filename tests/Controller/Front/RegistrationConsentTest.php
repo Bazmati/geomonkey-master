@@ -56,7 +56,7 @@ final class RegistrationConsentTest extends WebTestCase
 
         // Pas d'inscription sans consentement : pas de redirection
         $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('.invalid-feedback, .alert-danger, .text-danger', 'Un message d\'erreur doit s\'afficher');
+        $this->assertSelectorExists('.invalid-feedback, .alert-gm-danger, .text-gm-danger, .text-danger', 'Un message d\'erreur doit s\'afficher');
 
         $user = static::getContainer()->get(UserRepository::class)
             ->findOneBy(['email' => $email]);

@@ -20,7 +20,7 @@
             <div class="card border-warning shadow-lg border-radius-15 overflow-hidden">
                 {# En-tête avec logo #}
                 <div class="card-header bg-gm-warning text-gm-bg text-center py-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="img-fluid rounded-circle border border-3 border-gm-bg img-avatar">
+                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="img-fluid rounded-circle border border-3 border-gm-bg img-avatar" loading="lazy">
                     <h2 class="h4 mt-3 mb-0 fw-bold">GéoMonkey</h2>
                     <p class="mb-0 small">Espace membre</p>
                 </div>
@@ -28,14 +28,14 @@
                 {# Corps de la card #}
                 <div class="card-body bg-gm-surface text-gm-text">
                     {% if app.user %}
-                        <div class="alert alert-info mb-4">
+                        <div class="alert alert-gm-info mb-4">
                             Vous êtes déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, 
                             <a href="{{ logout_path() }}" class="alert-link text-gm-green">Se déconnecter</a>
                         </div>
                     {% endif %}
 
                     {% if error %}
-                        <div class="alert alert-danger mb-4">
+                        <div class="alert alert-gm-danger mb-4">
                             <strong>Erreur :</strong> {{ error.messageKey|trans(error.messageData, 'security') }}
                         </div>
                     {% endif %}

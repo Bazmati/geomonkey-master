@@ -46,7 +46,7 @@
            ============================================================ #}
         <div class="d-lg-none">
             {% if events is empty %}
-                <div class="alert alert-info">
+                <div class="alert alert-gm-info">
                     <i class="bi bi-info-circle"></i> Aucun événement à afficher pour ce filtre. Revenez bientôt !
                 </div>
             {% else %}
@@ -56,7 +56,7 @@
                             <div class="card h-100 shadow-sm">
                                 {% if event.hasImage %}
                                     <img src="{{ asset('uploads/events/' ~ event.image) }}"
-                                         class="card-img-top" alt="Illustration de l'événement {{ event.title }}">
+                                         class="card-img-top" alt="Illustration de l'événement {{ event.title }}" loading="lazy">
                                 {% endif %}
                                 <div class="card-body d-flex flex-column">
                                     <div class="mb-2">

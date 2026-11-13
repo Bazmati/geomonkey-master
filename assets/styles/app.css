@@ -705,3 +705,42 @@ body.admin-body > .container.mt-3:empty {
     min-height: 600px;
     margin: 20px 0;
 }
+/* ============================================================
+   ACCESSIBILITÉ & FEEDBACK (RGAA 2.1 / WCAG AA)
+   ============================================================ */
+
+/* Focus visible, clavier uniquement (outline verte sur les
+   éléments interactifs ; les champs de formulaire gardent leur
+   box-shadow vert dédié, pas de double signal). */
+:focus-visible {
+    outline: 2px solid var(--gm-green);
+    outline-offset: 2px;
+}
+
+.form-control:focus-visible,
+.form-select:focus-visible,
+.form-check-input:focus-visible {
+    outline: none;
+}
+
+/* Alertes thème sombre : succès / danger (warning & info existent déjà) */
+.alert-gm-success {
+    background-color: rgba(0, 160, 64, 0.15);
+    border-color: var(--gm-green);
+    color: var(--gm-green);
+}
+.alert-gm-success .alert-link { color: var(--gm-white); }
+
+.alert-gm-danger,
+.alert-gm-error {
+    background-color: rgba(229, 72, 77, 0.15);
+    border-color: var(--gm-danger);
+    color: var(--gm-danger);
+}
+.alert-gm-danger .alert-link,
+.alert-gm-error .alert-link { color: var(--gm-white); }
+
+/* Feedback tactile léger au clic sur les boutons actifs */
+.btn:active:not(:disabled):not(.btn-static) {
+    transform: scale(0.98);
+}
