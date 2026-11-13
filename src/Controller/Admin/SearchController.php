@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Repository\BlogPostRepository;
 use App\Repository\EventRepository;
+use App\Repository\ProjectRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -27,6 +28,7 @@ class SearchController extends AbstractController
         UserRepository $users,
         EventRepository $events,
         BlogPostRepository $posts,
+        ProjectRepository $projects,
     ): JsonResponse {
         $q = trim((string) $request->query->get('q', ''));
 
@@ -61,6 +63,14 @@ class SearchController extends AbstractController
             ->getQuery()
             ->getResult();
 
+        $projectRows = $projects->createQueryBuilder('pr')
+            ->where('LOWER(pr.title) LIKE :q')
+            ->setParameter('q', $like)
+            ->orderBy('pr.id', 'DESC')
+            ->setMaxResults(self::MAX_PER_TYPE)
+            ->getQuery()
+            ->getResult();
+
         $groups = [];
 
         $userItems = array_map(fn ($u) => [
@@ -88,6 +98,15 @@ class SearchController extends AbstractController
         ], $postRows);
         if ($postItems) {
             $groups[] = ['label' => 'Articles', 'items' => $postItems];
+        }
+
+        $projectItems = array_map(fn ($pr) => [
+            'title' => $pr->getTitle(),
+            'subtitle' => $pr->getStatus()->getLabel() . ($pr->isPublished() ? '' : ' · brouillon'),
+            'url' => $this->generateUrl('admin_projects_edit', ['id' => $pr->getId()]),
+        ], $projectRows);
+        if ($projectItems) {
+            $groups[] = ['label' => 'Projets', 'items' => $projectItems];
         }
 
         return $this->json(['groups' => $groups]);

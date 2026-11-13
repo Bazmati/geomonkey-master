@@ -277,8 +277,17 @@ final class ProjectController extends AbstractController
         }
 
         foreach ($files as $file) {
+            // IMPORTANT : lire toutes les infos AVANT move(),
+            // car le fichier temporaire disparaît après le déplacement.
             $originalName = $file->getClientOriginalName() ?? 'document';
-            $safeName = strtolower($slugger->slug(pathinfo($originalName, PATHINFO_FILENAME)) . '-' . uniqid() . '.' . ($file->guessExtension() ?? 'bin'));
+            $mimeType = $file->getMimeType() ?? 'application/octet-stream';
+            $size = (int) $file->getSize();
+
+            $safeName = strtolower(
+                $slugger->slug(pathinfo($originalName, PATHINFO_FILENAME))
+                . '-' . uniqid()
+                . '.' . ($file->guessExtension() ?? 'bin')
+            );
 
             $file->move($uploadDir, $safeName);
 
@@ -286,8 +295,8 @@ final class ProjectController extends AbstractController
             $document->setTask($task)
                 ->setFileName($safeName)
                 ->setOriginalName($originalName)
-                ->setMimeType($file->getMimeType() ?? 'application/octet-stream')
-                ->setSize((int) $file->getSize())
+                ->setMimeType($mimeType)
+                ->setSize($size)
                 ->setUploadedBy($this->getUser());
 
             $entityManager->persist($document);
