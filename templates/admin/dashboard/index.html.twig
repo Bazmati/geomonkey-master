@@ -4,13 +4,25 @@
 
 {% block admin_content %}
     <div class="p-4">
-        <h1 class="text-gm-green mb-4">Tableau de bord</h1>
+        {# Bandeau d'accueil : dégradé palette + motif de points #}
+        <div class="dash-hero admin-fade-up">
+            <div class="dash-hero-content">
+                <h1 class="dash-hero-title">Tableau de bord</h1>
+                <p class="dash-hero-sub">
+                    <i class="bi bi-emoji-smile" aria-hidden="true"></i>
+                    Bonjour {{ app.user.firstName ?? app.user.userIdentifier }}, voici l'activité de l'asso.
+                </p>
+            </div>
+            <p class="dash-hero-date">{{ 'now'|date('EEEE d MMMM Y')|capitalize }}</p>
+        </div>
 
-        {# Cartes statistiques #}
-        {% include 'admin/partials/_stats.html.twig' with {'stats': stats} %}
+        {# Cartes statistiques (count-up animé) #}
+        <div class="mt-4">
+            {% include 'admin/partials/_stats.html.twig' with {'stats': stats} %}
+        </div>
 
         {# Prochains événements #}
-        <div class="card mt-4 shadow-sm">
+        <div class="card mt-4 shadow-sm admin-fade-up" style="animation-delay:.15s">
             <div class="card-header bg-gm-dark text-gm-text d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-calendar-event"></i> Prochains événements</h5>
                 <a href="{{ path('admin_events_index') }}" class="btn btn-sm btn-gm-yellow">
@@ -24,13 +36,34 @@
                         <p class="mt-2">Aucun événement à venir</p>
                     </div>
                 {% else %}
-                    {% for event in upcomingEvents %}
-                        <div class="mb-3 p-3 bg-gm-surface rounded border">
-                            <h6 class="text-gm-text">{{ event.title }}</h6>
-                            <p class="mb-1 text-gm-text"><i class="bi bi-calendar"></i> {{ event.date }}</p>
-                            <p class="mb-0 text-gm-text"><i class="bi bi-geo-alt"></i> {{ event.location }}</p>
-                        </div>
-                    {% endfor %}
+                    <div class="dash-event-list">
+                        {% for event in upcomingEvents %}
+                            <div class="dash-event">
+                                {% set media = image_url(event, 'medium') ?? (event.galleryImages is not empty ? image_url(event.galleryImages|first, 'medium') : null) %}
+                                {% if media %}
+                                    <img src="{{ media }}" alt="" loading="lazy" class="dash-event-img">
+                                {% else %}
+                                    <div class="dash-event-img dash-event-img-empty">
+                                        <i class="bi bi-calendar-event" aria-hidden="true"></i>
+                                    </div>
+                                {% endif %}
+                                <div class="dash-event-body">
+                                    <h6 class="text-gm-text mb-1">{{ event.title }}</h6>
+                                    <p class="mb-0 text-gm-muted small">
+                                        <i class="bi bi-clock" aria-hidden="true"></i>
+                                        {{ event.startDate ? event.startDate|date('d/m/Y H:i') : '—' }}
+                                    </p>
+                                    <p class="mb-0 text-gm-muted small">
+                                        <i class="bi bi-geo-alt" aria-hidden="true"></i> {{ event.location }}
+                                    </p>
+                                </div>
+                                <div class="dash-event-date" aria-label="{{ event.startDate ? event.startDate|date('d/m/Y H:i') : '' }}">
+                                    <span class="dash-event-day">{{ event.startDate ? event.startDate|date('d') : '?' }}</span>
+                                    <span class="dash-event-month">{{ event.startDate ? event.startDate|date('M')|upper : '—' }}</span>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 {% endif %}
             </div>
         </div>

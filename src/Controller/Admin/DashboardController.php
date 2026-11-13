@@ -26,15 +26,8 @@ final class DashboardController extends AbstractController
             'users' => $this->userRepository->count([]),
         ];
 
-        // Prochains événements, formatés pour le template existant
-        $upcomingEvents = [];
-        foreach ($this->eventRepository->findUpcoming(5) as $event) {
-            $upcomingEvents[] = [
-                'title' => $event->getTitle(),
-                'date' => $event->getStartDate()?->format('d/m/Y H:i'),
-                'location' => $event->getLocation(),
-            ];
-        }
+        // Prochains événements : entités (pour vignettes + date structurée)
+        $upcomingEvents = $this->eventRepository->findUpcoming(5);
 
         return $this->render('admin/dashboard/index.html.twig', [
             'stats' => $stats,

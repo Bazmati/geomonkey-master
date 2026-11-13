@@ -894,3 +894,176 @@ body > footer,
     font-size: 1.5rem;
     color: var(--gm-gray-300);
 }
+
+/* ============================================================
+   DASHBOARD — bandeau accueil, stats animées, événements
+   Palette existante uniquement (surface / green / yellow / gray)
+   ============================================================ */
+.dash-hero {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem;
+    padding: 1.5rem 1.75rem;
+    border-radius: 1rem;
+    background:
+        radial-gradient(rgba(255, 255, 255, .06) 1px, transparent 1.5px) 0 0 / 18px 18px,
+        linear-gradient(135deg, rgba(0, 160, 64, .28), var(--gm-surface) 55%);
+    border: 1px solid var(--gm-gray-900);
+}
+.dash-hero-title {
+    margin: 0;
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: var(--gm-white);
+}
+.dash-hero-sub {
+    margin: .35rem 0 0;
+    color: var(--gm-gray-300);
+}
+.dash-hero-date {
+    margin: 0;
+    padding: .35rem .9rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, .25);
+    border: 1px solid var(--gm-gray-900);
+    color: var(--gm-gray-200);
+    font-size: .875rem;
+    white-space: nowrap;
+}
+
+/* ----- Cartes stats ----- */
+.stat-card {
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1rem;
+    overflow: hidden;
+    position: relative;
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+}
+.stat-card::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    background: var(--stat-accent, var(--gm-green));
+}
+.stat-card:hover {
+    transform: translateY(-3px);
+    border-color: var(--stat-accent, var(--gm-green));
+    box-shadow: 0 .5rem 1.25rem rgba(0, 0, 0, .35);
+}
+.stat-green { --stat-accent: var(--gm-green); }
+.stat-yellow { --stat-accent: var(--gm-yellow); }
+.stat-gray   { --stat-accent: var(--gm-gray-500); }
+.stat-icon {
+    width: 46px;
+    height: 46px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: .65rem;
+    font-size: 1.25rem;
+    color: var(--stat-accent, var(--gm-green));
+    background: color-mix(in srgb, var(--stat-accent, var(--gm-green)) 14%, transparent);
+    border: 1px solid color-mix(in srgb, var(--stat-accent, var(--gm-green)) 35%, transparent);
+    margin-bottom: .75rem;
+}
+.stat-label {
+    margin: 0;
+    color: var(--gm-gray-300);
+    font-size: .9rem;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+}
+.stat-value {
+    margin: 0;
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--gm-white);
+    font-variant-numeric: tabular-nums;
+}
+
+/* ----- Liste événements ----- */
+.dash-event-list { display: flex; flex-direction: column; gap: .75rem; }
+.dash-event {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: .75rem;
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: .75rem;
+    transition: transform .2s ease, border-color .2s ease;
+}
+.dash-event:hover {
+    transform: translateX(4px);
+    border-color: var(--gm-green);
+}
+.dash-event-img {
+    width: 56px;
+    height: 56px;
+    flex: 0 0 56px;
+    border-radius: .6rem;
+    object-fit: cover;
+}
+.dash-event-img-empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gm-gray-500);
+    background: rgba(255, 255, 255, .04);
+    font-size: 1.4rem;
+}
+.dash-event-body { flex: 1 1 auto; min-width: 0; }
+.dash-event-body h6 { margin: 0; }
+.dash-event-date {
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    line-height: 1.1;
+    min-width: 56px;
+    padding: .4rem .5rem;
+    border-radius: .6rem;
+    background: color-mix(in srgb, var(--gm-yellow) 12%, transparent);
+    border: 1px solid color-mix(in srgb, var(--gm-yellow) 35%, transparent);
+}
+.dash-event-day {
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--gm-yellow);
+    font-variant-numeric: tabular-nums;
+}
+.dash-event-month {
+    font-size: .7rem;
+    font-weight: 600;
+    letter-spacing: .08em;
+    color: var(--gm-yellow);
+}
+
+/* ----- Animations d'apparition (cascade) ----- */
+.admin-fade-up {
+    animation: gmFadeUp .45s ease both;
+}
+.admin-fade-group > * {
+    animation: gmFadeUp .45s ease both;
+}
+.admin-fade-group > *:nth-child(2) { animation-delay: .08s; }
+.admin-fade-group > *:nth-child(3) { animation-delay: .16s; }
+.admin-fade-group > *:nth-child(4) { animation-delay: .24s; }
+@keyframes gmFadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .admin-fade-up,
+    .admin-fade-group > *,
+    .stat-card,
+    .dash-event {
+        animation: none !important;
+        transition: none !important;
+    }
+}

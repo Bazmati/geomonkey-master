@@ -1,26 +1,19 @@
-<div class="row g-4">
-    <div class="col-md-4">
-        <div class="card bg-success text-white h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title"><i class="bi bi-calendar"></i> Événements</h3>
-                <p class="card-text fs-1 fw-bold">{{ stats.events }}</p>
+{% set stat_items = [
+    {label: 'Événements', value: stats.events, icon: 'bi-calendar2-event', accent: 'green'},
+    {label: 'Projets', value: stats.projects, icon: 'bi-kanban', accent: 'yellow'},
+    {label: 'Utilisateurs', value: stats.users, icon: 'bi-people', accent: 'gray'},
+] %}
+
+<div class="row g-4 admin-fade-group">
+    {% for item in stat_items %}
+        <div class="col-md-4">
+            <div class="card stat-card stat-{{ item.accent }} h-100">
+                <div class="card-body">
+                    <div class="stat-icon"><i class="bi {{ item.icon }}" aria-hidden="true"></i></div>
+                    <p class="stat-label">{{ item.label }}</p>
+                    <p class="stat-value" data-count="{{ item.value }}">0</p>
+                </div>
             </div>
         </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-primary text-white h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title"><i class="bi bi-folder"></i> Projets</h3>
-                <p class="card-text fs-1 fw-bold">{{ stats.projects }}</p>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-4">
-        <div class="card bg-info text-white h-100">
-            <div class="card-body text-center">
-                <h3 class="card-title"><i class="bi bi-people"></i> Utilisateurs</h3>
-                <p class="card-text fs-1 fw-bold">{{ stats.users }}</p>
-            </div>
-        </div>
-    </div>
+    {% endfor %}
 </div>
