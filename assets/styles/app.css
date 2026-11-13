@@ -1129,10 +1129,13 @@ body > footer,
     align-items: center;
     overflow: hidden;
     /* Hero 100% dégradés palette : aucune image requise.
-       Pour activer une photo, déposer public/images/background.jpg puis
-       dé-commenter la ligne url() ci-dessous (couche au-dessus des dégradés). */
+       Pour activer une photo de fond : déposer le fichier dans
+       assets/images/background.jpg (il DOIT exister, sinon AssetMapper
+       refuse de compiler), puis ajouter une couche image en première
+       position du background-image ci-dessous (chemin relatif :
+       deux points slash images slash background punto jpg — sans quoi
+       le simple fait de l'écrire ici fait échouer la compilation !). */
     background-image:
-        /* url('../images/background.jpg'), */
         radial-gradient(ellipse at 25% 15%, rgba(0, 160, 64, .35), transparent 55%),
         radial-gradient(ellipse at 80% 85%, rgba(224, 192, 32, .18), transparent 50%),
         linear-gradient(160deg, var(--gm-gray-700), var(--gm-bg));
