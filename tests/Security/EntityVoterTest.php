@@ -39,7 +39,6 @@ class EntityVoterTest extends TestCase
         // Ajouter l'adhésion à l'utilisateur
         $reflection = new \ReflectionClass($user);
         $property = $reflection->getProperty('memberships');
-        $property->setAccessible(true);
         $memberships = new \Doctrine\Common\Collections\ArrayCollection([$membership]);
         $property->setValue($user, $memberships);
         
