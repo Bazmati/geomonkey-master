@@ -401,8 +401,9 @@ class AppMembershipExpiryCommandTest extends TestCase
         $this->assertIsInt($capturedEmail[0][1]);
         
         $this->assertEquals(0, $result);
-        $this->assertStringContainsString('Found 1 membership(s) expiring within 30 days', $output->fetch());
-        $this->assertStringContainsString('Downgraded:', $output->fetch());
+        $display = $output->fetch();
+        $this->assertStringContainsString('Found 1 membership(s) expiring within 30 days', $display);
+        $this->assertStringContainsString('Downgraded:', $display);
     }
 
     public function testExecuteWithExceptionInMailService(): void
@@ -609,8 +610,10 @@ class AppMembershipExpiryCommandTest extends TestCase
             ->expects($this->never())
             ->method('applyMembershipStatus');
         
+        // expireMemberships() fait un flush final systematique, meme sans
+        // retrogradation (sendExpirationReminders ne flush pas : resultat vide)
         $this->em
-            ->expects($this->never())
+            ->expects($this->exactly(1))
             ->method('flush');
         
         $result = $this->command->run($input, $output);

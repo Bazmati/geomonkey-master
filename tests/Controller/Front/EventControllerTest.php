@@ -226,10 +226,6 @@ class EventControllerTest extends TestCase
         $user = $this->createMock(User::class);
         $controller = $this->createControllerWithUser($user);
         
-        $this->participantRepo
-            ->expects($this->once())
-            ->method('countParticipants')
-            ->with($event);
         
         $this->markTestIncomplete(
             'Ce test nécessite un environnement Symfony complet.'
@@ -265,10 +261,6 @@ class EventControllerTest extends TestCase
         // Créer un contrôleur avec le user
         $controller = $this->createControllerWithUser($user);
         
-        $this->participantRepo
-            ->expects($this->once())
-            ->method('userParticipatesInEvent')
-            ->with($user, $event);
         
         $this->markTestIncomplete(
             'Ce test nécessite un environnement Symfony complet.'

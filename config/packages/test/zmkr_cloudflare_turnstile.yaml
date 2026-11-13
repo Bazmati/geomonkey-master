@@ -1,0 +1,7 @@
+# En environnement test : le widget Turnstile ne peut pas etre resolu
+# (pas de navigateur, pas d'appel API possible). enabled: false fait
+# que le validateur CloudflareTurnstileCaptchaValidator retourne sans
+# verifier ni ajouter de violation - les formulaires passent en test.
+zmkr_cloudflare_turnstile:
+    captcha:
+        enabled: false
