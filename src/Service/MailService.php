@@ -501,4 +501,47 @@ class MailService
 
         $this->mailer->send($email);
     }
+
+    /**
+     * M11: Campagne newsletter — corps fourni par la commande app:newsletter:send,
+     * enveloppe GéoMonkey + pied de page désinscription ajouté pour chaque destinataire (RGPD).
+     */
+    public function sendNewsletterCampaign(NewsletterSubscriber $subscriber, string $subject, string $body): void
+    {
+        $unsubscribeUrl = $this->urlGenerator->generate(
+            'app_newsletter_unsubscribe',
+            ['token' => $subscriber->getToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $html = '<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#1C1C1A;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#1C1C1A;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#242422;border-radius:14px;padding:32px;color:#ffffff;">
+        <tr><td align="center" style="font-size:28px;padding-bottom:16px;">
+          <span style="font-weight:bold;color:#E0C020;">G&#233;o</span><span style="font-weight:bold;color:#00A040;">Monkey</span> &#128018;
+        </td></tr>
+        <tr><td style="line-height:1.6;color:#cccccc;font-size:15px;">
+          ' . $body . '
+        </td></tr>
+        <tr><td style="padding-top:24px;border-top:1px solid #444444;margin-top:16px;color:#999999;font-size:12px;line-height:1.6;">
+          Tu re&#231;ois cet email car tu es inscrit &#224; la newsletter G&#233;oMonkey.
+          <br><a href="' . $unsubscribeUrl . '" style="color:#E0C020;">Me d&#233;sinscrire</a> &#8212; ou &#233;cris &#224; contact@geomonkey.fr.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>';
+
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($subscriber->getEmail())
+            ->subject($subject)
+            ->html($html);
+
+        $this->mailer->send($email);
+    }
 }

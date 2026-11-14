@@ -108,4 +108,16 @@ class MembershipRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+    /**
+     * Toutes les adhésions, plus récentes d'abord, avec l'adhérent joint (une seule requête).
+     */
+    public function findAllWithUsers(): array
+    {
+        return $this->createQueryBuilder('m')
+            ->leftJoin('m.user', 'u')->addSelect('u')
+            ->orderBy('m.startedAt', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

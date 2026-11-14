@@ -1,0 +1,120 @@
+{# templates/admin/membership/list.html.twig #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Toutes les adhésions - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    <div class="p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <h1 class="text-gm-green mb-0"><i class="bi bi-card-checklist"></i> Toutes les adhésions</h1>
+            <a href="{{ path('app_admin_membership_requests') }}" class="btn btn-gm-surface btn-sm">
+                <i class="bi bi-clock-history me-1"></i> Demandes en attente
+            </a>
+        </div>
+
+        {# ===== Chiffres clés ===== #}
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm bg-gm-surface h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-2 fw-bold text-gm-warning">{{ stats.total }}</div>
+                        <div class="small text-gm-muted">Adhésions enregistrées</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm bg-gm-surface h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-2 fw-bold text-gm-green">{{ stats.active }}</div>
+                        <div class="small text-gm-muted">Actives (payées)</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm bg-gm-surface h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-2 fw-bold text-gm-yellow">{{ (stats.collected / 100)|number_format(2, ',', ' ') }} €</div>
+                        <div class="small text-gm-muted">Cotisations encaissées</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3">
+                <div class="card shadow-sm bg-gm-surface h-100">
+                    <div class="card-body text-center py-3">
+                        <div class="fs-2 fw-bold">{{ stats.total - stats.active }}</div>
+                        <div class="small text-gm-muted">Expirées / en attente</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% if memberships|length > 0 %}
+            <div class="card shadow-sm">
+                <div class="card-header bg-gm-surface d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">
+                        <i class="bi bi-people-fill me-2"></i>
+                        {{ memberships|length }} adhésion(s)
+                    </h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table-mobile-cards table table-gm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Adhérent</th>
+                                    <th>Début</th>
+                                    <th>Expiration</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for membership in memberships %}
+                                    <tr>
+                                        <td data-label="Adhérent">
+                                            {% if membership.user %}
+                                                {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-person-fill'} %}
+                                                <strong>{{ membership.user.firstName }} {{ membership.user.lastName }}</strong>
+                                            {% else %}
+                                                <span class="text-gm-muted"><i class="bi bi-person-x me-1"></i> Adhérent supprimé</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Début">{{ membership.startedAt|date('d/m/Y') }}</td>
+                                        <td data-label="Expiration">
+                                            {{ membership.expiresAt|date('d/m/Y') }}
+                                            {% if membership.isActive and date(membership.expiresAt) < date('now') %}
+                                                <span class="badge bg-danger-subtle text-danger ms-1">dépassée</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Montant">
+                                            {% if membership.amount %}
+                                                {{ (membership.amount / 100)|number_format(2, ',', ' ') }} €
+                                            {% else %}
+                                                —
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Statut">
+                                            {% if not membership.isActive %}
+                                                <span class="badge text-bg-secondary">inactive</span>
+                                            {% elseif membership.paymentStatus == 'paid' %}
+                                                <span class="badge text-bg-success">payée</span>
+                                            {% elseif membership.paymentStatus == 'pending' %}
+                                                <span class="badge text-bg-warning text-dark">en attente de paiement</span>
+                                            {% else %}
+                                                <span class="badge text-bg-danger">{{ membership.paymentStatus ?? 'échec' }}</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-gm-info">
+                <i class="bi bi-info-circle me-2"></i>Aucune adhésion enregistrée pour le moment.
+            </div>
+        {% endif %}
+    </div>
+{% endblock %}

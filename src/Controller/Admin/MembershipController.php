@@ -4,6 +4,7 @@ namespace App\Controller\Admin;
 
 use App\Entity\Membership;
 use App\Entity\User;
+use App\Repository\MembershipRepository;
 use App\Repository\UserRepository;
 use App\Service\MailService;
 use App\Service\MembershipFeeService;
@@ -22,6 +23,7 @@ class MembershipController extends AbstractController
 {
     public function __construct(
         private UserRepository $userRepo,
+        private MembershipRepository $membershipRepository,
         private EntityManagerInterface $em,
         private MembershipFeeService $feeService,
         private StripeService $stripeService,
@@ -93,7 +95,23 @@ class MembershipController extends AbstractController
     #[Route('/list', name: 'list')]
     public function list(): Response
     {
-        // TODO: Lister toutes les adhésions
-        return $this->render('admin/membership/list.html.twig');
+        $memberships = $this->membershipRepository->findAllWithUsers();
+
+        $stats = [
+            'total' => \count($memberships),
+            'active' => 0,
+            'collected' => 0, // en euros
+        ];
+        foreach ($memberships as $membership) {
+            if ($membership->isActive() && $membership->getPaymentStatus() === 'paid') {
+                ++$stats['active'];
+                $stats['collected'] += $membership->getAmount();
+            }
+        }
+
+        return $this->render('admin/membership/list.html.twig', [
+            'memberships' => $memberships,
+            'stats' => $stats,
+        ]);
     }
 }
