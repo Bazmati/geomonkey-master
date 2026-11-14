@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\Entity\Donation;
+use App\Entity\NewsletterSubscriber;
 use App\Entity\User;
 use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Email;
@@ -455,5 +456,49 @@ class MailService
         $html .= '</div></body></html>';
         
         return $html;
+    }
+
+    /**
+     * M10: Email de bienvenue newsletter (avec lien de désinscription RGPD)
+     */
+    public function sendNewsletterWelcome(NewsletterSubscriber $subscriber): void
+    {
+        $unsubscribeUrl = $this->urlGenerator->generate(
+            'app_newsletter_unsubscribe',
+            ['token' => $subscriber->getToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL
+        );
+
+        $html = '<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#1C1C1A;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#1C1C1A;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#242422;border-radius:14px;padding:32px;color:#ffffff;">
+        <tr><td align="center" style="font-size:40px;">&#128018;</td></tr>
+        <tr><td align="center" style="padding:8px 0 0;">
+          <h1 style="margin:0;font-size:22px;color:#ffffff;">Bienvenue dans la newsletter G&#233;oMonkey !</h1>
+        </td></tr>
+        <tr><td style="padding:16px 0 0;line-height:1.6;color:#cccccc;font-size:15px;">
+          Merci de ton inscription. Tu recevras en avant-premi&#232;re les news de l&#8217;asso et les nouvelles dates d&#8217;&#233;v&#233;nements.
+        </td></tr>
+        <tr><td style="padding:24px 0 0;color:#999999;font-size:12px;line-height:1.6;">
+          Tu peux te d&#233;sinscrire &#224; tout moment en cliquant sur ce lien :
+          <br><a href="' . $unsubscribeUrl . '" style="color:#E0C020;">Me d&#233;sinscrire de la newsletter</a>
+          <br>Ou en &#233;crivant &#224; contact@geomonkey.fr.
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>';
+
+        $email = (new Email())
+            ->from('noreply@geomonkey.fr')
+            ->to($subscriber->getEmail())
+            ->subject('Bienvenue dans la newsletter GéoMonkey 🐒')
+            ->html($html);
+
+        $this->mailer->send($email);
     }
 }

@@ -24,6 +24,7 @@ class SeoController extends AbstractController
     private const STATIC_ROUTES = [
         // [route, paramètres, priorité, changefreq]
         ['app_home', [], 1.0, 'weekly'],
+        ['app_project_index', [], 0.8, 'monthly'],
         ['app_blog_index', [], 0.9, 'daily'],
         ['app_donation', [], 0.7, 'monthly'],
         ['app_membership_register', [], 0.7, 'monthly'],

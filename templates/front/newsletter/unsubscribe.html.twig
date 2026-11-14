@@ -1,0 +1,47 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Newsletter - GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-6">
+                <div class="gm-legal-card text-center">
+                    {% if status == 'ok' %}
+                        <div style="font-size: 48px;">🐵</div>
+                        <h1 class="h4 text-white mt-2">C'est fait, tu es désabonné·e</h1>
+                        <p class="mt-3">
+                            L'adresse <strong>{{ email }}</strong> ne recevra plus la newsletter GéoMonkey.
+                            Si c'était une erreur, tu peux te réinscrire à tout moment depuis l'accueil.
+                        </p>
+                        <a href="{{ path('app_home') }}#newsletter" class="btn btn-gm-green mt-3">
+                            <i class="bi bi-arrow-counterclockwise me-2"></i>Me réinscrire
+                        </a>
+                    {% elseif status == 'already' %}
+                        <div style="font-size: 48px;">🐵</div>
+                        <h1 class="h4 text-white mt-2">Tu étais déjà désabonné·e</h1>
+                        <p class="mt-3">
+                            L'adresse <strong>{{ email }}</strong> ne reçoit déjà plus la newsletter.
+                        </p>
+                        <a href="{{ path('app_home') }}" class="btn btn-gm-surface mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
+                        </a>
+                    {% else %}
+                        <div style="font-size: 48px;">🤔</div>
+                        <h1 class="h4 text-white mt-2">Lien de désinscription inconnu</h1>
+                        <p class="mt-3">
+                            Ce lien n'est plus valide : il a peut-être déjà été utilisé ou remplacé
+                            par une nouvelle inscription. Aucune action supplémentaire est nécessaire —
+                            tu ne recevras pas la newsletter depuis cette adresse.
+                        </p>
+                        <a href="{{ path('app_home') }}" class="btn btn-gm-surface mt-3">
+                            <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

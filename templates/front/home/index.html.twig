@@ -290,7 +290,8 @@
                         <div class="card-body p-4">
                             <h2 class="text-warning fw-bold"><i class="bi bi-envelope-paper-heart me-2"></i>Newsletter</h2>
                             <p class="text-muted">Reçois les news et les nouvelles dates avant tout le monde.</p>
-                            <form method="post">
+                            <form method="post" action="{{ path('app_newsletter_subscribe') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('newsletter_subscribe') }}">
                                 <div class="mb-3">
                                     <label for="newsletter_email" class="form-label">Adresse email</label>
                                     <input type="email" class="form-control" id="newsletter_email" name="email" placeholder="ton@email.fr" required>
