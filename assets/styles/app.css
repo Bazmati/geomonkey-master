@@ -2134,3 +2134,282 @@ body > footer,
     .gm-join-card { animation: none !important; }
     .gm-join-video { transition: none !important; }
 }
+
+/* ============================================================
+   NAVIGATION — verre anthracite, pastille logo, soulignés animés
+   ============================================================ */
+.gm-nav {
+    background: rgba(28, 28, 26, 0.82);
+    backdrop-filter: blur(12px) saturate(1.2);
+    -webkit-backdrop-filter: blur(12px) saturate(1.2);
+    border-bottom: 1px solid rgba(224, 192, 32, 0.10);
+    transition: background 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    min-height: 74px;
+    padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
+}
+
+.gm-nav-scrolled {
+    background: rgba(28, 28, 26, 0.94);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+    border-bottom-color: rgba(224, 192, 32, 0.22);
+}
+
+/* Pastille anthracite derrière le logo sans fond */
+.gm-nav-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+    background: var(--gm-surface);          /* fond anthracite garanti */
+    box-shadow: inset 0 0 0 2px var(--gm-yellow);
+    overflow: hidden;
+}
+
+.gm-nav-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.gm-nav-brand {
+    font-size: 1.3rem;
+    letter-spacing: 0.02em;
+    color: #fff;
+    text-shadow: 0 1px 6px rgba(0, 0, 0, 0.5);
+}
+
+/* Liens : soulignement animé */
+.gm-nav-link {
+    position: relative;
+    color: rgba(255, 255, 255, 0.82) !important;
+    padding-left: 0.65rem !important;
+    padding-right: 0.65rem !important;
+    transition: color 0.25s ease;
+}
+
+.gm-nav-link::after {
+    content: "";
+    position: absolute;
+    left: 0.65rem;
+    right: 0.65rem;
+    bottom: 0.25rem;
+    height: 2px;
+    border-radius: 2px;
+    background: var(--gm-yellow);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.gm-nav-link:hover { color: #fff !important; }
+
+.gm-nav-link:hover::after { transform: scaleX(0.55); }
+
+.gm-nav-link.active {
+    color: #fff !important;
+    font-weight: 600;
+}
+
+.gm-nav-link.active::after {
+    background: var(--gm-green);
+    transform: scaleX(1);
+}
+
+/* Bouton Don — cœur rose, distinct des autres actions */
+.gm-nav-don {
+    --bs-btn-bg: transparent;
+    --bs-btn-border-color: #e5484d;
+    --bs-btn-color: #e5484d;
+    --bs-btn-hover-bg: #e5484d;
+    --bs-btn-hover-border-color: #e5484d;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-active-bg: #c93a3f;
+    --bs-btn-active-border-color: #c93a3f;
+    --bs-btn-active-color: #fff;
+    border-radius: 50rem;
+}
+
+/* Menu utilisateur : fond anthracite cohérent */
+.gm-nav .dropdown-menu {
+    background: var(--gm-surface);
+    border: 1px solid rgba(224, 192, 32, 0.18);
+    box-shadow: 0 14px 34px rgba(0, 0, 0, 0.5);
+}
+
+.gm-nav .dropdown-item { color: rgba(255, 255, 255, 0.85); }
+
+.gm-nav .dropdown-item:hover,
+.gm-nav .dropdown-item:focus {
+    background: rgba(0, 160, 64, 0.18);
+    color: #fff;
+}
+
+.gm-nav .dropdown-divider { border-color: rgba(255, 255, 255, 0.12); }
+
+/* Mobile : aérations et séparation des actions */
+@media (max-width: 991.98px) {
+    .gm-nav {
+        background: rgba(28, 28, 26, 0.96);
+    }
+    .gm-nav .navbar-nav { padding: 0.5rem 0 1rem; }
+    .gm-nav .nav-item.btn-item,
+    .gm-nav .btn { margin-top: 0.4rem; }
+    .gm-nav-link::after { display: none; }
+    .gm-nav-link.active { color: var(--gm-green) !important; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gm-nav, .gm-nav-link, .gm-nav-link::after { transition: none !important; }
+}
+
+/* ============================================================
+   FLASHS SOUS NAVBAR
+   ============================================================ */
+.gm-flash-zone {
+    margin-top: 0.75rem;
+    margin-bottom: 0.5rem;
+    z-index: 10;
+    position: relative;
+}
+
+.gm-flash-zone .alert {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+    border-radius: 12px;
+}
+
+@media (max-width: 575.98px) {
+    .gm-flash-zone { padding-left: 0.5rem; padding-right: 0.5rem; }
+    .gm-flash-zone .alert { font-size: 0.9rem; }
+}
+
+/* ============================================================
+   PAGES LÉGALES (CGU / confidentialité) — sans vidéo
+   ============================================================ */
+.gm-legal-hero {
+    background:
+        radial-gradient(ellipse 60% 90% at 20% 0%, rgba(0, 160, 64, 0.18), transparent 60%),
+        radial-gradient(ellipse 50% 80% at 85% 10%, rgba(224, 192, 32, 0.12), transparent 55%),
+        var(--gm-bg);
+    border-bottom: 1px solid rgba(224, 192, 32, 0.15);
+}
+
+.gm-legal-badge {
+    display: inline-block;
+    padding: 0.4rem 1rem;
+    border-radius: 50rem;
+    background: rgba(0, 160, 64, 0.16);
+    border: 1px solid rgba(0, 160, 64, 0.45);
+    color: #7ee2a8;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.gm-legal-title {
+    font-size: clamp(1.7rem, 4vw, 2.6rem);
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 12px rgba(0, 0, 0, 0.55);
+}
+
+.gm-legal-sub {
+    max-width: 640px;
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.gm-legal-date {
+    color: rgba(255, 255, 255, 0.45);
+    font-size: 0.85rem;
+}
+
+/* Sommaire */
+.gm-legal-toc {
+    background: var(--gm-surface);
+    border: 1px solid rgba(224, 192, 32, 0.14);
+    border-radius: 14px;
+    padding: 1.1rem 1.4rem;
+}
+
+.gm-legal-toc-title {
+    color: var(--gm-yellow);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.gm-legal-toc ol {
+    columns: 2;
+    column-gap: 2rem;
+    margin: 0;
+    padding-left: 1.2rem;
+}
+
+.gm-legal-toc li {
+    margin-bottom: 0.35rem;
+    break-inside: avoid;
+}
+
+.gm-legal-toc a {
+    color: rgba(255, 255, 255, 0.8);
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.gm-legal-toc a:hover { color: var(--gm-green); }
+
+/* Carte de contenu */
+.gm-legal-card {
+    background: var(--gm-surface);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 16px;
+    padding: 2rem 2.2rem;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+}
+
+.gm-legal-card p { color: rgba(255, 255, 255, 0.85); line-height: 1.7; }
+.gm-legal-card ul li { color: rgba(255, 255, 255, 0.85); line-height: 1.7; margin-bottom: 0.3rem; }
+.gm-legal-card a { color: var(--gm-yellow); }
+.gm-legal-card a:hover { color: #f5d552; }
+.gm-legal-card strong { color: #fff; }
+
+.gm-legal-h2 {
+    display: flex;
+    align-items: center;
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #fff;
+    margin-top: 2.2rem;
+    margin-bottom: 0.8rem;
+    padding-left: 0.85rem;
+    border-left: 3px solid var(--gm-green);
+    scroll-margin-top: 90px; /* ancre sous la nav sticky */
+}
+
+.gm-legal-h2 i { color: var(--gm-yellow); }
+
+.gm-legal-h2:first-child { margin-top: 0; }
+
+.gm-legal-foot {
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 1.2rem;
+    text-align: center;
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 0.9rem;
+}
+
+@media (max-width: 575.98px) {
+    .gm-legal-card { padding: 1.4rem 1.1rem; }
+    .gm-legal-toc ol { columns: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .gm-legal-toc a { transition: none !important; }
+}

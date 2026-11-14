@@ -6,132 +6,161 @@
     {% include 'partials/_navbar.html.twig' %}
 
     {{ breadcrumb() }}
-    
+
+    {# ===== Hero anthracite (sans vidéo) ===== #}
+    <header class="gm-legal-hero">
+        <div class="container text-center py-5">
+            <span class="gm-legal-badge"><i class="bi bi-file-earmark-check me-2"></i>Adhérer en toute clarté</span>
+            <h1 class="gm-legal-title mt-3">
+                <i class="bi bi-file-earmark-text me-2"></i>Conditions Générales d'Adhésion
+            </h1>
+            <p class="gm-legal-sub mx-auto mt-3">
+                Les modalités d'adhésion à l'association GéoMonkey, association loi 1901 :
+                cotisation, durée, droits et obligations de chaque membre.
+            </p>
+            <p class="gm-legal-date mt-2">Dernière mise à jour : novembre 2026</p>
+        </div>
+    </header>
+
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h1 class="mb-0 text-center">
-                            <i class="bi bi-file-earmark-text me-2"></i>
-                            Conditions Générales d'Adhésion
-                        </h1>
-                    </div>
-                    <div class="card-body">
-                        <h2>Article 1 - Objet</h2>
-                        <p>
-                            Les présentes Conditions Générales d'Adhésion (ci-après « CGU ») régissent les modalités 
-                            d'adhésion à l'association GéoMonkey, association loi 1901.
-                        </p>
 
-                        <h2>Article 2 - Adhésion</h2>
-                        <p>
-                            L'adhésion à GéoMonkey est ouverte à toute personne physique majeure ou mineure émancipée, 
-                            souhaitant participer à la vie associative et à ses activités.
-                        </p>
-                        <p>
-                            Deux types d'adhésion sont proposés :
-                        </p>
-                        <ul>
-                            <li><strong>Visiteur</strong> : Accès gratuit aux contenus publics du site (galerie, actualités publiques).</li>
-                            <li><strong>Membre actif</strong> : Accès complet à tous les contenus et événements de l'association, 
-                                sous réserve de validation par le bureau et de paiement de la cotisation annuelle.
-                            </li>
-                        </ul>
+                {# ===== Sommaire ===== #}
+                <nav class="gm-legal-toc mb-4" aria-label="Sommaire">
+                    <p class="gm-legal-toc-title mb-2"><i class="bi bi-list-ul me-2"></i>Sommaire</p>
+                    <ol>
+                        <li><a href="#objet">Objet</a></li>
+                        <li><a href="#adhesion">Adhésion</a></li>
+                        <li><a href="#cotisation">Cotisation</a></li>
+                        <li><a href="#duree">Durée et renouvellement</a></li>
+                        <li><a href="#remboursement">Remboursement</a></li>
+                        <li><a href="#radiation">Radiation</a></li>
+                        <li><a href="#droits">Droits et obligations des membres</a></li>
+                        <li><a href="#assurance">Assurance</a></li>
+                        <li><a href="#donnees">Données personnelles</a></li>
+                        <li><a href="#mineurs">Mineurs</a></li>
+                        <li><a href="#modification">Modification des CGU</a></li>
+                        <li><a href="#loi">Loi applicable</a></li>
+                    </ol>
+                </nav>
 
-                        <h2>Article 3 - Cotisation</h2>
-                        <p>
-                            La cotisation annuelle pour les membres actifs est fixée à 
-                            <strong>{{ "%.2f"|format(feeAmount ?? 15.00) }} €</strong>.
-                            Ce montant est voté chaque année en Assemblée Générale et peut être révisé.
-                        </p>
-                        <p>
-                            La cotisation est valable pour une période d'un an à compter de la date de paiement.
-                        </p>
+                <div class="gm-legal-card">
+                    <h2 id="objet" class="gm-legal-h2"><i class="bi bi-book me-2"></i>Article 1 — Objet</h2>
+                    <p>
+                        Les présentes Conditions Générales d'Adhésion (ci-après « CGA ») régissent les modalités
+                        d'adhésion à l'association GéoMonkey, association loi 1901.
+                    </p>
 
-                        <h2>Article 4 - Durée et Renouvellement</h2>
-                        <p>
-                            L'adhésion est valable pour une durée d'un an renouvelable par tacite reconduction.
-                            Le membre sera informé par email 30 jours avant l'expiration de son adhésion.
-                        </p>
+                    <h2 id="adhesion" class="gm-legal-h2"><i class="bi bi-person-plus me-2"></i>Article 2 — Adhésion</h2>
+                    <p>
+                        L'adhésion à GéoMonkey est ouverte à toute personne physique majeure, ou mineure émancipée,
+                        souhaitant participer à la vie associative et à ses activités.
+                        Pour les mineurs non émancipés, l'adhésion est possible avec l'autorisation écrite
+                        d'un responsable légal (voir Article 10).
+                    </p>
+                    <p>Deux types d'adhésion sont proposés :</p>
+                    <ul>
+                        <li><strong>Visiteur</strong> : accès gratuit aux contenus publics du site (galerie, actualités publiques) ;</li>
+                        <li><strong>Membre actif</strong> : accès complet à tous les contenus et événements de l'association,
+                            sous réserve de validation par le bureau et de paiement de la cotisation annuelle.</li>
+                    </ul>
 
-                        <h2>Article 5 - Remboursement</h2>
-                        <p>
-                            La cotisation versée n'est pas remboursable, sauf en cas de radiation de l'association 
-                            dans les 14 jours suivant le paiement (droit de rétractation).
-                        </p>
+                    <h2 id="cotisation" class="gm-legal-h2"><i class="bi bi-cash-coin me-2"></i>Article 3 — Cotisation</h2>
+                    <p>
+                        La cotisation annuelle pour les membres actifs est fixée à
+                        <strong>{{ "%.2f"|format(feeAmount ?? 15.00) }} €</strong>.
+                        Ce montant est voté chaque année en Assemblée Générale et peut être révisé.
+                    </p>
+                    <p>La cotisation est valable pour une période d'un an à compter de la date de paiement.</p>
 
-                        <h2>Article 6 - Radiation</h2>
-                        <p>
-                            L'association se réserve le droit de radier tout membre qui :
-                        </p>
-                        <ul>
-                            <li>Ne respecte pas les valeurs et le règlement intérieur de l'association ;</li>
-                            <li>N'a pas réglé sa cotisation annuelle dans les délais impartis ;</li>
-                            <li>Fait preuve de comportement préjudiciable à l'association ou à ses membres.</li>
-                        </ul>
-                        <p>
-                            La radiation entraîne la perte immédiate de tous les droits liés à l'adhésion.
-                        </p>
+                    <h2 id="duree" class="gm-legal-h2"><i class="bi bi-calendar-range me-2"></i>Article 4 — Durée et renouvellement</h2>
+                    <p>
+                        L'adhésion est valable pour une durée d'un an, renouvelable par tacite reconduction.
+                        Le membre sera informé par email 30 jours avant l'expiration de son adhésion.
+                    </p>
 
-                        <h2>Article 7 - Droits et Obligations des Membres</h2>
-                        <p>
-                            Les membres actifs s'engagent à :
-                        </p>
-                        <ul>
-                            <li>Respecter les statuts et le règlement intérieur de l'association ;</li>
-                            <li>Participer aux activités avec esprit de convivialité et de respect ;</li>
-                            <li>Signaler tout incident ou problème à l'asso.</li>
-                        </ul>
-                        <p>
-                            Les membres actifs bénéficient de :
-                        </p>
-                        <ul>
-                            <li>L'accès à tous les contenus et événements de l'association ;</li>
-                            <li>Le droit de vote lors des Assemblées Générales ;</li>
-                            <li>La couverture par l'assurance souscrite par l'association (voir Article 8).</li>
-                        </ul>
+                    <h2 id="remboursement" class="gm-legal-h2"><i class="bi bi-arrow-counterclockwise me-2"></i>Article 5 — Remboursement</h2>
+                    <p>
+                        La cotisation versée n'est pas remboursable, sauf en cas de radiation de l'association
+                        dans les 14 jours suivant le paiement (droit de rétractation).
+                    </p>
 
-                        <h2>Article 8 - Assurance</h2>
-                        <p>
-                            L'adhésion à GéoMonkey inclut une assurance responsabilité civile et individuelle accident 
-                            souscrite par l'association. Cette assurance couvre :
-                        </p>
-                        <ul>
-                            <li>La responsabilité civile des membres lors des événements organisés par l'association ;</li>
-                            <li>Les accidents individuels survenant lors des activités de l'association.</li>
-                        </ul>
-                        <p>
-                            <strong>Attention</strong> : Cette assurance ne couvre pas les activités personnelles en dehors 
-                            du cadre associatif. Les détails précis de la couverture sont disponibles sur demande.
-                        </p>
+                    <h2 id="radiation" class="gm-legal-h2"><i class="bi bi-person-x me-2"></i>Article 6 — Radiation</h2>
+                    <p>L'association se réserve le droit de radier tout membre qui :</p>
+                    <ul>
+                        <li>Ne respecte pas les valeurs et le règlement intérieur de l'association ;</li>
+                        <li>N'a pas réglé sa cotisation annuelle dans les délais impartis ;</li>
+                        <li>Fait preuve de comportement préjudiciable à l'association ou à ses membres.</li>
+                    </ul>
+                    <p>
+                        La décision de radiation est prononcée par le bureau, après que le membre a été invité
+                        à présenter ses observations. Elle entraîne la perte immédiate de tous les droits liés à l'adhésion.
+                    </p>
 
-                        <h2>Article 9 - Données Personnelles</h2>
-                        <p>
-                            Les données personnelles recueillies lors de l'adhésion sont traitées conformément 
-                            à notre <a href="{{ path('app_privacy') }}">Politique de Confidentialité</a>.
-                        </p>
+                    <h2 id="droits" class="gm-legal-h2"><i class="bi bi-people me-2"></i>Article 7 — Droits et obligations des membres</h2>
+                    <p>Les membres actifs s'engagent à :</p>
+                    <ul>
+                        <li>Respecter les statuts et le règlement intérieur de l'association ;</li>
+                        <li>Participer aux activités avec esprit de convivialité et de respect ;</li>
+                        <li>Signaler tout incident ou problème au bureau.</li>
+                    </ul>
+                    <p>Les membres actifs bénéficient de :</p>
+                    <ul>
+                        <li>L'accès à tous les contenus et événements de l'association ;</li>
+                        <li>Le droit de vote lors des Assemblées Générales ;</li>
+                        <li>La couverture par l'assurance souscrite par l'association (voir Article 8).</li>
+                    </ul>
 
-                        <h2>Article 10 - Modification des CGU</h2>
-                        <p>
-                            Les présentes CGU peuvent être modifiées à tout moment par décision du bureau de l'association.
-                            Les membres en seront informés par email et les nouvelles conditions s'appliqueront 
-                            dès leur publication sur le site.
-                        </p>
+                    <h2 id="assurance" class="gm-legal-h2"><i class="bi bi-shield-fill-check me-2"></i>Article 8 — Assurance</h2>
+                    <p>
+                        L'adhésion à GéoMonkey inclut une assurance responsabilité civile et individuelle accident
+                        souscrite par l'association. Cette assurance couvre :
+                    </p>
+                    <ul>
+                        <li>La responsabilité civile des membres lors des événements organisés par l'association ;</li>
+                        <li>Les accidents individuels survenant lors des activités de l'association.</li>
+                    </ul>
+                    <p>
+                        <strong>Attention</strong> : cette assurance ne couvre pas les activités personnelles en dehors
+                        du cadre associatif. Les détails précis de la couverture sont disponibles sur demande.
+                    </p>
 
-                        <h2>Article 11 - Loi Applicable</h2>
-                        <p>
-                            Les présentes CGU sont régies par le droit français. Tout litige relatif à leur interprétation 
-                            ou exécution sera soumis à la compétence des tribunaux français.
-                        </p>
+                    <h2 id="donnees" class="gm-legal-h2"><i class="bi bi-shield-lock me-2"></i>Article 9 — Données personnelles</h2>
+                    <p>
+                        Les données personnelles recueillies lors de l'adhésion sont traitées conformément
+                        à notre <a href="{{ path('app_privacy') }}">Politique de Confidentialité</a>.
+                    </p>
 
-                        <div class="mt-4 text-center">
-                            <p class="text-muted">
-                                En vigueur depuis le {{ 'now'|date('d/m/Y') }}<br>
-                                Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
-                            </p>
-                            <a href="{{ path('app_home') }}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left me-2"></i> Retour à l'accueil
+                    <h2 id="mineurs" class="gm-legal-h2"><i class="bi bi-person-arms-up me-2"></i>Article 10 — Mineurs</h2>
+                    <p>
+                        L'adhésion d'un mineur non émancipé requiert l'autorisation écrite d'un responsable légal,
+                        qui accepte les présentes CGA et la politique de confidentialité en son nom.
+                        Le responsable légal peut demander à tout moment la suppression du compte du mineur
+                        en écrivant à contact@geomonkey.fr.
+                    </p>
+
+                    <h2 id="modification" class="gm-legal-h2"><i class="bi bi-pencil-square me-2"></i>Article 11 — Modification des CGA</h2>
+                    <p>
+                        Les présentes CGA peuvent être modifiées à tout moment par décision du bureau de l'association.
+                        Les membres en seront informés par email et les nouvelles conditions s'appliqueront
+                        dès leur publication sur le site.
+                    </p>
+
+                    <h2 id="loi" class="gm-legal-h2"><i class="bi bi-bank me-2"></i>Article 12 — Loi applicable</h2>
+                    <p>
+                        Les présentes CGA sont régies par le droit français. Tout litige relatif à leur interprétation
+                        ou exécution sera soumis à la compétence des tribunaux français.
+                    </p>
+
+                    <div class="gm-legal-foot mt-4">
+                        <p>Association GéoMonkey — association loi 1901</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                            <a href="{{ path('app_privacy') }}" class="btn btn-outline-gm-green">
+                                <i class="bi bi-shield-check me-2"></i>Politique de Confidentialité
+                            </a>
+                            <a href="{{ path('app_home') }}" class="btn btn-gm-surface">
+                                <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
                             </a>
                         </div>
                     </div>

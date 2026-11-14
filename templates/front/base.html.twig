@@ -19,7 +19,7 @@
         <meta property="og:title" content="{{ block('title') }}">
         <meta property="og:description" content="{{ block('meta_description') }}">
         <meta property="og:url" content="{{ block('canonical') }}">
-        <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('images/logo.png')) }}{% endblock %}">
+        <meta property="og:image" content="{% block og_image %}{{ absolute_url(asset('images/Logo_geomonkey.png')) }}{% endblock %}">
         <meta property="og:locale" content="fr_FR">
 
         {# Twitter / X #}
@@ -50,7 +50,7 @@
             "@type": "Organization",
             "name": "GéoMonkey",
             "url": "{{ url('app_home') }}",
-            "logo": "{{ absolute_url(asset('images/logo.png')) }}",
+            "logo": "{{ absolute_url(asset('images/Logo_geomonkey.png')) }}",
             "description": "Association culturelle et conviviale : événements, ateliers et rencontres."
         }
         </script>
@@ -66,32 +66,6 @@
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
     <body data-turbo="false">
-        {# Messages flash #}
-        <div class="container mt-3">
-            {% set gm_alert_classes = {
-                success: 'alert-gm-success',
-                error: 'alert-gm-danger',
-                danger: 'alert-gm-danger',
-                warning: 'alert-gm-warning',
-                info: 'alert-gm-info',
-            } %}
-            {% set gm_alert_icons = {
-                success: 'bi-check-circle-fill',
-                error: 'bi-exclamation-circle-fill',
-                danger: 'bi-exclamation-circle-fill',
-                warning: 'bi-exclamation-triangle-fill',
-                info: 'bi-info-circle-fill',
-            } %}
-            {% for type, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert {{ gm_alert_classes[type] ?? 'alert-gm-info' }} alert-dismissible fade show" role="alert">
-                        <i class="bi {{ gm_alert_icons[type] ?? 'bi-info-circle-fill' }} me-2" aria-hidden="true"></i>{{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
-                    </div>
-                {% endfor %}
-            {% endfor %}
-        </div>
-
         {% block body %}{% endblock %}
         <footer class="bg-gm-surface text-center text-gm-warning py-3 mt-5">
             <div class="container">

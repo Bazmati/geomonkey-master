@@ -1,6 +1,9 @@
 <div class="admin-nav">
     <a class="d-flex align-items-center mb-4 text-decoration-none" href="{{ path('app_admin_dashboard') }}">
-        <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" width="40" class="img-fluid me-2">
+        <span class="gm-nav-logo flex-shrink-0" style="width:40px;height:40px;">
+            <img src="{{ asset('images/Logo_geomonkey.png') }}" alt="GéoMonkey"
+                 onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.classList.add('rounded-circle');">
+        </span>
         <span class="fw-bold text-gm-warning">Admin Panel</span>
     </a>
     

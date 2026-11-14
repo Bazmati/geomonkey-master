@@ -1,48 +1,65 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark border-bottom border-warning sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top gm-nav" id="gm-nav">
     <div class="container">
-        <a class="navbar-brand fw-bold text-warning d-flex align-items-center gap-2" href="{{ path('app_home') }}">
-            <img src="{{ asset('images/logo.png') }}" alt="GeoMonkey" width="36" height="36" class="img-fluid rounded-circle">
-            <span>GéoMonkey</span>
+
+        {# ===== Marque : logo sans fond sur pastille anthracite ===== #}
+        <a class="navbar-brand d-flex align-items-center gap-2 pe-2" href="{{ path('app_home') }}" aria-label="GéoMonkey — Accueil">
+            <span class="gm-nav-logo">
+                <img src="{{ asset('images/Logo_geomonkey.png') }}" alt="Logo GéoMonkey"
+                     onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.classList.add('rounded-circle')">
+            </span>
+            <span class="gm-nav-brand fw-bold">Géo<span class="text-gm-yellow">Monkey</span></span>
         </a>
 
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
+        <button class="navbar-toggler border-gm-yellow" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"
                 aria-controls="mainNavbar" aria-expanded="false" aria-label="Basculer la navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav ms-auto mb-2 mb-lg-0 align-items-lg-center">
+
                 <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href="{{ path('app_home') }}">Accueil</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') == 'app_home' ? 'active' : '' }}"
+                       href="{{ path('app_home') }}">Accueil</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_presentation_index') }}">Présentation</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') starts with 'app_presentation' ? 'active' : '' }}"
+                       href="{{ path('app_presentation_index') }}">Présentation</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_project_index') }}">Nos projets</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') starts with 'app_project' ? 'active' : '' }}"
+                       href="{{ path('app_project_index') }}">Projets</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_blog_index') }}">Actualités</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') starts with 'app_blog' ? 'active' : '' }}"
+                       href="{{ path('app_blog_index') }}">Actualités</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_gallery_index') }}">Galerie</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') starts with 'app_event' ? 'active' : '' }}"
+                       href="{{ path('app_event_index') }}">Événements</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_event_index') }}">Événements</a>
+                    <a class="nav-link gm-nav-link {{ app.request.attributes.get('_route') starts with 'app_gallery' ? 'active' : '' }}"
+                       href="{{ path('app_gallery_index') }}">Galerie</a>
                 </li>
+
+                {# ===== Actions ===== #}
                 {% if not app.user %}
-                <li class="nav-item ms-lg-2">
-                    <a class="btn btn-outline-light" href="{{ path('app_membership_register') }}">
-                        <i class="bi bi-person-plus me-1"></i> Rejoindre
+                    <li class="nav-item ms-lg-2">
+                        <a class="btn btn-outline-gm-green btn-sm" href="{{ path('app_membership_register') }}">
+                            <i class="bi bi-person-plus me-1"></i> Rejoindre
+                        </a>
+                    </li>
+                {% endif %}
+                <li class="nav-item ms-lg-1">
+                    <a class="btn btn-gm-yellow btn-sm" href="#newsletter">
+                        <i class="bi bi-envelope-heart me-1"></i> Newsletter
                     </a>
                 </li>
-                {% endif %}
-                <li class="nav-item ms-lg-2">
-                    <a class="btn btn-warning fw-semibold" href="#newsletter">Newsletter</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ path('app_donation') }}">
-                        <i class="bi bi-heart-fill me-1"></i>Faire un don
+                <li class="nav-item ms-lg-1">
+                    <a class="btn btn-sm gm-nav-don" href="{{ path('app_donation') }}"
+                       title="Faire un don à l'association">
+                        <i class="bi bi-heart-fill me-1"></i> Don
                     </a>
                 </li>
 
@@ -63,7 +80,6 @@
                                 </li>
                                 <li><hr class="dropdown-divider"></li>
                             {% endif %}
-                            {# futur : page profil #}
                             <li>
                                 <a class="dropdown-item" href="{{ path('app_logout') }}">
                                     <i class="bi bi-box-arrow-right me-2"></i>Déconnexion
@@ -72,8 +88,8 @@
                         </ul>
                     </li>
                 {% else %}
-                    <li class="nav-item ms-lg-2">
-                        <a class="btn btn-outline-warning" href="{{ path('app_login') }}">
+                    <li class="nav-item ms-lg-1">
+                        <a class="btn btn-outline-gm-yellow btn-sm" href="{{ path('app_login') }}">
                             <i class="bi bi-box-arrow-in-right"></i> Connexion
                         </a>
                     </li>
@@ -82,3 +98,19 @@
         </div>
     </div>
 </nav>
+
+{# Messages flash : juste sous la navbar, sur toutes les pages #}
+{% include 'partials/_flash.html.twig' %}
+
+<script>
+    // Ombre + opacité renforcée dès qu'on quitte le haut de page
+    (function () {
+        var nav = document.getElementById('gm-nav');
+        if (!nav) { return; }
+        function onScroll() {
+            nav.classList.toggle('gm-nav-scrolled', window.scrollY > 10);
+        }
+        window.addEventListener('scroll', onScroll, { passive: true });
+        onScroll();
+    })();
+</script>

@@ -4,150 +4,177 @@
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
-    
+
     {{ breadcrumb() }}
+
+    {# ===== Hero anthracite (sans vidéo) ===== #}
+    <header class="gm-legal-hero">
+        <div class="container text-center py-5">
+            <span class="gm-legal-badge"><i class="bi bi-shield-lock-fill me-2"></i>Vos données, notre engagement</span>
+            <h1 class="gm-legal-title mt-3">
+                <i class="bi bi-shield-check me-2"></i>Politique de Confidentialité
+            </h1>
+            <p class="gm-legal-sub mx-auto mt-3">
+                GéoMonkey prend très au sérieux la protection de vos données personnelles.
+                Cette politique explique, en toute transparence, comment nous les collectons,
+                les utilisons et les protégeons — conformément au RGPD.
+            </p>
+            <p class="gm-legal-date mt-2">Dernière mise à jour : novembre 2026</p>
+        </div>
+    </header>
 
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-warning text-dark">
-                        <h1 class="mb-0 text-center">
-                            <i class="bi bi-shield-check me-2"></i>
-                            Politique de Confidentialité
-                        </h1>
-                    </div>
-                    <div class="card-body">
-                        <p class="lead">
-                            GéoMonkey prend très au sérieux la protection de vos données personnelles. 
-                            Cette politique explique comment nous collectons, utilisons et protégeons vos informations.
-                        </p>
 
-                        <h2>1. Responsable du traitement</h2>
-                        <p>
-                            Le responsable du traitement des données est l'association GéoMonkey, représentée par son président.
-                            Vous pouvez nous contacter à l'adresse : <strong>contact@geomonkey.fr</strong>
-                        </p>
+                {# ===== Sommaire ===== #}
+                <nav class="gm-legal-toc mb-4" aria-label="Sommaire">
+                    <p class="gm-legal-toc-title mb-2"><i class="bi bi-list-ul me-2"></i>Sommaire</p>
+                    <ol>
+                        <li><a href="#resp">Responsable du traitement</a></li>
+                        <li><a href="#finalites">Finalités du traitement</a></li>
+                        <li><a href="#donnees">Données collectées</a></li>
+                        <li><a href="#base">Base légale du traitement</a></li>
+                        <li><a href="#duree">Durée de conservation</a></li>
+                        <li><a href="#droits">Vos droits</a></li>
+                        <li><a href="#securite">Sécurité des données</a></li>
+                        <li><a href="#sous-traitants">Sous-traitants et transferts</a></li>
+                        <li><a href="#cookies">Cookies</a></li>
+                        <li><a href="#image">Droit à l'image</a></li>
+                        <li><a href="#reclamation">Réclamation</a></li>
+                        <li><a href="#modifications">Modifications</a></li>
+                    </ol>
+                </nav>
 
-                        <h2>2. Finalités du traitement</h2>
-                        <p>
-                            Nous traitons vos données personnelles uniquement pour les finalités suivantes :
-                        </p>
-                        <ul>
-                            <li><strong>Gestion des adhérents</strong> : Création et gestion de votre compte, suivi de votre adhésion ;</li>
-                            <li><strong>Vie associative</strong> : Organisation et communication des événements, envoi d'informations ;</li>
-                            <li><strong>Comptabilité</strong> : Gestion des cotisations et obligations légales de conservation ;</li>
-                            <li><strong>Support et communication</strong> : Réponse à vos questions et envoi de communications importantes.</li>
-                        </ul>
+                <div class="gm-legal-card">
+                    <h2 id="resp" class="gm-legal-h2"><i class="bi bi-person-badge me-2"></i>1. Responsable du traitement</h2>
+                    <p>
+                        Le responsable du traitement des données est l'association GéoMonkey (association loi 1901),
+                        représentée par son président. Vous pouvez nous contacter à l'adresse :
+                        <strong>contact@geomonkey.fr</strong>
+                    </p>
 
-                        <h2>3. Données collectées</h2>
-                        <p>
-                            Nous collectons les données suivantes :
-                        </p>
-                        <ul>
-                            <li><strong>Données d'identification</strong> : Nom, prénom, adresse email ;</li>
-                            <li><strong>Données de connexion</strong> : Mot de passe (stocké de manière sécurisée, jamais en clair) ;</li>
-                            <li><strong>Données d'adhésion</strong> : Statut (visiteur/membre actif), date d'adhésion, date de validation ;</li>
-                            <li><strong>Données de paiement</strong> : Aucun détail bancaire n'est stocké. Les paiements sont traités 
-                                par Stripe, qui stocke uniquement l'ID de transaction (stripePaymentId) pour la traçabilité.</li>
-                        </ul>
+                    <h2 id="finalites" class="gm-legal-h2"><i class="bi bi-bullseye me-2"></i>2. Finalités du traitement</h2>
+                    <p>Nous traitons vos données personnelles uniquement pour les finalités suivantes :</p>
+                    <ul>
+                        <li><strong>Gestion des adhérents</strong> : création et gestion de votre compte, suivi de votre adhésion ;</li>
+                        <li><strong>Vie associative</strong> : organisation et communication des événements ;</li>
+                        <li><strong>Newsletter</strong> : envoi d'informations sur la vie de l'association, <strong>uniquement avec votre consentement explicite</strong>, révocable à tout moment via le lien de désinscription présent dans chaque email ;</li>
+                        <li><strong>Comptabilité</strong> : gestion des cotisations et obligations légales de conservation ;</li>
+                        <li><strong>Support et communication</strong> : réponse à vos questions et envoi de communications importantes.</li>
+                    </ul>
 
-                        <h2>4. Base légale du traitement</h2>
-                        <p>
-                            <strong>Pour les visiteurs (gratuit)</strong> : Votre consentement explicite (case à cocher lors de l'inscription).
-                        </p>
-                        <p>
-                            <strong>Pour les membres actifs (payant)</strong> : 
-                            <ul>
-                                <li>Consentement explicite pour l'adhésion et la gestion associative ;</li>
-                                <li>Exécution d'un contrat (fourniture des services d'adhésion) ;</li>
-                                <li>Obligation légale (conservation comptable pendant 2 ans après la fin de l'adhésion).</li>
-                            </ul>
-                        </p>
+                    <h2 id="donnees" class="gm-legal-h2"><i class="bi bi-database me-2"></i>3. Données collectées</h2>
+                    <ul>
+                        <li><strong>Données d'identification</strong> : nom, prénom, adresse email ;</li>
+                        <li><strong>Données de connexion</strong> : mot de passe (stocké de manière sécurisée, jamais en clair) ;</li>
+                        <li><strong>Données d'adhésion</strong> : statut (visiteur / membre actif), date d'adhésion, date de validation ;</li>
+                        <li><strong>Données de paiement</strong> : aucun détail bancaire n'est stocké. Les paiements sont traités
+                            par Stripe ; nous conservons uniquement l'identifiant de transaction pour la traçabilité comptable.</li>
+                    </ul>
 
-                        <h2>5. Durée de conservation</h2>
-                        <p>
-                            Vos données sont conservées :
-                        </p>
-                        <ul>
-                            <li>Tant que votre adhésion est active ;</li>
-                            <li>Pendant 2 ans supplémentaires après la fin de votre adhésion (obligation comptable) ;</li>
-                            <li>Après quoi, vos données sont anonymisées ou supprimées, sauf si vous avez donné un consentement 
-                                spécifique pour une conservation plus longue.</li>
-                        </ul>
+                    <h2 id="base" class="gm-legal-h2"><i class="bi bi-bank me-2"></i>4. Base légale du traitement</h2>
+                    <p><strong>Pour les visiteurs (gratuit)</strong> : votre consentement explicite (case à cocher lors de l'inscription).</p>
+                    <p><strong>Pour les membres actifs (payant)</strong> :</p>
+                    <ul>
+                        <li>Consentement explicite pour l'adhésion et la gestion associative ;</li>
+                        <li>Exécution d'un contrat (fourniture des services d'adhésion) ;</li>
+                        <li>Obligation légale (conservation comptable pendant 2 ans après la fin de l'adhésion).</li>
+                    </ul>
+                    <p>
+                        Vous pouvez retirer votre consentement à tout moment (article 7 du RGPD),
+                        sans affecter la licéité du traitement antérieur.
+                    </p>
 
-                        <h2>6. Droits des personnes concernées</h2>
-                        <p>
-                            Conformément au RGPD, vous disposez des droits suivants :
-                        </p>
-                        <ul>
-                            <li><strong>Droit d'accès</strong> : Accéder à vos données personnelles ;</li>
-                            <li><strong>Droit de rectification</strong> : Corriger vos données si elles sont inexactes ;</li>
-                            <li><strong>Droit à l'effacement</strong> : Supprimer vos données (sous réserve des obligations légales de conservation) ;</li>
-                            <li><strong>Droit à la limitation</strong> : Limiter le traitement de vos données ;</li>
-                            <li><strong>Droit à la portabilité</strong> : Récupérer vos données dans un format structuré ;</li>
-                            <li><strong>Droit d'opposition</strong> : Vous opposer au traitement de vos données.</li>
-                        </ul>
-                        <p>
-                            Pour exercer l'un de ces droits, contactez-nous à <strong>contact@geomonkey.fr</strong>.
-                        </p>
+                    <h2 id="duree" class="gm-legal-h2"><i class="bi bi-hourglass-split me-2"></i>5. Durée de conservation</h2>
+                    <p>Vos données sont conservées :</p>
+                    <ul>
+                        <li>Tant que votre adhésion est active ;</li>
+                        <li>Pendant 2 ans supplémentaires après la fin de votre adhésion (obligation comptable) ;</li>
+                        <li>Après quoi elles sont anonymisées ou supprimées, sauf consentement spécifique pour une conservation plus longue.</li>
+                    </ul>
 
-                        <h2>7. Sécurité des données</h2>
-                        <p>
-                            Nous mettons en œuvre des mesures techniques et organisationnelles pour protéger vos données :
-                        </p>
-                        <ul>
-                            <li>Chiffrement des mots de passe ;</li>
-                            <li>Hébergement sécurisé directement par l'association sur son propre serveur, situé dans l'Union européenne ;</li>
-                            <li>Accès réservé au bureau de l'association ;</li>
-                            <li>Paiements sécurisés via Stripe (conforme PCI-DSS).</li>
-                        </ul>
+                    <h2 id="droits" class="gm-legal-h2"><i class="bi bi-person-check me-2"></i>6. Vos droits</h2>
+                    <p>Conformément au RGPD, vous disposez des droits suivants :</p>
+                    <ul>
+                        <li><strong>Droit d'accès</strong> : accéder à vos données personnelles ;</li>
+                        <li><strong>Droit de rectification</strong> : corriger vos données si elles sont inexactes ;</li>
+                        <li><strong>Droit à l'effacement</strong> : supprimer vos données (sous réserve des obligations légales de conservation) ;</li>
+                        <li><strong>Droit à la limitation</strong> : limiter le traitement de vos données ;</li>
+                        <li><strong>Droit à la portabilité</strong> : récupérer vos données dans un format structuré ;</li>
+                        <li><strong>Droit d'opposition</strong> : vous opposer au traitement de vos données ;</li>
+                        <li><strong>Droit de retrait du consentement</strong> : retirer votre consentement à tout moment.</li>
+                    </ul>
+                    <p>
+                        Pour exercer l'un de ces droits, écrivez à <strong>contact@geomonkey.fr</strong>.
+                        Nous nous engageons à répondre dans un délai d'un mois.
+                    </p>
 
-                        <h2>8. Sous-traitants et transferts</h2>
-                        <p>
-                            Nous faisons appel aux prestataires suivants, dans le cadre de leurs obligations 
-                            professionnelles de confidentialité et de sécurité :
-                        </p>
-                        <ul>
-                            <li><strong>Stripe</strong> : traitement sécurisé des paiements (conformité PCI-DSS).
-                                Seules vos données d'identification (nom, email) et le montant sont transmis
-                                pour l'établissement du paiement. Aucune donnée bancaire n'est stockée par l'association.
-                                <a href="https://stripe.com/fr/privacy" target="_blank">Politique de confidentialité de Stripe</a> ;</li>
-                        </ul>
-                        <p>
-                            Vos données sont traitées et stockées au sein de l'Union Européenne. 
-                            Stripe peut transférer certaines données aux États-Unis conformément à ses conditions de confidentialité.
-                        </p>
+                    <h2 id="securite" class="gm-legal-h2"><i class="bi bi-lock-fill me-2"></i>7. Sécurité des données</h2>
+                    <ul>
+                        <li>Chiffrement des mots de passe ;</li>
+                        <li>Hébergement sécurisé directement par l'association sur son propre serveur, situé dans l'Union européenne ;</li>
+                        <li>Accès aux données réservé au bureau de l'association ;</li>
+                        <li>Paiements sécurisés via Stripe (conforme PCI-DSS).</li>
+                    </ul>
 
-                        <h2>9. Droit à l'image</h2>
-                        <p>
-                            La publication de vos photos prises lors des événements fait l'objet d'un
-                            <strong>consentement distinct et facultatif</strong>, recueilli lors de l'inscription
-                            et horodaté dans nos registres. Vous pouvez le retirer à tout moment en écrivant à
-                            contact@geomonkey.fr : les photos concernées seront retirées du site dans les meilleurs délais.
-                        </p>
+                    <h2 id="sous-traitants" class="gm-legal-h2"><i class="bi bi-box-seam me-2"></i>8. Sous-traitants et transferts</h2>
+                    <p>Nous faisons appel aux prestataires suivants, dans le cadre de leurs obligations professionnelles de confidentialité et de sécurité :</p>
+                    <ul>
+                        <li><strong>Stripe</strong> : traitement sécurisé des paiements (conformité PCI-DSS).
+                            Seules vos données d'identification (nom, email) et le montant sont transmis
+                            pour l'établissement du paiement. Aucune donnée bancaire n'est stockée par l'association —
+                            <a href="https://stripe.com/fr/privacy" target="_blank" rel="noopener">politique de confidentialité de Stripe</a>.</li>
+                    </ul>
+                    <p>
+                        Vos données sont traitées et stockées au sein de l'Union européenne.
+                        Stripe peut transférer certaines données aux États-Unis conformément à ses conditions de confidentialité.
+                    </p>
 
-                        <h2>10. Réclamation</h2>
-                        <p>
-                            Si vous estimez, après nous avoir contactés, que vos droits ne sont pas respectés,
-                            vous pouvez introduire une réclamation auprès de la
-                            <a href="https://www.cnil.fr" target="_blank">CNIL</a> (Commission Nationale de l'Informatique et des Libertés).
-                        </p>
+                    <h2 id="cookies" class="gm-legal-h2"><i class="bi bi-cookie me-2"></i>9. Cookies</h2>
+                    <p>
+                        Le site GéoMonkey n'utilise <strong>aucun cookie publicitaire ni traceur d'analyse d'audience</strong>.
+                        Seuls des cookies techniques strictement nécessaires au fonctionnement du site sont déposés :
+                    </p>
+                    <ul>
+                        <li><strong>Session</strong> : maintien de votre connexion (PHPSESSID) ;</li>
+                        <li><strong>Sécurité Stripe</strong> : prévention de la fraude lors d'un paiement.</li>
+                    </ul>
+                    <p>
+                        Ces cookies étant strictement nécessaires, aucun consentement n'est requis (article 82 de la loi Informatique et Libertés).
+                        Vous pouvez néanmoins les supprimer à tout moment via les réglages de votre navigateur.
+                    </p>
 
-                        <h2>11. Modifications de la politique</h2>
-                        <p>
-                            Cette politique de confidentialité peut être modifiée à tout moment. 
-                            Vous serez informé de toute modification par email.
-                        </p>
+                    <h2 id="image" class="gm-legal-h2"><i class="bi bi-camera me-2"></i>10. Droit à l'image</h2>
+                    <p>
+                        La publication de vos photos prises lors des événements fait l'objet d'un
+                        <strong>consentement distinct et facultatif</strong>, recueilli lors de l'inscription
+                        et horodaté dans nos registres. Vous pouvez le retirer à tout moment en écrivant à
+                        contact@geomonkey.fr : les photos concernées seront retirées du site dans les meilleurs délais.
+                    </p>
 
-                        <div class="mt-4 text-center">
-                            <p class="text-muted">
-                                En vigueur depuis le {{ 'now'|date('d/m/Y') }}<br>
-                                Dernière mise à jour : {{ 'now'|date('d/m/Y') }}
-                            </p>
-                            <p class="text-muted small mt-4">Hébergement : Association GéoMonkey (auto-hébergement sur serveur situé dans l'Union européenne)</p>
-                            <a href="{{ path('app_home') }}" class="btn btn-secondary">
-                                <i class="bi bi-arrow-left me-2"></i> Retour à l'accueil
+                    <h2 id="reclamation" class="gm-legal-h2"><i class="bi bi-exclamation-octagon me-2"></i>11. Réclamation</h2>
+                    <p>
+                        Si vous estimez, après nous avoir contactés, que vos droits ne sont pas respectés,
+                        vous pouvez introduire une réclamation auprès de la
+                        <a href="https://www.cnil.fr" target="_blank" rel="noopener">CNIL</a>
+                        (Commission Nationale de l'Informatique et des Libertés).
+                    </p>
+
+                    <h2 id="modifications" class="gm-legal-h2"><i class="bi bi-pencil-square me-2"></i>12. Modifications de la politique</h2>
+                    <p>
+                        Cette politique de confidentialité peut être modifiée à tout moment.
+                        Vous serez informé de toute modification par email.
+                    </p>
+
+                    <div class="gm-legal-foot mt-4">
+                        <p>Hébergement : Association GéoMonkey (auto-hébergement sur serveur situé dans l'Union européenne)</p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
+                            <a href="{{ path('app_cgu') }}" class="btn btn-outline-gm-yellow">
+                                <i class="bi bi-file-earmark-text me-2"></i>Conditions Générales d'Adhésion
+                            </a>
+                            <a href="{{ path('app_home') }}" class="btn btn-gm-surface">
+                                <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
                             </a>
                         </div>
                     </div>

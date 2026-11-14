@@ -1,0 +1,25 @@
+{# ===== Messages flash — affichés sous la navbar ===== #}
+{% set gm_alert_classes = {
+    success: 'alert-gm-success',
+    error: 'alert-gm-danger',
+    danger: 'alert-gm-danger',
+    warning: 'alert-gm-warning',
+    info: 'alert-gm-info',
+} %}
+{% set gm_alert_icons = {
+    success: 'bi-check-circle-fill',
+    error: 'bi-exclamation-circle-fill',
+    danger: 'bi-exclamation-circle-fill',
+    warning: 'bi-exclamation-triangle-fill',
+    info: 'bi-info-circle-fill',
+} %}
+<div class="container gm-flash-zone">
+    {% for type, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert {{ gm_alert_classes[type] ?? 'alert-gm-info' }} alert-dismissible fade show" role="alert">
+                <i class="bi {{ gm_alert_icons[type] ?? 'bi-info-circle-fill' }} me-2" aria-hidden="true"></i>{{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+</div>

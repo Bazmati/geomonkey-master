@@ -2,34 +2,79 @@
 
 {% block title %}Connexion - GéoMonkey{% endblock %}
 
-{% block body %}
-    {% include 'partials/_navbar.html.twig' %}
+{% block meta %}
+    <meta name="robots" content="noindex">
+    <meta name="description" content="Connecte-toi à ton espace membre GéoMonkey.">
+{% endblock %}
 
-    <div class="min-vh-100 d-flex flex-column bg-gm-bg">
+{% block body %}
+{% include 'partials/_navbar.html.twig' %}
+
+{# ===== Fond vidéo en boucle (fallback : aurores animées CSS) ===== #}
+<div class="gm-join-bg" aria-hidden="true">
+    <div class="gm-join-aurora gm-join-aurora-green"></div>
+    <div class="gm-join-aurora gm-join-aurora-yellow"></div>
+    <video class="gm-join-video" autoplay muted loop playsinline preload="metadata" tabindex="-1">
+        <source src="{{ asset('videos/connexion.mp4') }}" type="video/mp4">
+        <source src="{{ asset('videos/adhesion.mp4') }}" type="video/mp4">
+    </video>
+    <div class="gm-join-veil"></div>
+</div>
+
+<main class="gm-join position-relative">
+    <div class="container py-4">
         {# Lien de retour en haut #}
-        <div class="p-3">
+        <div class="mb-2">
             <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
                 <i class="bi bi-arrow-left"></i> Retour à l'accueil
             </a>
         </div>
 
-    {# Contenu principal #}
-    <div class="flex-grow-1 d-flex align-items-center justify-content-center p-4">
-        <div class="col-lg-4 col-md-6 col-sm-8">
-            {# Card de connexion #}
-            <div class="card border-warning shadow-lg border-radius-15 overflow-hidden">
-                {# En-tête avec logo #}
-                <div class="card-header bg-gm-warning text-gm-bg text-center py-4">
-                    <img src="{{ asset('images/logo.png') }}" alt="GéoMonkey" class="img-fluid rounded-circle border border-3 border-gm-bg img-avatar" loading="lazy">
-                    <h2 class="h4 mt-3 mb-0 fw-bold">GéoMonkey</h2>
-                    <p class="mb-0 small">Espace membre</p>
-                </div>
+        <div class="row g-5 align-items-center justify-content-center min-vh-90 pt-2 pb-4">
 
-                {# Corps de la card #}
-                <div class="card-body bg-gm-surface text-gm-text">
+            {# ===== Colonne pitch ===== #}
+            <div class="col-lg-5 text-center text-lg-start">
+                <span class="badge home-hero-badge mb-3">
+                    <i class="bi bi-box-arrow-in-right me-1"></i> Espace membre
+                </span>
+                <h1 class="gm-join-title mb-3">Content de te<br>revoir !</h1>
+                <p class="gm-join-sub mb-4">
+                    Derrière cette porte : les projets en cours, le suivi
+                    d'avancement, les événements réservés et toute la vie
+                    interne de l'assoc'.
+                </p>
+                <ul class="list-unstyled gm-join-benefits">
+                    <li>
+                        <i class="bi bi-kanban"></i>
+                        <div><strong>Suivi des projets</strong><br>
+                        <span class="small">Tableaux d'avancement et tâches en temps réel</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-calendar-event"></i>
+                        <div><strong>Événements membres</strong><br>
+                        <span class="small">Sorties et ateliers réservés aux adhérents actifs</span></div>
+                    </li>
+                    <li>
+                        <i class="bi bi-images"></i>
+                        <div><strong>Galerie complète</strong><br>
+                        <span class="small">Toutes les photos, y compris celles réservées aux membres</span></div>
+                    </li>
+                </ul>
+            </div>
+
+            {# ===== Colonne formulaire : carte verre dépoli ===== #}
+            <div class="col-lg-4 col-md-6 col-sm-9">
+                <div class="gm-join-card text-center">
+                    <span class="gm-nav-logo mb-3 mx-auto" style="width:72px;height:72px;border-radius:18px;">
+                        <img src="{{ asset('images/Logo_geomonkey.png') }}" alt="GéoMonkey"
+                             onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.classList.add('rounded-circle');">
+                    </span>
+                    <h2 class="gm-join-card-title mb-1">GéoMonkey</h2>
+                    <p class="text-gm-muted small mb-4">Espace membre</p>
+
                     {% if app.user %}
                         <div class="alert alert-gm-info mb-4">
-                            Vous êtes déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>, 
+                            Vous êtes déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>,
                             <a href="{{ logout_path() }}" class="alert-link text-gm-green">Se déconnecter</a>
                         </div>
                     {% endif %}
@@ -40,7 +85,7 @@
                         </div>
                     {% endif %}
 
-                    <form method="post" class="needs-validation" novalidate>
+                    <form method="post" class="needs-validation text-start" novalidate>
                         {# Champ Email #}
                         <div class="mb-4">
                             <label for="inputEmail" class="form-label fw-semibold">Email</label>
@@ -71,12 +116,11 @@
                         {# Protection CSRF (indispensable si enable_csrf_protection: true dans security.yaml) #}
                         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
 
-                        {# Option Se souvenir de moi — à activer seulement si "remember_me" est configuré dans security.yaml #}
+                        {# Option Se souvenir de moi #}
                         <div class="mb-4 form-check">
                             <input type="checkbox" id="rememberMe" name="_remember_me" class="form-check-input">
                             <label for="rememberMe" class="form-check-label">Se souvenir de moi</label>
                         </div>
-                       
 
                         {# Bouton de connexion #}
                         <button class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8" type="submit">
@@ -84,22 +128,35 @@
                         </button>
                     </form>
 
-
-
-                    {# Lien mot de passe oublié - placeholder #}
+                    {# Lien mot de passe oublié #}
                     <div class="mt-4 text-center">
                         <small class="text-gm-muted">
-                            <a href="#" class="text-gm-warning text-decoration-none">Mot de passe oublié ?</a>
+                            <a href="{{ path('app_forgot_password') }}" class="text-gm-warning text-decoration-none">Mot de passe oublié ?</a>
                         </small>
                     </div>
-                </div>
 
-                {# Pied de la card #}
-                <div class="card-footer bg-gm-warning text-gm-bg text-center py-2 small">
-                    <p class="mb-0">Pas encore membre ? <a href="{{ path('app_membership_register') }}" class="fw-bold text-gm-bg">Rejoignez-nous</a></p>
+                    <hr class="my-3 border-gm-gray-700">
+                    <p class="mb-0 small text-gm-muted">
+                        Pas encore membre ? <a href="{{ path('app_membership_register') }}" class="fw-bold text-gm-warning">Rejoins-nous</a>
+                    </p>
                 </div>
             </div>
         </div>
     </div>
-</div>
+</main>
+
+<script>
+    // Fond vidéo : n'apparaît que si le fichier charge réellement,
+    // et respecte prefers-reduced-motion
+    (function () {
+        var v = document.querySelector('.gm-join-video');
+        if (!v) { return; }
+        v.addEventListener('canplay', function () { v.classList.add('is-playing'); }, { once: true });
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+            v.pause();
+            v.removeAttribute('autoplay');
+            v.classList.remove('is-playing');
+        }
+    })();
+</script>
 {% endblock %}
