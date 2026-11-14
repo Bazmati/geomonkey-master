@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Hors ligne — GéoMonkey</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background:
+                radial-gradient(ellipse 60% 90% at 20% 0%, rgba(0, 160, 64, 0.18), transparent 60%),
+                radial-gradient(ellipse 50% 80% at 85% 10%, rgba(224, 192, 32, 0.12), transparent 55%),
+                #1C1C1A;
+            color: #fff;
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+            text-align: center;
+            padding: 24px;
+        }
+        .card {
+            background: #242422;
+            border: 1px solid rgba(224, 192, 32, 0.15);
+            border-radius: 16px;
+            padding: 40px 32px;
+            max-width: 420px;
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        }
+        .monkey { font-size: 56px; }
+        h1 { font-size: 1.4rem; margin-top: 12px; }
+        p { color: rgba(255, 255, 255, 0.7); line-height: 1.6; margin-top: 12px; }
+        a.btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            background: #00A040;
+            color: #fff;
+            border-radius: 50rem;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        a.btn:hover { background: #00b348; }
+        .brand { font-size: 0.85rem; color: rgba(255, 255, 255, 0.4); margin-top: 24px; }
+        .brand b { color: #E0C020; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="monkey">🐒</div>
+        <h1>Tu es hors ligne</h1>
+        <p>Pas de réseau détecté. La jungle a besoin d'une connexion&nbsp;: vérifie ton Wi-Fi ou ta 4G, puis réessaie.</p>
+        <a class="btn" href="/">Réessayer</a>
+        <div class="brand"><b>Géo</b>Monkey</div>
+    </div>
+</body>
+</html>

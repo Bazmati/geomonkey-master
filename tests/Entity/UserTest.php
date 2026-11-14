@@ -155,6 +155,7 @@ class UserTest extends TestCase
         $this->assertTrue($user->isRegistrationConfirmed());
         $this->assertInstanceOf(\DateTimeImmutable::class, $user->getRegistrationValidatedAt());
         $this->assertEquals('membre_actif', $user->getRequestedFunction());
+    }
 
     public function testMembershipValidDateDeriveDeLAdhesionActive(): void
     {

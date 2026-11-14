@@ -85,5 +85,13 @@
 
         {% block javascripts %}
         {% endblock %}
+        {# Service Worker (PWA) — enregistré après le chargement, silencieux si non supporté #}
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function () {
+                    navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function () {});
+                });
+            }
+        </script>
     </body>
 </html>
