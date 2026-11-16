@@ -2,6 +2,11 @@
 framework:
     secret: '%env(APP_SECRET)%'
 
+    # Derriere le reverse proxy nginx du conteneur 200 : sans ceci,
+    # Symfony croit etre en HTTP et les redirections/cookies SSL foirent.
+    trusted_proxies: '%env(TRUSTED_PROXIES)%'
+    trusted_headers: ['x-forwarded-for', 'x-forwarded-host', 'x-forwarded-proto', 'x-forwarded-port']
+
     # Note that the session will be started ONLY if you read or write from it.
     session:
         cookie_secure: true
