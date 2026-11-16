@@ -2,6 +2,7 @@
 
 namespace App\EventSubscriber;
 
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -13,6 +14,12 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class SecurityHeadersSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        #[Autowire('%kernel.environment%')]
+        private readonly string $environment,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [KernelEvents::RESPONSE => ['onKernelResponse', 0]];
@@ -48,13 +55,13 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
         $request = $event->getRequest();
         $host = $request->getHost();
         $isLocal = in_array($host, ['localhost', '127.0.0.1', '::1'], true);
-        if ($event->getKernel()->getEnvironment() === 'prod' && !$isLocal && $request->isSecure()) {
+        if ($this->environment === 'prod' && !$isLocal && $request->isSecure()) {
             $headers->set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
         }
 
         // CSP (ZAP 10038) : uniquement en prod, le profiler de dev
         // ne respecte pas une CSP stricte.
-        if ($event->getKernel()->getEnvironment() === 'prod') {
+        if ($this->environment === 'prod') {
             $csp = implode('; ', [
                 "default-src 'self'",
                 "script-src 'self' https://challenges.cloudflare.com",
