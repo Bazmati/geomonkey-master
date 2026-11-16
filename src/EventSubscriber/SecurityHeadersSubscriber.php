@@ -64,7 +64,7 @@ class SecurityHeadersSubscriber implements EventSubscriberInterface
         if ($this->environment === 'prod') {
             $csp = implode('; ', [
                 "default-src 'self'",
-                "script-src 'self' https://challenges.cloudflare.com",
+                "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
                 "style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net",
                 "font-src 'self' https://cdn.jsdelivr.net data:",
                 "img-src 'self' data: blob:",
