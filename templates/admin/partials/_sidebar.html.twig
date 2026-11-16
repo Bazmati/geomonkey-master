@@ -1,45 +1,95 @@
+{% set route = app.request.attributes.get('_route') %}
+
+{# ============ Petits helpers (macros locaux) ============ #}
+{% macro navItem(item, route) %}
+    {% if item.route != '#' %}
+        <a class="nav-link {{ route starts with item.match ? 'active' : '' }}"
+           href="{{ path(item.route) }}">
+            <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+        </a>
+    {% else %}
+        <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">
+            <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
+        </a>
+    {% endif %}
+{% endmacro %}
+
+{% macro navSection(title) %}
+    <div class="nav-section">{{ title }}</div>
+{% endmacro %}
+
+{# Groupe repliable (dropdown) avec détection d'activité sur les enfants #}
+{% macro navGroup(id, icon, label, items, route) %}
+    {% set groupActive = false %}
+    {% for item in items %}
+        {% if item.route != '#' and route starts with item.match %}{% set groupActive = true %}{% endif %}
+    {% endfor %}
+    <div class="nav-group {{ groupActive ? 'active-group' : '' }}">
+        <button type="button"
+                class="nav-link nav-group-toggle"
+                data-bs-toggle="collapse"
+                data-bs-target="#admin-nav-{{ id }}"
+                aria-expanded="{{ groupActive ? 'true' : 'false' }}"
+                aria-controls="admin-nav-{{ id }}">
+            <i class="bi bi-{{ icon }}"></i> {{ label }}
+            <i class="bi bi-chevron-down nav-group-chevron"></i>
+        </button>
+        <div class="collapse {{ groupActive ? 'show' : '' }}" id="admin-nav-{{ id }}">
+            <div class="nav-group-items">
+                {% for item in items %}
+                    {{ _self.navItem(item, route) }}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endmacro %}
+
 <div class="admin-nav">
-    <a class="d-flex align-items-center mb-4 text-decoration-none" href="{{ path('app_admin_dashboard') }}">
+    {# ============ Marque ============ #}
+    <a class="admin-brand d-flex align-items-center gap-2 text-decoration-none" href="{{ path('app_admin_dashboard') }}">
         <span class="gm-nav-logo flex-shrink-0" style="width:40px;height:40px;">
             <img src="{{ asset('images/Logo_geomonkey.png') }}" alt="GéoMonkey"
                  onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.classList.add('rounded-circle');">
         </span>
-        <span class="fw-bold text-gm-warning">Admin Panel</span>
+        <span class="admin-brand-text d-flex flex-column">
+            <span class="fw-bold text-gm-warning">Monkey Admin</span>
+            <span class="admin-brand-sub">GéoMonkey</span>
+        </span>
     </a>
-    
-    {# Menu dynamique - route courante #}
-    {% set route = app.request.attributes.get('_route') %}
-    {% set menu = [
-        {label: 'Tableau de bord', icon: 'house', route: 'app_admin_dashboard', match: 'app_admin_dashboard'},
-        {label: 'Présentation', icon: 'newspaper', route: 'app_admin_presentation_index', match: 'app_admin_presentation'},
-        {label: 'Actualités', icon: 'newspaper', route: 'app_admin_blog_index', match: 'app_admin_blog'},
-        {label: 'Catégories blog', icon: 'folder', route: 'admin_blog_category_index', match: 'admin_blog_category'},
-        {label: 'Tags blog', icon: 'tag', route: 'admin_blog_tag_index', match: 'admin_blog_tag'},
-        {label: 'Événements', icon: 'calendar', route: 'admin_events_index', match: 'admin_events'},
-        {label: 'Catégories événements', icon: 'folder', route: 'admin_event_category_index', match: 'admin_event_category'},
-        {label: 'Tags événements', icon: 'tag', route: 'admin_event_tag_index', match: 'admin_event_tag'},
-        {label: 'Galerie', icon: 'images', route: 'app_admin_gallery_image_index', match: 'app_admin_gallery_image'},
-        {label: 'Projets', icon: 'kanban', route: 'admin_projects_index', match: 'admin_projects'},
-        {label: 'Boutique', icon: 'shop', route: '#', match: 'app_admin_shop'},
-        {label: 'Billetterie', icon: 'ticket-perforated', route: '#', match: 'app_admin_ticket'},
-        {label: 'Utilisateurs', icon: 'people', route: 'app_admin_user_index', match: 'app_admin_user'},
-        {label: 'Adhésions', icon: 'person-plus', route: 'app_admin_membership_requests', match: 'app_admin_membership'},
-        {label: 'Tarif adhésion', icon: 'currency-euro', route: 'app_admin_membership_fee_index', match: 'app_admin_membership_fee'},
-        {label: 'Messages', icon: 'envelope', route: '#', match: 'app_admin_message'},
-        {label: 'Paramètres', icon: 'gear', route: '#', match: 'app_admin_settings'},
-    ] %}
-    {# Fin du menu - les entrées avec route='#' sont des placeholders pour modules futurs #}
-    
-    {% for item in menu %}
-        {% if item.route != '#' %}
-            <a class="nav-link {{ route starts with item.match ? 'active' : '' }}" 
-               href="{{ path(item.route) }}">
-                <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
-            </a>
-        {% else %}
-            <a class="nav-link disabled" href="#">
-                <i class="bi bi-{{ item.icon }}"></i> {{ item.label }}
-            </a>
-        {% endif %}
-    {% endfor %}
+
+    {# ============ Pilotage ============ #}
+    {{ _self.navSection('Pilotage') }}
+    {{ _self.navItem({label: 'Tableau de bord', icon: 'speedometer2', route: 'app_admin_dashboard', match: 'app_admin_dashboard'}, route) }}
+    {{ _self.navItem({label: 'Présentation', icon: 'newspaper', route: 'app_admin_presentation_index', match: 'app_admin_presentation'}, route) }}
+
+    {# ============ Blog (dropdown) ============ #}
+    {{ _self.navSection('Contenus') }}
+    {{ _self.navGroup('blog', 'newspaper', 'Blog', [
+        {label: 'Actualités', icon: 'journal-text', route: 'app_admin_blog_index', match: 'app_admin_blog'},
+        {label: 'Catégories', icon: 'folder', route: 'admin_blog_category_index', match: 'admin_blog_category'},
+        {label: 'Tags', icon: 'tag', route: 'admin_blog_tag_index', match: 'admin_blog_tag'},
+    ], route) }}
+
+    {# ============ Événements (dropdown) ============ #}
+    {{ _self.navGroup('events', 'calendar-event', 'Événements', [
+        {label: 'Tous les événements', icon: 'calendar2-week', route: 'admin_events_index', match: 'admin_events'},
+        {label: 'Catégories', icon: 'folder', route: 'admin_event_category_index', match: 'admin_event_category'},
+        {label: 'Tags', icon: 'tag', route: 'admin_event_tag_index', match: 'admin_event_tag'},
+    ], route) }}
+
+    {{ _self.navItem({label: 'Galerie', icon: 'images', route: 'app_admin_gallery_image_index', match: 'app_admin_gallery_image'}, route) }}
+    {{ _self.navItem({label: 'Projets', icon: 'kanban', route: 'admin_projects_index', match: 'admin_projects'}, route) }}
+
+    {# ============ Communauté ============ #}
+    {{ _self.navSection('Communauté') }}
+    {{ _self.navItem({label: 'Utilisateurs', icon: 'people', route: 'app_admin_user_index', match: 'app_admin_user'}, route) }}
+    {{ _self.navItem({label: 'Adhésions', icon: 'person-plus', route: 'app_admin_membership_requests', match: 'app_admin_membership'}, route) }}
+    {{ _self.navItem({label: 'Tarif adhésion', icon: 'currency-euro', route: 'app_admin_membership_fee_index', match: 'app_admin_membership_fee'}, route) }}
+
+    {# ============ Modules à venir (placeholders) ============ #}
+    {{ _self.navSection('Modules') }}
+    {{ _self.navItem({label: 'Boutique', icon: 'shop', route: '#', match: 'app_admin_shop'}, route) }}
+    {{ _self.navItem({label: 'Billetterie', icon: 'ticket-perforated', route: '#', match: 'app_admin_ticket'}, route) }}
+    {{ _self.navItem({label: 'Messages', icon: 'envelope', route: '#', match: 'app_admin_message'}, route) }}
+    {{ _self.navItem({label: 'Paramètres', icon: 'gear', route: '#', match: 'app_admin_settings'}, route) }}
 </div>
