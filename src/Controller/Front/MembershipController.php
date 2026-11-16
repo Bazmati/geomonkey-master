@@ -14,6 +14,8 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Security\Csrf\CsrfToken;
+use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
 
 #[Route('/inscription')]
 class MembershipController extends AbstractController
@@ -203,9 +205,17 @@ class MembershipController extends AbstractController
     public function forgotPassword(
         Request $request,
         EntityManagerInterface $em,
-        UserRepository $userRepository
+        UserRepository $userRepository,
+        CsrfTokenManagerInterface $csrf
     ): Response {
         if ($request->isMethod('POST')) {
+            // Protection CSRF : le formulaire embarque un jeton _csrf_token
+            $submittedToken = $request->request->get('_csrf_token', '');
+            if (!$csrf->isTokenValid(new CsrfToken('forgot_password', $submittedToken))) {
+                $this->addFlash('error', 'Session expirée ou jeton invalide, veuillez réessayer.');
+                return $this->redirectToRoute('app_forgot_password');
+            }
+
             $email = $request->request->get('email');
             
             $user = $userRepository->findOneBy(['email' => $email]);
