@@ -141,21 +141,21 @@ class EventController extends AbstractController
         if (!$this->isCsrfTokenValid('register' . $event->getId(), $request->request->get('_token'))) {
             $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Événement réservé aux membres : adhésion active obligatoire
         if ($event->isMembersOnly() && !$this->isViewerActiveMember()) {
             $this->addFlash('warning', 'Cet événement est réservé aux membres actifs de l\'association.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Événement déjà commencé
         if ($event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time()) {
             $this->addFlash('warning', 'Cet événement a déjà commencé, les inscriptions sont fermées.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Capacité atteinte
@@ -163,14 +163,14 @@ class EventController extends AbstractController
             && $this->participantRepository->countParticipants($event) >= $event->getCapacity()) {
             $this->addFlash('warning', 'Toutes les places sont prises, l\'événement est complet.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Déjà inscrit
         if ($this->participantRepository->userParticipatesInEvent($user, $event)) {
             $this->addFlash('info', 'Vous êtes déjà inscrit à cet événement.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         $participant = new EventParticipant();
@@ -183,7 +183,7 @@ class EventController extends AbstractController
 
         $this->addFlash('success', 'Inscription confirmée, à bientôt !');
 
-        return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
     }
 
     #[Route('/{id}/unregister', name: 'unregister', requirements: ['id' => '\d+'], methods: ['POST'])]
@@ -200,14 +200,14 @@ class EventController extends AbstractController
         if (!$this->isCsrfTokenValid('unregister' . $event->getId(), $request->request->get('_token'))) {
             $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         $participant = $this->participantRepository->findOneBy(['event' => $event, 'user' => $user]);
         if (null === $participant) {
             $this->addFlash('info', 'Vous n\'êtes pas inscrit à cet événement.');
 
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         $this->entityManager->remove($participant);
@@ -215,7 +215,7 @@ class EventController extends AbstractController
 
         $this->addFlash('success', 'Votre inscription a été annulée.');
 
-        return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+        return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
     }
 
     #[Route('/{id}.ics', name: 'ics', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -223,7 +223,7 @@ class EventController extends AbstractController
     {
         $event = $this->findVisibleEventOr404($id);
 
-        $url = $this->generateUrl('app_event_show', ['id' => $event->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $url = $this->generateUrl('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()], UrlGeneratorInterface::ABSOLUTE_URL);
 
         return $this->icsGenerator->response($event, $url);
     }
