@@ -1,5 +1,5 @@
 import './stimulus_bootstrap.js';
-import './vendor/bootstrap/css/bootstrap.min.css';
+
 
 
 // ----- Modales : sortie du contexte d'empilage -----
