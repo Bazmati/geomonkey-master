@@ -169,7 +169,14 @@
                         <div class="col-md-6 col-lg-4">
                             <a href="{{ path('app_project_show', {slug: project.slug}) }}" class="text-decoration-none">
                                 <article class="home-card h-100">
-                                    {% set media = image_url(project, 'medium') ?? (project.galleryImages is not empty ? image_url(project.galleryImages|first, 'medium') : null) %}
+                                    {% set media = image_url(project, 'medium') %}
+                                    {% if not media %}
+                                        {% for task in project.tasks %}
+                                            {% if not media and task.galleryImages is not empty %}
+                                                {% set media = image_url(task.galleryImages|first, 'medium') %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    {% endif %}
                                     {% if media %}
                                         <img src="{{ media }}" alt="" loading="lazy" class="home-card-img">
                                     {% else %}
