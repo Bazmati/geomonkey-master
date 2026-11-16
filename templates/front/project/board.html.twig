@@ -89,7 +89,7 @@
                                                 <ul class="list-unstyled mb-2 small">
                                                     {% for document in task.documents %}
                                                         <li>
-                                                            <a href="{{ asset(document.webPath) }}" target="_blank" rel="noopener">
+                                                            <a href="{{ path('app_project_task_document_download', {document: document.id}) }}" target="_blank" rel="noopener">
                                                                 <i class="bi {{ document.icon }}"></i> {{ document.originalName }}
                                                             </a>
                                                             <span class="text-muted">({{ document.formattedSize }})</span>

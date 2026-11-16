@@ -62,4 +62,21 @@ class BlogController extends AbstractController
             'related' => array_slice($related, 0, 3),
         ]);
     }
+
+    #[Route('/tag/{slug}', name: 'tag', methods: ['GET'])]
+    public function tag(string $slug, BlogTagRepository $tagRepo): Response
+    {
+        $tag = $tagRepo->findOneBy(['slug' => $slug]);
+        if (!$tag) {
+            throw $this->createNotFoundException('Tag inconnu.');
+        }
+
+        $posts = $tag->getPosts()->filter(static fn ($p) => $p->isPublished());
+
+        return $this->render('front/blog/index.html.twig', [
+            'posts' => $posts,
+            'tags' => $tagRepo->findUsedTags(),
+            'currentTag' => $tag,
+        ]);
+    }
 }

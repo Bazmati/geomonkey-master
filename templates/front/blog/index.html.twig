@@ -27,6 +27,13 @@
 <main class="container py-5">
     {{ breadcrumb() }}
 
+    {% if currentTag is defined and currentTag %}
+        <div class="alert alert-dark d-flex align-items-center justify-content-between">
+            <span><i class="bi bi-tag me-1 text-gm-yellow"></i> Articles tagués <strong class="text-gm-yellow">#{{ currentTag.name }}</strong></span>
+            <a href="{{ path('app_blog_index') }}" class="btn btn-sm btn-outline-light">Tout voir</a>
+        </div>
+    {% endif %}
+
     {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
 
     {% if tags|length > 0 %}

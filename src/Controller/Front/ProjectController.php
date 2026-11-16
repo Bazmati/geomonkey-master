@@ -2,7 +2,9 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\ProjectTaskDocument;
 use App\Entity\User;
+use App\Service\ProjectTaskDocumentManager;
 use App\Enum\ProjectTaskState;
 use App\Repository\ProjectRepository;
 use App\Repository\ProjectTaskRepository;
@@ -41,6 +43,25 @@ class ProjectController extends AbstractController
         return $this->render('front/project/show.html.twig', [
             'project' => $project,
         ]);
+    }
+
+    /**
+     * Téléchargement d'un document de tâche — réservé aux utilisateurs
+     * connectés (fichiers stockés hors de public/, servis via le gestionnaire).
+     */
+    #[Route('/task-document/{document}/download', name: 'task_document_download', methods: ['GET'])]
+    #[IsGranted('IS_AUTHENTICATED')]
+    public function taskDocumentDownload(
+        ProjectTaskDocument $document,
+        ProjectTaskDocumentManager $documentManager
+    ): Response {
+        $project = $document->getTask()?->getProject();
+
+        if ($project === null || !$project->isPublished()) {
+            throw $this->createNotFoundException("Document indisponible : le projet associé n'est pas accessible.");
+        }
+
+        return $documentManager->downloadResponse($document);
     }
 
     /**
