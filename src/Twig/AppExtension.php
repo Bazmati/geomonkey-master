@@ -46,7 +46,7 @@ class AppExtension extends AbstractExtension
             return null;
         }
 
-        return $this->imageManager->getUrl($entity, $size);
+        return $this->imageManager->getCoverUrl($entity, $size);
     }
 
     /**

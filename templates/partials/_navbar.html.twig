@@ -100,7 +100,9 @@
 </nav>
 
 {# Messages flash : juste sous la navbar, sur toutes les pages #}
+{% if app.flashes %}
 {% include 'partials/_flash.html.twig' %}
+{% endif %}
 
 <script>
     // Ombre + opacité renforcée dès qu'on quitte le haut de page

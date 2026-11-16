@@ -7,16 +7,33 @@
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
-<section class="py-5">
-    <div class="container">
-        {{ breadcrumb_macros.breadcrumb([
-            ('Accueil', path('app_home')),
-            ('Actualités', path('app_blog_index')),
-            (category.name, null),
-        ]) }}
 
-        <h1 class="mb-4"><i class="bi bi-folder"></i> {{ category.name }}</h1>
-        {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
+{# ===== Hero de section ===== #}
+<header class="pres-hero">
+    <div class="container position-relative text-center">
+        <span class="badge home-hero-badge mb-3">
+            <i class="bi bi-folder2-open me-1"></i> Catégorie
+        </span>
+        <h1 class="pres-hero-title">{{ category.name }}</h1>
+        <p class="home-hero-sub mx-auto mb-0">
+            Tous les articles classés dans « {{ category.name }} ».
+        </p>
     </div>
-</section>
+</header>
+
+<main class="container py-5">
+    {{ breadcrumb() }}
+
+    <div class="row g-5">
+        {# ===== Colonne principale : articles de la catégorie ===== #}
+        <div class="col-lg-8">
+            {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
+        </div>
+
+        {# ===== Colonne latérale : derniers articles + filtres ===== #}
+        <div class="col-lg-4">
+            {% include 'front/blog/_sidebar.html.twig' %}
+        </div>
+    </div>
+</main>
 {% endblock %}

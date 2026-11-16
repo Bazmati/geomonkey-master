@@ -89,7 +89,7 @@
             {% endif %}
 
             {# Galerie de l'article #}
-            {% set gallery = post.galleryImages|filter(i => i.isPublished) %}
+            {# {% set gallery = post.galleryImages|filter(i => i.isPublished) %}
             {% if gallery|length > 0 %}
                 <section class="mt-5">
                     <h2 class="h4 mb-3"><i class="bi bi-images text-gm-yellow"></i> En images</h2>
@@ -101,7 +101,7 @@
                         {% endfor %}
                     </div>
                 </section>
-            {% endif %}
+            {% endif %} #}
 
             {# Fin d'article : partage + adhésion #}
             <div class="blog-end text-center mt-5 p-4">

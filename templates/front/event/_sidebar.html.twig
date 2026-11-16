@@ -1,0 +1,76 @@
+{# Colonne latérale de l'agenda : prochains rendez-vous, filtres, souvenirs.
+   Variables attendues : events, upcoming, filter (calculés dans index.html.twig). #}
+{% set past = events|filter(e => e.endDate and e.endDate|date('U') < 'now'|date('U')) %}
+
+<aside class="blog-sidebar">
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> Prochains rendez-vous</h2>
+        {% if upcoming|length > 1 %}
+            {% for event in upcoming|slice(1, 5) %}
+                <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="blog-latest-item">
+                    <div class="event-date-badge">
+                        <span>{{ event.startDate|date('d') }}</span>
+                        <small>{{ event.startDate|date('M')|upper }}</small>
+                    </div>
+                    <span>
+                        <strong>{{ event.title }}</strong>
+                        <small>
+                            {{ event.startDate|date('H\\h i') }}{% if event.location %} · <i class="bi bi-geo-alt"></i> {{ event.location }}{% endif %}
+                        </small>
+                    </span>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p class="text-muted small mb-0">
+                <i class="bi bi-hourglass-split me-1"></i> Aucun événement programmé pour le moment.
+            </p>
+        {% endif %}
+    </div>
+
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-funnel text-gm-yellow me-1"></i> Filtrer</h2>
+        <ul class="list-unstyled mb-0">
+            <li>
+                <a href="{{ path('app_event_index', {'filter': 'tous'}) }}"
+                   class="blog-cat-link {{ filter == 'tous' ? 'active' }}">
+                    <span><i class="bi bi-asterisk me-1"></i> Tous</span>
+                    <span class="blog-cat-count">{{ events|length }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_event_index', {'filter': 'a-venir'}) }}"
+                   class="blog-cat-link {{ filter == 'a-venir' ? 'active' }}">
+                    <span><i class="bi bi-calendar-plus me-1"></i> À venir</span>
+                    <span class="blog-cat-count">{{ upcoming|length }}</span>
+                </a>
+            </li>
+            <li>
+                <a href="{{ path('app_event_index', {'filter': 'passes'}) }}"
+                   class="blog-cat-link {{ filter == 'passes' ? 'active' }}">
+                    <span><i class="bi bi-clock-fill me-1"></i> Passés</span>
+                    <span class="blog-cat-count">{{ past|length }}</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-camera text-gm-green me-1"></i> Derniers souvenirs</h2>
+        {% for event in past|slice(0, 3) %}
+            <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="blog-latest-item">
+                <div class="event-date-badge event-date-badge-past">
+                    <span>{{ event.startDate|date('d') }}</span>
+                    <small>{{ event.startDate|date('M')|upper }}</small>
+                </div>
+                <span>
+                    <strong>{{ event.title }}</strong>
+                    <small>{{ event.startDate|date('d/m/Y') }}</small>
+                </span>
+            </a>
+        {% else %}
+            <p class="text-muted small mb-0">
+                <i class="bi bi-emoji-smile me-1"></i> Les premiers souvenirs arrivent bientôt !
+            </p>
+        {% endfor %}
+    </div>
+</aside>

@@ -12,4 +12,20 @@ class BlogCategoryRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, BlogCategory::class);
     }
+
+    /**
+     * Catégories utilisées par au moins un article publié,
+     * triées par nombre d'articles publiés (décroissant).
+     */
+    public function findUsedCategories(): array
+    {
+        return $this->createQueryBuilder('c')
+            ->innerJoin('c.posts', 'p')
+            ->andWhere('p.isPublished = true')
+            ->addSelect('COUNT(p.id) AS HIDDEN nb')
+            ->groupBy('c.id')
+            ->orderBy('nb', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
 }

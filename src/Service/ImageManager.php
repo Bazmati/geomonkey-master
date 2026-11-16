@@ -225,6 +225,29 @@ class ImageManager
     }
 
     /**
+     * URL de l'image de couverture d'une entité : image dédiée si présente,
+     * sinon première image de galerie publiée (ex. articles sans image dédiée).
+     */
+    public function getCoverUrl(object $entity, string $size = 'medium'): ?string
+    {
+        $url = $entity instanceof ImageableInterface ? $this->getUrl($entity, $size) : null;
+
+        if ($url === null && method_exists($entity, 'getGalleryImages')) {
+            foreach ($entity->getGalleryImages() as $galleryImage) {
+                if (method_exists($galleryImage, 'isPublished') && !$galleryImage->isPublished()) {
+                    continue;
+                }
+                $url = $this->getUrl($galleryImage, $size);
+                if ($url !== null) {
+                    break;
+                }
+            }
+        }
+
+        return $url;
+    }
+
+    /**
      * Delete all images for an entity.
      */
     public function deleteForEntity(ImageableInterface $entity, ?string $uuid = null): void

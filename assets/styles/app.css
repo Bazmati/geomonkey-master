@@ -231,17 +231,51 @@ input[type="datetime-local"] {
    CONTENU ARTICLES
    ============================================ */
 
-.article-content p { margin-bottom: 1rem; line-height: 1.7; }
-.article-content h2 { font-size: 1.5rem; margin: 2rem 0 .75rem; }
-.article-content h3 { font-size: 1.25rem; margin: 1.5rem 0 .5rem; }
-.article-content ul { padding-left: 1.5rem; margin-bottom: 1rem; }
-.article-content li { margin-bottom: .35rem; }
+.article-content { font-size: 1.06rem; line-height: 1.85; color: var(--gm-gray-100); }
+.article-content p { margin-bottom: 1.15rem; }
+.article-content h2 {
+    display: flex;
+    align-items: center;
+    gap: .65rem;
+    font-size: 1.45rem;
+    font-weight: 800;
+    color: var(--gm-white);
+    margin: 2.4rem 0 1rem;
+}
+.article-content h2::before {
+    content: '';
+    width: .5rem;
+    height: 1.7rem;
+    border-radius: .3rem;
+    background: linear-gradient(180deg, var(--gm-green), var(--gm-yellow));
+    flex: 0 0 auto;
+}
+.article-content h3 { font-size: 1.2rem; font-weight: 700; color: var(--gm-yellow); margin: 1.8rem 0 .6rem; }
+.article-content ul { padding-left: 1.4rem; margin-bottom: 1.15rem; }
+.article-content li { margin-bottom: .4rem; }
+.article-content li::marker { color: var(--gm-yellow); }
+.article-content img {
+    border-radius: .9rem;
+    box-shadow: 0 .5rem 1.4rem rgba(0, 0, 0, .45);
+    margin: 1.5rem 0;
+}
+.article-content a { color: var(--gm-green); text-decoration: underline; text-underline-offset: .2em; }
+.article-content a:hover { color: var(--gm-yellow); }
 .article-content blockquote {
     border-left: 4px solid var(--gm-green);
-    padding: .5rem 1rem;
+    border-radius: 0 .6rem .6rem 0;
+    background: color-mix(in srgb, var(--gm-green) 7%, transparent);
+    padding: .9rem 1.2rem;
     color: var(--gm-gray-100);
     font-style: italic;
-    margin: 1.5rem 0;
+    margin: 1.8rem 0;
+}
+.article-content hr {
+    border: 0;
+    height: 2px;
+    width: 55%;
+    margin: 2.6rem auto;
+    background: linear-gradient(90deg, transparent, var(--gm-yellow), transparent);
 }
 
 .article-figure figcaption { font-style: italic; }
@@ -1700,9 +1734,10 @@ body > footer,
 /* ----- Fiche article ----- */
 .blog-lead {
     color: var(--gm-gray-200);
-    font-size: 1.15rem;
+    font-size: 1.22rem;
+    line-height: 1.65;
     border-left: 3px solid var(--gm-yellow);
-    padding-left: 1rem;
+    padding: .4rem 0 .4rem 1.1rem;
 }
 
 /* Bloc de fin d'article : partage + adhésion */
@@ -2412,4 +2447,147 @@ body > footer,
 
 @media (prefers-reduced-motion: reduce) {
     .gm-legal-toc a { transition: none !important; }
+}
+
+/* ============================================================
+   BLOG — colonne latérale : derniers articles, catégories, tags
+   ============================================================ */
+.blog-sidebar {
+    position: sticky;
+    top: 5.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+.blog-sidebar-block {
+    background: var(--gm-surface);
+    border: 1px solid var(--gm-gray-900);
+    border-radius: 1.25rem;
+    padding: 1.4rem;
+}
+.blog-sidebar-title {
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--gm-white);
+    margin-bottom: 1rem;
+}
+
+/* Derniers articles */
+.blog-latest-item {
+    display: flex;
+    gap: .8rem;
+    align-items: center;
+    text-decoration: none;
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--gm-gray-900);
+}
+.blog-latest-item:last-child { border-bottom: 0; }
+.blog-latest-item strong {
+    color: var(--gm-gray-100);
+    font-size: .95rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1.35;
+}
+.blog-latest-item:hover strong { color: var(--gm-green); }
+.blog-latest-item small {
+    color: var(--gm-muted);
+    font-size: .8rem;
+}
+.blog-latest-img {
+    width: 56px;
+    height: 56px;
+    border-radius: .6rem;
+    object-fit: cover;
+    flex: 0 0 auto;
+}
+.blog-latest-img-empty {
+    background: color-mix(in srgb, var(--gm-green) 12%, var(--gm-bg));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gm-green);
+    font-size: 1.2rem;
+}
+
+/* Catégories */
+.blog-cat-link {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .45rem .6rem;
+    border-radius: .5rem;
+    color: var(--gm-gray-200);
+    text-decoration: none;
+}
+.blog-cat-link:hover {
+    background: color-mix(in srgb, var(--gm-green) 10%, transparent);
+    color: var(--gm-white);
+}
+.blog-cat-link.active {
+    background: color-mix(in srgb, var(--gm-green) 18%, transparent);
+    color: var(--gm-white);
+    font-weight: 700;
+}
+.blog-cat-count {
+    font-size: .75rem;
+    background: var(--gm-gray-900);
+    color: var(--gm-gray-300);
+    border-radius: 2rem;
+    padding: .1rem .5rem;
+}
+
+/* Tag actif dans la sidebar */
+.gm-tag-pill.active {
+    background: var(--gm-yellow);
+    color: var(--gm-bg);
+    font-weight: 700;
+}
+
+@media (max-width: 991.98px) {
+    .blog-sidebar { position: static; }
+}
+
+/* ============================================================
+   BLOG — césure : les mots très longs (URLs…) ne débordent plus
+   ============================================================ */
+.pres-show-content,
+.article-content,
+.blog-lead,
+.article-content p,
+.article-content li,
+.article-content blockquote {
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    min-width: 0;
+}
+.article-content img,
+.article-content figure,
+.article-content table {
+    max-width: 100%;
+}
+
+/* ============================================================
+   AGENDA — sidebar : badge date des événements
+   ============================================================ */
+.event-date-badge {
+    width: 52px;
+    height: 56px;
+    border-radius: .6rem;
+    flex: 0 0 auto;
+    background: color-mix(in srgb, var(--gm-green) 14%, var(--gm-bg));
+    border: 1px solid color-mix(in srgb, var(--gm-green) 32%, transparent);
+    color: var(--gm-green);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+}
+.event-date-badge span { font-size: 1.05rem; line-height: 1.1; }
+.event-date-badge small { font-size: .65rem; letter-spacing: .08em; }
+.event-date-badge-past {
+    background: color-mix(in srgb, var(--gm-gray-700) 40%, var(--gm-bg));
+    border-color: var(--gm-gray-900);
+    color: var(--gm-gray-300);
 }

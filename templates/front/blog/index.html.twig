@@ -27,24 +27,23 @@
 <main class="container py-5">
     {{ breadcrumb() }}
 
-    {% if currentTag is defined and currentTag %}
-        <div class="alert alert-dark d-flex align-items-center justify-content-between">
-            <span><i class="bi bi-tag me-1 text-gm-yellow"></i> Articles tagués <strong class="text-gm-yellow">#{{ currentTag.name }}</strong></span>
-            <a href="{{ path('app_blog_index') }}" class="btn btn-sm btn-outline-light">Tout voir</a>
+    <div class="row g-5">
+        {# ===== Colonne principale : articles ===== #}
+        <div class="col-lg-8">
+            {% if currentTag is defined and currentTag %}
+                <div class="alert alert-dark d-flex align-items-center justify-content-between">
+                    <span><i class="bi bi-tag me-1 text-gm-yellow"></i> Articles tagués <strong class="text-gm-yellow">#{{ currentTag.name }}</strong></span>
+                    <a href="{{ path('app_blog_index') }}" class="btn btn-sm btn-outline-light">Tout voir</a>
+                </div>
+            {% endif %}
+
+            {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
         </div>
-    {% endif %}
 
-    {% include 'front/blog/_list.html.twig' with {'posts': posts} %}
-
-    {% if tags|length > 0 %}
-        <hr class="my-5">
-        <h2 class="h4 mb-3"><i class="bi bi-tags text-gm-yellow"></i> Explorer par tag</h2>
-        <p class="mb-0">
-            {% for tag in tags %}
-                <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
-                   class="badge gm-tag-pill text-decoration-none me-1 mb-1">#{{ tag.name }}</a>
-            {% endfor %}
-        </p>
-    {% endif %}
+        {# ===== Colonne latérale : derniers articles + filtres ===== #}
+        <div class="col-lg-4">
+            {% include 'front/blog/_sidebar.html.twig' %}
+        </div>
+    </div>
 </main>
 {% endblock %}

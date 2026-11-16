@@ -1,0 +1,46 @@
+{# Colonne latérale du blog : derniers articles, catégories, tags.
+   Variables attendues : latest, categories, tags (+ currentTag / currentCategory en option). #}
+<aside class="blog-sidebar">
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> Derniers articles</h2>
+        {% for post in latest %}
+            <a href="{{ path('app_blog_show', {'slug': post.slug}) }}" class="blog-latest-item">
+                {% set img = image_url(post, 'small') %}
+                {% if img %}
+                    <img src="{{ img }}" alt="" loading="lazy" class="blog-latest-img">
+                {% else %}
+                    <div class="blog-latest-img blog-latest-img-empty"><i class="bi bi-newspaper"></i></div>
+                {% endif %}
+                <span>
+                    <strong>{{ post.title }}</strong>
+                    <small><i class="bi bi-calendar me-1"></i>{{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}</small>
+                </span>
+            </a>
+        {% endfor %}
+    </div>
+
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> Catégories</h2>
+        <ul class="list-unstyled mb-0">
+            {% for category in categories %}
+                <li>
+                    <a href="{{ path('app_blog_category', {'slug': category.slug}) }}"
+                       class="blog-cat-link {{ (currentCategory is defined and currentCategory and currentCategory.id == category.id) ? 'active' }}">
+                        <span>{{ category.name }}</span>
+                        <span class="blog-cat-count">{{ category.posts|filter(p => p.isPublished)|length }}</span>
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="blog-sidebar-block">
+        <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> Tags</h2>
+        <p class="mb-0">
+            {% for tag in tags %}
+                <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
+                   class="badge gm-tag-pill text-decoration-none me-1 mb-1 {{ (currentTag is defined and currentTag and currentTag.id == tag.id) ? 'active' }}">#{{ tag.name }}</a>
+            {% endfor %}
+        </p>
+    </div>
+</aside>

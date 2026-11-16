@@ -20,17 +20,26 @@ class BlogController extends AbstractController
     ) {}
 
     #[Route('', name: 'index', methods: ['GET'])]
-    public function index(BlogPostRepository $repo, BlogTagRepository $tagRepo): Response
-    {
+    public function index(
+        BlogPostRepository $repo,
+        BlogTagRepository $tagRepo,
+        BlogCategoryRepository $categoryRepo
+    ): Response {
         return $this->render('front/blog/index.html.twig', [
             'posts' => $repo->findPublishedPosts(),
             'tags' => $tagRepo->findUsedTags(),
+            'categories' => $categoryRepo->findUsedCategories(),
+            'latest' => $repo->findRecentPosts(3),
         ]);
     }
 
         #[Route('/categorie/{slug}', name: 'category', methods: ['GET'])]
-    public function category(string $slug, BlogCategoryRepository $repo): Response
-    {
+    public function category(
+        string $slug,
+        BlogCategoryRepository $repo,
+        BlogPostRepository $postRepo,
+        BlogTagRepository $tagRepo
+    ): Response {
         $category = $repo->findOneBy(['slug' => $slug]);
         if (!$category) {
             throw $this->createNotFoundException('Catégorie inconnue.');
@@ -39,6 +48,10 @@ class BlogController extends AbstractController
         return $this->render('front/blog/category.html.twig', [
             'category' => $category,
             'posts' => $category->getPosts()->filter(static fn ($p) => $p->isPublished()),
+            'tags' => $tagRepo->findUsedTags(),
+            'categories' => $repo->findUsedCategories(),
+            'latest' => $postRepo->findRecentPosts(3),
+            'currentCategory' => $category,
         ]);
     }
 
@@ -58,14 +71,18 @@ class BlogController extends AbstractController
 
         return $this->render('front/blog/show.html.twig', [
             'post' => $post,
-            'image_url' => $this->imageManager->getUrl($post, 'large'),
+            'image_url' => $this->imageManager->getCoverUrl($post, 'large'),
             'related' => array_slice($related, 0, 3),
         ]);
     }
 
     #[Route('/tag/{slug}', name: 'tag', methods: ['GET'])]
-    public function tag(string $slug, BlogTagRepository $tagRepo): Response
-    {
+    public function tag(
+        string $slug,
+        BlogTagRepository $tagRepo,
+        BlogPostRepository $postRepo,
+        BlogCategoryRepository $categoryRepo
+    ): Response {
         $tag = $tagRepo->findOneBy(['slug' => $slug]);
         if (!$tag) {
             throw $this->createNotFoundException('Tag inconnu.');
@@ -76,6 +93,8 @@ class BlogController extends AbstractController
         return $this->render('front/blog/index.html.twig', [
             'posts' => $posts,
             'tags' => $tagRepo->findUsedTags(),
+            'categories' => $categoryRepo->findUsedCategories(),
+            'latest' => $postRepo->findRecentPosts(3),
             'currentTag' => $tag,
         ]);
     }
