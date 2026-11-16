@@ -4,7 +4,7 @@
 {% set url = app.request.uri %}
 {% set text = post.title %}
 
-<div class="share-buttons mt-5">
+<div class="share-buttons mt-5" data-controller="share-buttons">
     <h5 class="mb-3"><i class="bi bi-share"></i> Partager cet article</h5>
     <div class="d-flex flex-wrap gap-2">
 
@@ -33,6 +33,7 @@
         </a>
 
         <button type="button" class="btn btn-sm btn-outline-secondary copy-link-btn"
+                data-action="share-buttons#copy"
                 data-url="{{ url }}" title="Copier le lien">
             <i class="bi bi-link-45deg"></i> Copier le lien
         </button>
@@ -40,18 +41,3 @@
     </div>
 </div>
 
-<script>
-    // Copier le lien dans le presse-papiers
-    document.querySelectorAll('.copy-link-btn').forEach(btn => {
-        btn.addEventListener('click', async () => {
-            try {
-                await navigator.clipboard.writeText(btn.dataset.url);
-                const original = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check-lg"></i> Copié !';
-                setTimeout(() => btn.innerHTML = original, 2000);
-            } catch (e) {
-                // Fallback silencieux : rien de critique
-            }
-        });
-    });
-</script>

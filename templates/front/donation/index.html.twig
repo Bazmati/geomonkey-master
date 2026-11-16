@@ -13,7 +13,7 @@
 <div class="gm-join-bg" aria-hidden="true">
     <div class="gm-join-aurora gm-join-aurora-green"></div>
     <div class="gm-join-aurora gm-join-aurora-yellow"></div>
-    <video class="gm-join-video" autoplay muted loop playsinline preload="metadata" tabindex="-1">
+    <video class="gm-join-video" autoplay muted loop playsinline preload="metadata" tabindex="-1" data-controller="video-background">
         <source src="{{ asset('videos/don.mp4') }}" type="video/mp4">
         <source src="{{ asset('videos/adhesion.mp4') }}" type="video/mp4">
     </video>
@@ -69,7 +69,7 @@
 
             {# ===== Colonne formulaire : carte verre dépoli ===== #}
             <div class="col-lg-6 col-md-9">
-                <div class="gm-join-card">
+                <div class="gm-join-card" data-controller="donation-presets">
                     <h2 class="gm-join-card-title">
                         <i class="bi bi-heart-fill me-2"></i>Soutenir GéoMonkey
                     </h2>
@@ -86,6 +86,7 @@
                         {% for preset in [5, 10, 20, 50] %}
                             <button type="button"
                                     class="btn btn-outline-gm-green donation-preset"
+                                    data-action="donation-presets#select"
                                     data-amount="{{ preset }}">
                                 {{ preset }}€
                             </button>
@@ -124,29 +125,5 @@
     </div>
 </main>
 
-<script>
-    // Les boutons de montant suggéré remplissent le champ du formulaire
-    document.querySelectorAll('.donation-preset').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            document.querySelector('.donation-amount-input').value = btn.dataset.amount;
-            document.querySelectorAll('.donation-preset').forEach(function (b) {
-                b.classList.remove('active');
-            });
-            btn.classList.add('active');
-        });
-    });
 
-    // Fond vidéo : n'apparaît que si le fichier charge réellement,
-    // et respecte prefers-reduced-motion
-    (function () {
-        var v = document.querySelector('.gm-join-video');
-        if (!v) { return; }
-        v.addEventListener('canplay', function () { v.classList.add('is-playing'); }, { once: true });
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            v.pause();
-            v.removeAttribute('autoplay');
-            v.classList.remove('is-playing');
-        }
-    })();
-</script>
 {% endblock %}

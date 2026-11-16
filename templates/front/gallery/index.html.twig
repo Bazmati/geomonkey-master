@@ -101,7 +101,7 @@
 </main>
 
 {# ===== Lightbox plein écran (sans dépendance) ===== #}
-<div class="gm-lightbox" id="gm-lightbox" hidden aria-hidden="true" role="dialog" aria-label="Visionneuse d'images">
+<div class="gm-lightbox" id="gm-lightbox" hidden aria-hidden="true" role="dialog" aria-label="Visionneuse d'images" data-controller="lightbox">
     <button type="button" class="gm-lightbox-close" title="Fermer (Échap)">
         <i class="bi bi-x-lg"></i>
     </button>
@@ -118,60 +118,5 @@
     <span class="gm-lightbox-counter"></span>
 </div>
 
-<script>
-(function () {
-    var patches = Array.prototype.slice.call(document.querySelectorAll('.gm-patch[data-full]'));
-    if (patches.length === 0) { return; }
 
-    var box = document.getElementById('gm-lightbox');
-    if (!box) { return; }
-    var img = box.querySelector('.gm-lightbox-img');
-    var caption = box.querySelector('.gm-lightbox-caption');
-    var counter = box.querySelector('.gm-lightbox-counter');
-    var current = -1;
-
-    function show(index) {
-        current = (index + patches.length) % patches.length;
-        var p = patches[current];
-        img.src = p.dataset.full;
-        img.alt = p.dataset.title || '';
-        var text = '';
-        if (p.dataset.title) { text += '<strong>' + p.dataset.title + '</strong>'; }
-        if (p.dataset.desc) {
-            if (text) { text += '<br>'; }
-            text += '<span class="small">' + p.dataset.desc + '</span>';
-        }
-        caption.innerHTML = text;
-        counter.textContent = (current + 1) + ' / ' + patches.length;
-        box.hidden = false;
-        box.setAttribute('aria-hidden', 'false');
-        document.body.style.overflow = 'hidden';
-    }
-
-    function close() {
-        box.hidden = true;
-        box.setAttribute('aria-hidden', 'true');
-        document.body.style.overflow = '';
-    }
-
-    patches.forEach(function (p, i) {
-        p.addEventListener('click', function (e) {
-            if (e.target.closest('a, form, button')) { return; }
-            show(i);
-        });
-    });
-
-    box.querySelector('.gm-lightbox-close').addEventListener('click', close);
-    box.querySelector('.gm-lightbox-prev').addEventListener('click', function () { show(current - 1); });
-    box.querySelector('.gm-lightbox-next').addEventListener('click', function () { show(current + 1); });
-    box.addEventListener('click', function (e) { if (e.target === box) { close(); } });
-
-    document.addEventListener('keydown', function (e) {
-        if (box.hidden) { return; }
-        if (e.key === 'Escape') { close(); }
-        else if (e.key === 'ArrowLeft') { show(current - 1); }
-        else if (e.key === 'ArrowRight') { show(current + 1); }
-    });
-})();
-</script>
 {% endblock %}

@@ -145,18 +145,5 @@
     </div>
 </main>
 
-<script>
-    // Fond vidéo : n'apparaît que si le fichier charge réellement,
-    // et respecte prefers-reduced-motion
-    (function () {
-        var v = document.querySelector('.gm-join-video');
-        if (!v) { return; }
-        v.addEventListener('canplay', function () { v.classList.add('is-playing'); }, { once: true });
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            v.pause();
-            v.removeAttribute('autoplay');
-            v.classList.remove('is-playing');
-        }
-    })();
-</script>
+
 {% endblock %}

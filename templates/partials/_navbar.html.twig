@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark sticky-top gm-nav" id="gm-nav">
+<nav class="navbar navbar-expand-lg navbar-dark sticky-top gm-nav" id="gm-nav" data-controller="navbar-scroll">
     <div class="container">
 
         {# ===== Marque : logo sans fond sur pastille anthracite ===== #}
@@ -100,19 +100,5 @@
 </nav>
 
 {# Messages flash : juste sous la navbar, sur toutes les pages #}
-{% if app.flashes %}
 {% include 'partials/_flash.html.twig' %}
-{% endif %}
 
-<script>
-    // Ombre + opacité renforcée dès qu'on quitte le haut de page
-    (function () {
-        var nav = document.getElementById('gm-nav');
-        if (!nav) { return; }
-        function onScroll() {
-            nav.classList.toggle('gm-nav-scrolled', window.scrollY > 10);
-        }
-        window.addEventListener('scroll', onScroll, { passive: true });
-        onScroll();
-    })();
-</script>

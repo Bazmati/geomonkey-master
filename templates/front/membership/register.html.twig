@@ -168,21 +168,5 @@
     </div>
 </main>
 
-<script>
-(function () {
-    var v = document.querySelector('.gm-join-video');
 
-    // La vidéo n'apparaît en fond QUE si le fichier charge réellement
-    // (sinon le fond reste l'aurore animée CSS — jamais de trou noir)
-    if (v) {
-        v.addEventListener('canplay', function () { v.classList.add('is-playing'); }, { once: true });
-        // Respect de prefers-reduced-motion : on fige la vidéo
-        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-            v.pause();
-            v.removeAttribute('autoplay');
-            v.classList.remove('is-playing');
-        }
-    }
-})();
-</script>
 {% endblock %}

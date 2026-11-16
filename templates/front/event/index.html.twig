@@ -48,7 +48,9 @@
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <span class="gm-countdown badge bg-gm-surface border-gm-yellow text-gm-yellow fs-6"
-                          data-start="{{ next.startDate|date(constant('DATE_ATOM')) }}">…</span>
+                          data-controller="countdown"
+                          data-countdown-start-value="{{ next.startDate|date(constant('DATE_ATOM')) }}"
+                          data-countdown-finished-value="C'est maintenant !">…</span>
                     <a href="{{ path('app_event_ics', {'id': next.id}) }}" class="proj-card-cta">
                         <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier
                     </a>
@@ -62,9 +64,9 @@
         {# ============================================================
            PAS D'ÉVÉNEMENT À L'HORIZON : la galerie défile à la place
            ============================================================ #}
-        <article class="blog-card gm-event-showcase gm-rotator gmFadeUp" data-rotator>
-            <div class="gm-rotator-layer" data-role="layer-a"></div>
-            <div class="gm-rotator-layer" data-role="layer-b"></div>
+        <article class="blog-card gm-event-showcase gm-rotator gmFadeUp" data-controller="rotator">
+            <div class="gm-rotator-layer" data-rotator-target="layerA"></div>
+            <div class="gm-rotator-layer" data-rotator-target="layerB"></div>
             <div class="blog-card-overlay">
                 <span class="badge bg-gm-yellow text-gm-bg mb-2">
                     <i class="bi bi-hourglass me-1"></i> Prochain événement en préparation
@@ -75,13 +77,13 @@
                     souvenirs : chaque image raconte un moment de vie de l'assoc'.
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-3">
-                    <span class="gm-rotator-dots" data-role="dots"></span>
+                    <span class="gm-rotator-dots" data-rotator-target="dots"></span>
                     <a href="{{ path('app_gallery_index') }}" class="proj-card-cta">
                         Voir toute la galerie <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
-            <script type="application/json" data-role="slides">
+            <script type="application/json" data-rotator-target="slides">
                 {{ gallery_images|map(image => {'src': image_url(image, 'large') ?? image_url(image, 'medium'), 'alt': image.alt})|json_encode(constant('JSON_HEX_TAG') + constant('JSON_HEX_APOS') + constant('JSON_HEX_AMP') + constant('JSON_HEX_QUOT'))|raw }}
             </script>
         </article>
@@ -161,85 +163,5 @@
     </div>
 </main>
 
-<script>
-(function () {
-    var el = document.querySelector('.gm-countdown[data-start]');
-    if (!el) { return; }
-    var start = new Date(el.dataset.start).getTime();
 
-    function pad(n) { return n < 10 ? '0' + n : '' + n; }
-
-    function tick() {
-        var diff = start - Date.now();
-        if (isNaN(start) || diff <= 0) {
-            el.innerHTML = '<i class="bi bi-lightning-charge me-1"></i> ' + "C'est maintenant !";
-            return;
-        }
-        var d = Math.floor(diff / 86400000);
-        var h = Math.floor(diff / 3600000) % 24;
-        var m = Math.floor(diff / 60000) % 60;
-        var s = Math.floor(diff / 1000) % 60;
-        el.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> ' +
-            (d > 0 ? 'J-' + d + ' · ' : '') + pad(h) + 'h ' + pad(m) + 'min ' + pad(s) + 's';
-        setTimeout(tick, 1000);
-    }
-
-    tick();
-})();
-
-/* ============================================================
-   ROTATEUR D'IMAGES (affiche quand aucun événement n'est prévu) :
-   deux calques en fondu enchaîné + pastilles de position
-   ============================================================ */
-(function () {
-    var rot = document.querySelector('[data-rotator]');
-    if (!rot) { return; }
-
-    var slides = [];
-    try {
-        var parsed = JSON.parse(rot.querySelector('[data-role="slides"]').textContent);
-        parsed.forEach(function (s) { if (s.src) { slides.push(s.src); } });
-    } catch (e) { return; }
-    if (slides.length === 0) { rot.classList.add('blog-card-noimg'); return; }
-
-    var layers = [
-        rot.querySelector('[data-role="layer-a"]'),
-        rot.querySelector('[data-role="layer-b"]')
-    ];
-    var dotsBox = rot.querySelector('[data-role="dots"]');
-    var current = 0;
-    var front = 0;
-
-    slides.forEach(function (src, i) {
-        var d = document.createElement('span');
-        d.className = 'gm-rotator-dot';
-        d.setAttribute('role', 'img');
-        d.setAttribute('aria-label', 'Image ' + (i + 1) + ' sur ' + slides.length);
-        dotsBox.appendChild(d);
-    });
-    var dots = Array.prototype.slice.call(dotsBox.children);
-
-    function paint() {
-        layers[front].style.backgroundImage = "url('" + slides[current] + "')";
-        layers[front].classList.add('is-visible');
-        layers[1 - front].classList.remove('is-visible');
-        dots.forEach(function (d, i) { d.classList.toggle('is-active', i === current); });
-        front = 1 - front;
-    }
-
-    // Préchargement pour éviter les flashs au changement
-    slides.forEach(function (src) { var im = new Image(); im.src = src; });
-
-    layers[0].style.backgroundImage = "url('" + slides[0] + "')";
-    layers[0].classList.add('is-visible');
-    dots[0].classList.add('is-active');
-    front = 1;
-
-    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        return; // Première image statique, pas de défilement
-    }
-
-    setInterval(function () { current = (current + 1) % slides.length; paint(); }, 5000);
-})();
-</script>
 {% endblock %}

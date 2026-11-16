@@ -70,7 +70,7 @@
         {# Importmap chargé dans HEAD pour éviter les conflits #}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
-    <body data-turbo="false">
+    <body data-turbo="false" data-controller="service-worker" data-service-worker-url-value="{{ asset('sw.js') }}">
         {% block body %}{% endblock %}
         <footer class="bg-gm-surface text-center text-gm-warning py-3 mt-5">
             <div class="container">
@@ -86,12 +86,5 @@
         {% block javascripts %}
         {% endblock %}
         {# Service Worker (PWA) — enregistré après le chargement, silencieux si non supporté #}
-        <script>
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function () {
-                    navigator.serviceWorker.register('{{ asset('sw.js') }}').catch(function () {});
-                });
-            }
-        </script>
     </body>
 </html>
