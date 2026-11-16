@@ -1,8 +1,6 @@
 import './stimulus_bootstrap.js';
 import './vendor/bootstrap/css/bootstrap.min.css';
-// import './vendor/bootstrap/js/bootstrap.bundle.min.js';
-// import './styles/app.css';
-// import './styles/app-calendar-cards.css';
+
 
 // ----- Modales : sortie du contexte d'empilage -----
 // Les modales imbriquées dans des conteneurs animés (gmFadeUp en fill-mode
