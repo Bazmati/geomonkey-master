@@ -6,7 +6,9 @@ use App\Entity\Event;
 use App\Entity\EventParticipant;
 use App\Enum\ParticipantRole;
 use App\Entity\User;
+use App\Repository\EventCategoryRepository;
 use App\Repository\EventParticipantRepository;
+use App\Repository\EventTagRepository;
 use App\Repository\EventRepository;
 use App\Repository\GalleryImageRepository;
 use App\Repository\MembershipRepository;
@@ -35,7 +37,12 @@ class EventController extends AbstractController
     }
 
     #[Route('/', name: 'index', methods: ['GET'])]
-    public function index(Request $request, GalleryImageRepository $galleryRepo): Response
+    public function index(
+        Request $request,
+        GalleryImageRepository $galleryRepo,
+        EventCategoryRepository $categoryRepo,
+        EventTagRepository $tagRepo
+    ): Response
     {
         $filter = $request->query->get('filter', 'tous');
         if (!in_array($filter, self::FILTERS, true)) {
@@ -49,9 +56,41 @@ class EventController extends AbstractController
         $events = $this->entityManager->getRepository(Event::class)
             ->findVisibleFor($isActiveMember, $filter);
 
+        // Filtres par catégorie et par tag (clique dans la sidebar)
+        $currentCategory = null;
+        $currentTag = null;
+        $categorySlug = trim((string) $request->query->get('category', ''));
+        $tagSlug = trim((string) $request->query->get('tag', ''));
+
+        if ($categorySlug !== '') {
+            $currentCategory = $categoryRepo->findOneBy(['slug' => $categorySlug]);
+            if ($currentCategory === null) {
+                throw $this->createNotFoundException("Catégorie d'événement inconnue.");
+            }
+            $events = array_values(array_filter(
+                $events,
+                static fn (Event $e) => $e->getCategory() !== null && $e->getCategory()->getId() === $currentCategory->getId()
+            ));
+        }
+
+        if ($tagSlug !== '') {
+            $currentTag = $tagRepo->findOneBy(['slug' => $tagSlug]);
+            if ($currentTag === null) {
+                throw $this->createNotFoundException("Tag d'événement inconnu.");
+            }
+            $events = array_values(array_filter(
+                $events,
+                static fn (Event $e) => $e->getTags()->contains($currentTag)
+            ));
+        }
+
         return $this->render('front/event/index.html.twig', [
             'events' => $events,
             'filter' => $filter,
+            'event_categories' => $categoryRepo->findUsedCategories(),
+            'event_tags' => $tagRepo->findUsedTags(),
+            'currentCategory' => $currentCategory,
+            'currentTag' => $currentTag,
             // Si aucun événement n'est programmé, l'affiche laisse place
             // à un défilement d'images de la galerie (visibles par l'utilisateur).
             'gallery_images' => array_slice($galleryRepo->findVisibleForUser($user), 0, 12),

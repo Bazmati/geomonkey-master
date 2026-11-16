@@ -1,0 +1,28 @@
+{% extends 'admin/base.html.twig' %}
+
+{% block admin_content %}
+    {% set page_title = tag.id ? 'Modifier le tag' : 'Nouveau tag' %}
+
+    <div class="p-4">
+
+        <div class="card shadow-sm max-w-600">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="h5 mb-0 text-gm-green">
+                    <i class="bi bi-tag"></i>
+                    {{ tag.id ? 'Modifier le tag d\'événement' : 'Nouveau tag d\'événement' }}
+                </h1>
+                <a href="{{ path('admin_event_tag_index') }}" class="btn btn-gm-surface btn-sm">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            </div>
+            <div class="card-body">
+                {{ form_start(form) }}
+                {{ form_row(form.name) }}
+                <button type="submit" class="btn btn-gm-green">
+                    <i class="bi bi-check-lg"></i> Enregistrer
+                </button>
+                {{ form_end(form) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

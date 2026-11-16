@@ -54,6 +54,35 @@
         </ul>
     </div>
 
+    {% if event_categories is defined and event_categories|length > 0 %}
+        <div class="blog-sidebar-block">
+            <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> Catégories</h2>
+            <ul class="list-unstyled mb-0">
+                {% for category in event_categories %}
+                    <li>
+                        <a href="{{ path('app_event_index', {'category': category.slug}) }}"
+                           class="blog-cat-link {{ (currentCategory is defined and currentCategory and currentCategory.id == category.id) ? 'active' }}">
+                            <span>{{ category.name }}</span>
+                            <span class="blog-cat-count">{{ category.events|filter(e => e.isPublished)|length }}</span>
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    {% if event_tags is defined and event_tags|length > 0 %}
+        <div class="blog-sidebar-block">
+            <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> Tags</h2>
+            <p class="mb-0">
+                {% for tag in event_tags %}
+                    <a href="{{ path('app_event_index', {'tag': tag.slug}) }}"
+                       class="badge gm-tag-pill text-decoration-none me-1 mb-1 {{ (currentTag is defined and currentTag and currentTag.id == tag.id) ? 'active' }}">#{{ tag.name }}</a>
+                {% endfor %}
+            </p>
+        </div>
+    {% endif %}
+
     <div class="blog-sidebar-block">
         <h2 class="blog-sidebar-title"><i class="bi bi-camera text-gm-green me-1"></i> Derniers souvenirs</h2>
         {% for event in past|slice(0, 3) %}

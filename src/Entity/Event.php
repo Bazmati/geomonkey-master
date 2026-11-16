@@ -253,6 +253,16 @@ class Event implements ImageableInterface
     /**
      * Participants à cet événement
      */
+    #[ORM\ManyToOne(targetEntity: EventCategory::class, inversedBy: 'events')]
+    #[ORM\JoinColumn(nullable: true, onDelete: 'SET NULL')]
+    private ?EventCategory $category = null;
+
+    #[ORM\ManyToMany(targetEntity: EventTag::class, inversedBy: 'events')]
+    #[ORM\JoinTable(name: 'event_event_tag')]
+    #[ORM\JoinColumn(name: 'event_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'event_tag_id', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    private Collection $tags;
+
     #[ORM\OneToMany(targetEntity: EventParticipant::class, mappedBy: 'event', cascade: ['persist'], orphanRemoval: true)]
     private Collection $participants;
 
@@ -440,6 +450,27 @@ class Event implements ImageableInterface
     public function removeBlogPost(BlogPost $post): static
     {
         if ($this->blogPosts->removeElement($post)) { $post->removeEvent($this); }
+        return $this;
+    }
+
+    // Catégorie et tags
+    public function getCategory(): ?EventCategory { return $this->category; }
+    public function setCategory(?EventCategory $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    /** @return Collection<int, EventTag> */
+    public function getTags(): Collection { return $this->tags; }
+    public function addTag(EventTag $tag): static
+    {
+        if (!$this->tags->contains($tag)) { $this->tags->add($tag); }
+        return $this;
+    }
+    public function removeTag(EventTag $tag): static
+    {
+        $this->tags->removeElement($tag);
         return $this;
     }
 }

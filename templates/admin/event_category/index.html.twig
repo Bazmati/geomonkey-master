@@ -1,0 +1,68 @@
+{% extends 'admin/base.html.twig' %}
+
+{% set page_title = 'Catégories d\'événements' %}
+
+{% block admin_content %}
+    <div class="p-4">
+
+        <h1 class="text-gm-green mb-4"><i class="bi bi-folder"></i> Catégories d'événements</h1>
+
+        <div class="d-flex justify-content-end mb-3">
+            <a href="{{ path('admin_event_category_new') }}" class="btn btn-gm-green">
+                <i class="bi bi-plus-circle"></i> Nouvelle catégorie
+            </a>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-body">
+                {% if categories is empty %}
+                    <div class="text-center py-4 text-gm-muted-light">
+                        <i class="bi bi-folder-x fs-1"></i>
+                        <p class="mt-2">Aucune catégorie trouvée</p>
+                    </div>
+                {% else %}
+                    <div class="table-responsive">
+                        <table class="table-mobile-cards table table-gm table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Slug</th>
+                                    <th>Événements</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for category in categories %}
+                                    <tr>
+                                        <td data-label="ID">{{ category.id }}</td>
+                                        <td data-label="Nom">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-folder'} %}
+                                            {{ category.name }}
+                                        </td>
+                                        <td data-label="Slug"><code>{{ category.slug }}</code></td>
+                                        <td data-label="Événements">{{ category.events|filter(e => e.isPublished)|length }}</td>
+                                        <td data-label="Actions">
+                                            <div class="d-flex gap-1">
+                                                <a href="{{ path('admin_event_category_edit', {'id': category.id}) }}" class="btn btn-sm btn-gm-yellow" title="Modifier">
+                                                    <i class="bi bi-pencil-fill"></i>
+                                                </a>
+                                                {% include 'front/partials/_delete_button.html.twig' with {
+                                                    id: category.id,
+                                                    path: path('admin_event_category_delete', {'id': category.id}),
+                                                    entity_type: 'catégorie',
+                                                    confirm_message: 'Êtes-vous sûr de vouloir supprimer cette catégorie ?',
+                                                    csrf_token: csrf_token('delete' ~ category.id)
+                                                } %}
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

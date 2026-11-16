@@ -17,6 +17,8 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use App\Entity\EventCategory;
+use App\Entity\EventTag;
 use Symfony\Component\Validator\Constraints\File;
 
 class EventType extends AbstractType
@@ -37,6 +39,23 @@ class EventType extends AbstractType
                 'input_format' => 'd-m-Y\TH:i',
             ])
             ->add('location')
+            ->add('category', EntityType::class, [
+                'class' => EventCategory::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'placeholder' => '— Aucune catégorie —',
+                'label' => 'Catégorie',
+            ])
+            ->add('tags', EntityType::class, [
+                'class' => EventTag::class,
+                'choice_label' => 'name',
+                'required' => false,
+                'multiple' => true,
+                'expanded' => false,
+                'by_reference' => false,
+                'label' => 'Tags',
+                'help' => 'Ctrl+clic pour sélectionner plusieurs tags.',
+            ])
             ->add('capacity', IntegerType::class, [
                 'required' => false,
                 'label' => 'Capacité (places)',
