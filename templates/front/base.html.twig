@@ -67,6 +67,10 @@
         <script src="{{ asset('vendor/fullcalendar/daygrid.global.min.js') }}"></script>
         <script src="{{ asset('vendor/fullcalendar/locales-fr.global.min.js') }}"></script>
 
+        <link rel="stylesheet" href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/app.css') }}">
+        <link rel="stylesheet" href="{{ asset('styles/app-calendar-cards.css') }}">
+
         {# Importmap chargé dans HEAD pour éviter les conflits #}
         {% block importmap %}{{ importmap('app') }}{% endblock %}
     </head>
