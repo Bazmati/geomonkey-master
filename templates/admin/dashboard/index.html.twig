@@ -115,7 +115,14 @@
                             <div class="dash-event-list">
                                 {% for project in ongoingProjects %}
                                     <div class="dash-event">
-                                        {% set media = image_url(project, 'medium') ?? (project.galleryImages is not empty ? image_url(project.galleryImages|first, 'medium') : null) %}
+                                        {% set media = image_url(project, 'medium') %}
+                                        {% if not media %}
+                                            {% for task in project.tasks %}
+                                                {% if not media and task.galleryImages is not empty %}
+                                                    {% set media = image_url(task.galleryImages|first, 'medium') %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        {% endif %}
                                         {% if media %}
                                             <img src="{{ media }}" alt="" loading="lazy" class="dash-event-img">
                                         {% else %}
