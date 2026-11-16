@@ -122,8 +122,8 @@
                             </div>
 
                             <div class="col-12 mb-3">
-                                {{ form_label(form.requestedFunction) }}
-                                {{ form_widget(form.requestedFunction) }}
+                                {{ form_label(form.requestedFunction, null, {'label_attr': {'class': 'form-check-label ms-2'}}) }}
+                                {{ form_widget(form.requestedFunction, {'attr': {'class': 'form-check-input'}}) }}
                                 <div class="text-gm-danger">{{ form_errors(form.requestedFunction) }}</div>
                             </div>
 
