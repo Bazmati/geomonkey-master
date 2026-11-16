@@ -4,6 +4,18 @@ import './vendor/bootstrap/js/bootstrap.bundle.min.js';
 import './styles/app.css';
 import './styles/app-calendar-cards.css';
 
+// ----- Modales : sortie du contexte d'empilage -----
+// Les modales imbriquées dans des conteneurs animés (gmFadeUp en fill-mode
+// "both") sont piégées dans un stacking context : le backdrop (z-index 1050)
+// se retrouve au-dessus de la modale (z-index 1055). On déplace la modale
+// sous <body> juste avant l'affichage, comme recommandé par Bootstrap.
+document.addEventListener('show.bs.modal', (event) => {
+    const modal = event.target;
+    if (modal instanceof HTMLElement && modal.parentElement !== document.body) {
+        document.body.appendChild(modal);
+    }
+});
+
 console.log('This log comes from assets/app.js - welcome to AssetMapper! 🎉');
 // ----- Dashboard : count-up des cartes stats -----
 document.addEventListener('DOMContentLoaded', () => {
