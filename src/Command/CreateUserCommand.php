@@ -32,6 +32,7 @@ class CreateUserCommand extends Command
         $this
             ->addArgument('email', InputArgument::REQUIRED, 'Email de l\'utilisateur')
             ->addOption('admin', 'a', InputOption::VALUE_NONE, 'Rôle ROLE_ADMIN')
+            ->addOption('super-admin', 's', InputOption::VALUE_NONE, 'Rôle ROLE_SUPER_ADMIN (clé de secours)')
             ->addOption('president', 'p', InputOption::VALUE_NONE, 'Fonction Président')
             ->addOption('password', null, InputOption::VALUE_REQUIRED, 'Mot de passe (sinon demandé)')
         ;
@@ -54,7 +55,10 @@ class CreateUserCommand extends Command
             $this->hasher->hashPassword($user, $plainPassword)
         );
 
-        $user->setRoles($input->getOption('admin') ? ['ROLE_ADMIN'] : ['ROLE_MEMBER']);
+        $user->setRoles(
+            $input->getOption('super-admin') ? ['ROLE_SUPER_ADMIN']
+            : ($input->getOption('admin') ? ['ROLE_ADMIN'] : ['ROLE_MEMBER'])
+        );
         $user->setOfficeFunction($input->getOption('president') ? OfficeFunction::President : OfficeFunction::None);
 
         $this->em->persist($user);

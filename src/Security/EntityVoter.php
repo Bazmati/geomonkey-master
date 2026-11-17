@@ -40,6 +40,14 @@ class EntityVoter extends Voter
             return false; // anonyme : refusé (le VIEW public se gère au niveau des routes publiques)
         }
 
+        // ROLE_SUPER_ADMIN : clé de secours (break-glass). Passe-partout
+        // total, à n'utiliser qu'en cas de blocage de gouvernance
+        // (président indisponible ou compromis). Les rôles du token
+        // contiennent ROLE_SUPER_ADMIN car la hiérarchie le propage.
+        if (\in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)) {
+            return true;
+        }
+
         $function = $user->getOfficeFunction();
 
         // RÈGLE DE SÉCURITÉ : un membre sans adhésion active est rétrogradé
