@@ -44,3 +44,4 @@
 ###>images###
 /public/images/ 
 /public/uploads/
+config/reference.php
