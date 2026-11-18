@@ -13,7 +13,7 @@
                     Bonjour {{ app.user.firstName ?? app.user.userIdentifier }}, voici l'activité de l'asso.
                 </p>
             </div>
-            <p class="dash-hero-date">{{ 'now'|date('EEEE d MMMM Y')|capitalize }}</p>
+            <p class="dash-hero-date">{{ 'now'|format_datetime(pattern='EEEE d MMMM y', locale='fr')|capitalize }}</p>
         </div>
 
         {# Compteurs rapides (liens vers les sections concernées) #}

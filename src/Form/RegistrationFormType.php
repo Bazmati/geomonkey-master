@@ -67,7 +67,6 @@ class RegistrationFormType extends AbstractType
                         default => 'Simple visiteur (gratuit, accès public)',
                     };
                 },
-                'attr' => ['class' => 'form-check-input'],
             ])
             ->add('agreeTerms', CheckboxType::class, [
                 'label' => 'J\'accepte les <a href="/legal/cgu" target="_blank">Conditions Générales d\'Adhésion</a> et la <a href="/legal/confidentialite" target="_blank">Politique de Confidentialité</a>',
