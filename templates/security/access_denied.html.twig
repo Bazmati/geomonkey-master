@@ -1,52 +1,76 @@
-{# templates/security/access_denied.html.twig #}
+{# Page « Accès refusé » — identité GéoMonkey, messages et retours contextuels #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Accès réservé{% endblock %}
+{% block title %}Accès réservé — {{ parent() }}{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
-    
-    <div class="container py-5">
-    <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-6">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h2 class="mb-0">
-                        <i class="bi bi-exclamation-triangle-fill"></i> 
-                        Accès réservé
-                    </h2>
-                </div>
-                <div class="card-body">
-                    <div class="text-center">
-                        <p class="lead mb-4">
-                            Votre compte n'a pas les droits nécessaires pour accéder à cette section.
-                        </p>
-                        
-                        {% if app.user and app.user.officeFunction == constant('App\\Enum\\OfficeFunction::None') %}
-                            <div class="alert alert-gm-info">
-                                <p class="mb-0">
-                                    Vous êtes connecté en tant que visiteur inscrit. 
-                                    Pour accéder aux fonctionnalités de gestion, 
-                                    <strong>contactez le bureau de l'association</strong>.
-                                </p>
-                            </div>
-                            <a href="{{ path('app_home') }}" class="btn btn-outline-primary">
-                                <i class="bi bi-house"></i> Retour à l'accueil
-                            </a>
-                        {% else %}
-                            <div class="alert alert-gm-warning">
-                                <p class="mb-0">
-                                    Vous n'avez pas les permissions requises pour cette action.
-                                </p>
-                            </div>
-                            <a href="{{ path('app_home') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-left"></i> Retour à l'accueil
-                            </a>
-                        {% endif %}
+
+    <div class="container py-5" style="min-height: 60vh;">
+        <div class="row justify-content-center">
+            <div class="col-md-8 col-lg-6">
+                <div class="card bg-gm-surface text-center p-4 p-md-5">
+                    {# Marque : logo + wordmark, comme la navbar #}
+                    <img src="{{ asset('images/Logo_geomonkey.png') }}" alt="Logo GéoMonkey"
+                         class="mx-auto d-block mb-3 rounded-circle" width="72" height="72">
+                    <div class="fs-4 fw-bold mb-2">
+                        Géo<span class="text-gm-yellow">Monkey</span>
                     </div>
+
+                    <h1 class="display-1 fw-bold text-gm-warning mb-1">403</h1>
+                    <h2 class="h5 mb-3"><i class="bi bi-shield-lock-fill me-1"></i> Cet espace est réservé</h2>
+
+                    {% if not app.user %}
+                        {# Visiteur non connecté : l'accès exige un compte #}
+                        <p class="text-gm-muted mb-4">
+                            Cette section est réservée aux membres de l'association.
+                            Connecte-toi pour y accéder.
+                        </p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <a href="{{ path('app_login') }}" class="btn btn-gm-green">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Se connecter
+                            </a>
+                            <a href="{{ path('app_home') }}" class="btn btn-outline-gm-gray">
+                                <i class="bi bi-house me-1"></i> Retour à l'accueil
+                            </a>
+                        </div>
+                    {% elseif app.user.officeFunction == constant('App\\Enum\\OfficeFunction::None') %}
+                        {# Membre visiteur : expliquer comment obtenir les droits #}
+                        <p class="text-gm-muted mb-3">
+                            Ton compte n'a pas les droits nécessaires pour accéder à cette section de gestion.
+                        </p>
+                        <div class="alert alert-gm-info text-start mb-4">
+                            <p class="mb-0">
+                                <i class="bi bi-info-circle-fill me-1"></i>
+                                Tu es connecté en tant que visiteur inscrit. Pour accéder aux
+                                fonctionnalités de gestion, <strong>contacte le bureau de l'association</strong>.
+                            </p>
+                        </div>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <a href="{{ path('app_home') }}" class="btn btn-gm-green">
+                                <i class="bi bi-house me-1"></i> Retour à l'accueil
+                            </a>
+                            <a href="{{ path('app_membership_register') }}" class="btn btn-outline-gm-yellow">
+                                <i class="bi bi-person-plus me-1"></i> Devenir membre actif
+                            </a>
+                        </div>
+                    {% else %}
+                        {# Membre du bureau : retour contextuel backoffice #}
+                        <p class="text-gm-muted mb-4">
+                            Ton compte n'a pas les permissions requises pour cette action.
+                            Si tu penses que c'est une erreur, contacte le président.
+                        </p>
+                        <div class="d-flex justify-content-center gap-2 flex-wrap">
+                            <a href="{{ path('app_admin_dashboard') }}" class="btn btn-gm-green">
+                                <i class="bi bi-speedometer2 me-1"></i> Retour au backoffice
+                            </a>
+                            <a href="{{ path('app_home') }}" class="btn btn-outline-gm-gray">
+                                <i class="bi bi-house me-1"></i> Retour à l'accueil
+                            </a>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}
