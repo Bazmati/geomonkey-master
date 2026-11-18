@@ -64,6 +64,7 @@ services:
         arguments:
             $contactEmail: '%env(CONTACT_EMAIL)%'
             $whatsappGroupLink: '%env(WHATSAPP_GROUP_LINK)%'
+            $fromAddress: '%env(MAIL_FROM_ADDRESS)%'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -65,6 +65,7 @@ class MailService
         private MailerInterface $mailer,
         private UrlGeneratorInterface $urlGenerator,
         private string $contactEmail,
+        private string $fromAddress,
         private ?string $whatsappGroupLink = null,
         private ?string $assuranceDetails = null
     ) {}
@@ -79,7 +80,7 @@ class MailService
             : 'Ton inscription à GéoMonkey est confirmée !';
 
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject($subject)
             ->html($this->renderRegistrationConfirmationEmail($user));
@@ -93,7 +94,7 @@ class MailService
     public function sendMembershipRequestAlert(User $user): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($this->contactEmail)
             ->subject(sprintf('Nouvelle demande d\'adhésion : %s', $user->getEmail()))
             ->html($this->renderMembershipRequestAlertEmail($user));
@@ -107,7 +108,7 @@ class MailService
     public function sendValidationEmail(User $user, string $paymentUrl): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject('Ta demande d\'adhésion est acceptée ✅')
             ->html($this->renderValidationEmail($user, $paymentUrl));
@@ -121,7 +122,7 @@ class MailService
     public function sendMembershipConfirmedEmail(User $user): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject('Bienvenue officiellement chez GéoMonkey ! 🎉')
             ->html($this->renderMembershipConfirmedEmail($user));
@@ -135,7 +136,7 @@ class MailService
     public function sendExpirationReminderEmail(User $user, int $daysUntilExpiry): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject(sprintf('Ton adhésion GéoMonkey expire dans %d jours', $daysUntilExpiry))
             ->html($this->renderExpirationReminderEmail($user, $daysUntilExpiry));
@@ -149,7 +150,7 @@ class MailService
     public function sendDonationThankYouEmail(Donation $donation): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($donation->getDonorEmail())
             ->subject('Merci pour ton don à GéoMonkey ! 🙏')
             ->html($this->renderDonationThankYouEmail($donation));
@@ -163,7 +164,7 @@ class MailService
     public function sendDonationAlert(Donation $donation): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($this->contactEmail)
             ->subject(sprintf('🎁 Don de %.2f€ reçu', $donation->getAmountInEuros()))
             ->html($this->renderDonationAlertEmail($donation));
@@ -385,7 +386,7 @@ class MailService
     public function sendEmailVerification(User $user, string $verificationUrl): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject('Vérifie ton adresse email pour GéoMonkey')
             ->html($this->renderEmailVerificationEmail($user, $verificationUrl));
@@ -400,7 +401,7 @@ class MailService
     public function sendPasswordReset(User $user, string $resetUrl): void
     {
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($user->getEmail())
             ->subject('Réinitialisation de ton mot de passe GéoMonkey')
             ->html($this->renderPasswordResetEmail($user, $resetUrl));
@@ -494,7 +495,7 @@ class MailService
 </html>';
 
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($subscriber->getEmail())
             ->subject('Bienvenue dans la newsletter GéoMonkey 🐒')
             ->html($html);
@@ -537,7 +538,7 @@ class MailService
 </html>';
 
         $email = (new Email())
-            ->from('noreply@geomonkey.fr')
+            ->from($this->fromAddress)
             ->to($subscriber->getEmail())
             ->subject($subject)
             ->html($html);
