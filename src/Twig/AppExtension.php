@@ -9,11 +9,22 @@ use Twig\TwigFunction;
 
 /**
  * Extension Twig pour GeoMonkey.
- * 
+ *
  * Fournit des filtres personnalisés pour les images.
  */
 class AppExtension extends AbstractExtension
 {
+    private const JOURS_FR = [
+        1 => 'lundi', 2 => 'mardi', 3 => 'mercredi', 4 => 'jeudi',
+        5 => 'vendredi', 6 => 'samedi', 7 => 'dimanche',
+    ];
+
+    private const MOIS_FR = [
+        1 => 'janvier', 2 => 'février', 3 => 'mars', 4 => 'avril',
+        5 => 'mai', 6 => 'juin', 7 => 'juillet', 8 => 'août',
+        9 => 'septembre', 10 => 'octobre', 11 => 'novembre', 12 => 'décembre',
+    ];
+
     public function __construct(
         private ImageManager $imageManager
     ) {
@@ -30,6 +41,7 @@ class AppExtension extends AbstractExtension
     {
         return [
             new TwigFilter('truncate', [$this, 'truncateText']),
+            new TwigFilter('date_fr', [$this, 'formatDateFr']),
         ];
     }
 
@@ -64,5 +76,24 @@ class AppExtension extends AbstractExtension
         }
 
         return substr($text, 0, $length) . $suffix;
+    }
+
+    /**
+     * Formate une date en français : « mercredi 18 novembre 2026 ».
+     * N'utilise ni ext-intl ni twig/intl-extra.
+     *
+     * @param \DateTimeInterface|string $date Une date, une chaîne comprise par DateTime, ou 'now'
+     */
+    public function formatDateFr(\DateTimeInterface|string $date): string
+    {
+        $date = $date instanceof \DateTimeInterface ? $date : new \DateTimeImmutable($date);
+
+        return sprintf(
+            '%s %d %s %d',
+            self::JOURS_FR[(int) $date->format('N')],
+            (int) $date->format('j'),
+            self::MOIS_FR[(int) $date->format('n')],
+            $date->format('Y'),
+        );
     }
 }
