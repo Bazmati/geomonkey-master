@@ -30,6 +30,14 @@
             </a>
         </div>
 
+        {# Info si on vient d'être redirigé depuis une page protégée (firewall) #}
+        {% if app.session.get('_security.main.target_path') %}
+        <div class="alert alert-gm-info d-flex align-items-center gap-2" role="alert">
+            <i class="bi bi-shield-lock-fill"></i>
+            <div>Cet espace est réservé aux membres. Connecte-toi pour y accéder.</div>
+        </div>
+        {% endif %}
+
         <div class="row g-5 align-items-center justify-content-center min-vh-90 pt-2 pb-4">
 
             {# ===== Colonne pitch ===== #}
