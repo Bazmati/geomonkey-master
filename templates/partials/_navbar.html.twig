@@ -72,7 +72,7 @@
                             {{ app.user.firstName ?? app.user.email }}
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
-                            {% if 'ROLE_ADMIN' in app.user.roles %}
+                            {% if is_granted('ROLE_ADMIN') %}
                                 <li>
                                     <a class="dropdown-item" href="{{ path('app_admin_dashboard') }}">
                                         <i class="bi bi-speedometer2 me-2"></i>Backoffice
