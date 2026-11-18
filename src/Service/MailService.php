@@ -71,6 +71,71 @@ class MailService
     ) {}
 
     /**
+     * Logo public de l'asso (même fichier que la navbar), en URL absolue :
+     * un email ne peut pas charger un asset local.
+     */
+    private const string LOGO_URL = 'https://www.geomonkey.fr/images/Logo_geomonkey.png';
+    private const string SITE_URL = 'https://www.geomonkey.fr';
+
+    /**
+     * Gabarit commun des emails transactionnels, dans l'identité visuelle du
+     * site (fond anthracite #1C1C1A, carte #242422, accents jaune #E0C020),
+     * cohérent avec les emails newsletter (M10/M11). Les webmails imposant
+     * le CSS inline, tout est en style="..." et en tableau d'anciennes
+     * générations : c'est voulu, ne pas "moderniser".
+     */
+    private function wrapEmailContent(string $title, string $innerHtml): string
+    {
+
+        $html = <<<'HTML'
+<!DOCTYPE html>
+<html lang="fr">
+<body style="margin:0;padding:0;background:#1C1C1A;font-family:Arial,Helvetica,sans-serif;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#1C1C1A;padding:32px 16px;">
+    <tr><td align="center">
+      <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="background:#242422;border-radius:14px;padding:32px;color:#ffffff;">
+        <tr><td align="center" style="padding-bottom:8px;">
+          <img src="%%LOGO%%" alt="Logo GéoMonkey" width="64" height="64" style="display:block;border-radius:50%;" />
+        </td></tr>
+        <tr><td align="center" style="padding-bottom:4px;font-size:18px;font-weight:bold;color:#ffffff;">
+          G&#233;o<span style="color:#E0C020;">Monkey</span>
+        </td></tr>
+        <tr><td align="center" style="padding-bottom:24px;">
+          <h1 style="margin:0;font-size:20px;line-height:1.4;color:#ffffff;">%%TITLE%%</h1>
+        </td></tr>
+        <tr><td style="line-height:1.6;color:#cccccc;font-size:15px;">
+          %%INNER%%
+        </td></tr>
+        <tr><td style="padding-top:24px;border-top:1px solid #3a3a38;color:#999999;font-size:12px;line-height:1.6;">
+          L&#8217;&#233;quipe G&#233;oMonkey &#183; <a href="%%SITE%%" style="color:#E0C020;text-decoration:none;">www.geomonkey.fr</a>
+        </td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>
+HTML;
+
+        return str_replace(
+            ['%%LOGO%%', '%%TITLE%%', '%%INNER%%', '%%SITE%%'],
+            [self::LOGO_URL, $title, $innerHtml, self::SITE_URL],
+            $html
+        );
+    }
+
+    /**
+     * Bouton d'action stylé (vert GéoMonkey), pour les CTA des emails.
+     */
+    private function emailButton(string $url, string $label): string
+    {
+        return sprintf(
+            '<div style="text-align:center;margin:20px 0;"><a href="%s" style="display:inline-block;padding:12px 24px;background:#00A040;color:#ffffff;text-decoration:none;border-radius:6px;font-weight:bold;">%s</a></div>',
+            htmlspecialchars($url),
+            $label
+        );
+    }
+
+    /**
      * M1: Email de confirmation de réception de l'inscription
      */
     public function sendRegistrationConfirmation(User $user): void
@@ -181,33 +246,21 @@ class MailService
      */
     private function renderRegistrationConfirmationEmail(User $user): string
     {
-        $isActiveMember = $user->needsBureauValidation();
-        
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<img src="cid:logo" style="width: 80px; height: 80px; border-radius: 50%;" />';
-        $html .= '<h2 style="color: #ffc107;">GéoMonkey</h2>';
-        $html .= '</div>';
-        
-        if ($isActiveMember) {
-            $html .= '<h3>Demande d\'adhésion reçue !</h3>';
-            $html .= '<p>Merci pour ton intérêt à rejoindre GéoMonkey en tant que membre actif.</p>';
-            $html .= '<p>Notre bureau va examiner ta demande et te contactera dans les plus brefs délais pour validation.</p>';
-            $html .= '<p><strong>Une fois validée, tu recevras un lien pour effectuer le paiement de ton adhésion.</strong></p>';
+        $needsValidation = $user->needsBureauValidation();
+
+        $title = $needsValidation ? 'Demande d&#8217;adh&#233;sion re&#231;ue !' : 'Inscription confirm&#233;e !';
+
+        if ($needsValidation) {
+            $inner = '<p style="margin:0 0 12px;">Merci pour ton int&#233;r&#234;t &#224; rejoindre G&#233;oMonkey en tant que membre actif.</p>';
+            $inner .= '<p style="margin:0 0 12px;">Notre bureau va examiner ta demande et te contactera dans les plus brefs d&#233;lais pour validation.</p>';
+            $inner .= '<p style="margin:0 0 12px;"><strong>Une fois valid&#233;e, tu recevras un lien pour effectuer le paiement de ton adh&#233;sion.</strong></p>';
         } else {
-            $html .= '<h3>Inscription confirmée !</h3>';
-            $html .= '<p>Merci de t\'être inscrit en tant que visiteur sur GéoMonkey.</p>';
-            $html .= '<p>Tu as maintenant accès à tous les contenus publics de notre association.</p>';
-            $html .= '<p>Pour devenir membre actif avec accès complet, tu peux faire une demande d\'adhésion payante depuis ton espace.</p>';
+            $inner = '<p style="margin:0 0 12px;">Merci de t&#8217;&#234;tre inscrit en tant que visiteur sur G&#233;oMonkey.</p>';
+            $inner .= '<p style="margin:0 0 12px;">Tu as maintenant acc&#232;s &#224; tous les contenus publics de notre association.</p>';
+            $inner .= '<p style="margin:0 0 12px;">Pour devenir membre actif avec acc&#232;s complet, tu peux faire une demande d&#8217;adh&#233;sion payante depuis ton espace.</p>';
         }
-        
-        $html .= '<div style="margin-top: 20px; padding: 15px; background: #fff; border-radius: 8px;">';
-        $html .= '<p style="margin: 0; color: #666;">Cordialement,<br>L\'équipe GéoMonkey</p>';
-        $html .= '</div>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+
+        return $this->wrapEmailContent($title, $inner);
     }
 
     /**
@@ -216,22 +269,14 @@ class MailService
     private function renderMembershipRequestAlertEmail(User $user): string
     {
         $adminUrl = $this->urlGenerator->generate('app_admin_membership_requests', [], UrlGeneratorInterface::ABSOLUTE_URL);
-        
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
-        $html .= '<h3>⚠️ Nouvelle demande d\'adhésion</h3>';
-        $html .= '<p><strong>Email :</strong> ' . htmlspecialchars($user->getEmail()) . '</p>';
-        $html .= '<p><strong>Nom :</strong> ' . htmlspecialchars($user->getLastName() . ' ' . $user->getFirstName()) . '</p>';
-        $html .= '<p><strong>Date :</strong> ' . (new \DateTime())->format('d/m/Y H:i') . '</p>';
-        $html .= '<div style="text-align: center; margin: 20px 0;">';
-        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #ffc107; color: #000; text-decoration: none; border-radius: 4px;">', $adminUrl);
-        $html .= 'Valider la demande';
-        $html .= '</a>';
-        $html .= '</div>';
-        $html .= '<p style="color: #666;">Merci de valider cette demande dans les plus brefs délais.</p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+
+        $inner = '<p style="margin:0 0 12px;"><strong>Email :</strong> ' . htmlspecialchars($user->getEmail()) . '</p>';
+        $inner .= '<p style="margin:0 0 12px;"><strong>Nom :</strong> ' . htmlspecialchars($user->getLastName() . ' ' . $user->getFirstName()) . '</p>';
+        $inner .= '<p style="margin:0 0 12px;"><strong>Date :</strong> ' . (new \DateTime())->format('d/m/Y H:i') . '</p>';
+        $inner .= $this->emailButton($adminUrl, 'Valider la demande');
+        $inner .= '<p style="margin:0;color:#999999;">Merci de valider cette demande dans les plus brefs d&#233;lais.</p>';
+
+        return $this->wrapEmailContent('&#9888;&#65039; Nouvelle demande d&#8217;adh&#233;sion', $inner);
     }
 
     /**
@@ -239,22 +284,13 @@ class MailService
      */
     private function renderValidationEmail(User $user, string $paymentUrl): string
     {
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<h3>✅ Ta demande est acceptée !</h3>';
-        $html .= '<p>Félicitations ' . htmlspecialchars($user->getFirstName()) . ' !</p>';
-        $html .= '<p>Le bureau de GéoMonkey a validé ta demande d\'adhésion en tant que membre actif.</p>';
-        $html .= '<p>Pour finaliser ton adhésion, il ne te reste plus qu\'à effectuer le paiement :</p>';
-        $html .= '<div style="text-align: center; margin: 20px 0;">';
-        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #28a745; color: #fff; text-decoration: none; border-radius: 4px;">', $paymentUrl);
-        $html .= 'Payer mon adhésion';
-        $html .= '</a>';
-        $html .= '</div>';
-        $html .= '<p><small>Le montant de l\'adhésion annuelle a été voté en Assemblée Générale.</small></p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner = '<p style="margin:0 0 12px;">F&#233;licitations ' . htmlspecialchars($user->getFirstName()) . ' !</p>';
+        $inner .= '<p style="margin:0 0 12px;">Le bureau de G&#233;oMonkey a valid&#233; ta demande d&#8217;adh&#233;sion en tant que membre actif.</p>';
+        $inner .= '<p style="margin:0 0 12px;">Pour finaliser ton adh&#233;sion, il ne te reste plus qu&#8217;&#224; effectuer le paiement :</p>';
+        $inner .= $this->emailButton($paymentUrl, 'Payer mon adh&#233;sion');
+        $inner .= '<p style="margin:0;color:#999999;"><small>Le montant de l&#8217;adh&#233;sion annuelle a &#233;t&#233; vot&#233; en Assembl&#233;e G&#233;n&#233;rale.</small></p>';
+
+        return $this->wrapEmailContent('&#9989; Ta demande est accept&#233;e !', $inner);
     }
 
     /**
@@ -263,34 +299,25 @@ class MailService
     private function renderMembershipConfirmedEmail(User $user): string
     {
         $whatsappText = $this->whatsappGroupLink 
-            ? '<p>Rejoins notre groupe WhatsApp pour rester informé des événements : <a href="' . $this->whatsappGroupLink . '">Rejoindre le groupe</a></p>'
+            ? '<p style="margin:0 0 12px;">Rejoins notre groupe WhatsApp pour rester inform&#233; des &#233;v&#233;nements : <a href="' . $this->whatsappGroupLink . '" style="color:#E0C020;">Rejoindre le groupe</a></p>'
             : '';
         
         $assuranceText = $this->assuranceDetails
-            ? '<p><strong>Assurance :</strong> ' . $this->assuranceDetails . '</p>'
-            : '<p><strong>Assurance :</strong> Ton adhésion inclut une assurance responsabilité civile et individuelle accident souscrite par l\'association.</p>';
+            ? '<p style="margin:0 0 12px;"><strong>Assurance :</strong> ' . htmlspecialchars($this->assuranceDetails) . '</p>'
+            : '<p style="margin:0 0 12px;"><strong>Assurance :</strong> Ton adh&#233;sion inclut une assurance responsabilit&#233; civile et individuelle accident souscrite par l&#8217;association.</p>';
 
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<h3>🎉 Bienvenue officiellement chez GéoMonkey !</h3>';
-        $html .= '<p>Ton adhésion a été confirmée avec succès.</p>';
-        $html .= '</div>';
-        
-        $html .= '<h4>Ce que tu peux faire maintenant :</h4>';
-        $html .= '<ul style="padding-left: 20px;">';
-        $html .= '<li>Accéder à tous les contenus réservés aux membres</li>';
-        $html .= '<li>Participer à tous nos événements</li>';
-        $html .= '<li>Voter lors des Assemblées Générales</li>';
-        $html .= '</ul>';
-        
-        $html .= $whatsappText;
-        $html .= $assuranceText;
-        
-        $html .= '<p style="margin-top: 20px; color: #666;">Merci de faire partie de notre association !</p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner = '<p style="margin:0 0 12px;">Ton adh&#233;sion a &#233;t&#233; confirm&#233;e avec succ&#232;s.</p>';
+        $inner .= '<p style="margin:16px 0 8px;font-weight:bold;color:#ffffff;">Ce que tu peux faire maintenant :</p>';
+        $inner .= '<ul style="margin:0 0 12px;padding-left:20px;">';
+        $inner .= '<li style="margin-bottom:6px;">Acc&#233;der &#224; tous les contenus r&#233;serv&#233;s aux membres</li>';
+        $inner .= '<li style="margin-bottom:6px;">Participer &#224; tous nos &#233;v&#233;nements</li>';
+        $inner .= '<li>Voter lors des Assembl&#233;es G&#233;n&#233;rales</li>';
+        $inner .= '</ul>';
+        $inner .= $whatsappText;
+        $inner .= $assuranceText;
+        $inner .= '<p style="margin:16px 0 0;color:#999999;">Merci de faire partie de notre association !</p>';
+
+        return $this->wrapEmailContent('&#127881; Bienvenue officiellement chez G&#233;oMonkey !', $inner);
     }
 
     /**
@@ -300,21 +327,13 @@ class MailService
     {
         $renewalUrl = $this->urlGenerator->generate('app_membership_register', [], UrlGeneratorInterface::ABSOLUTE_URL);
         
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
-        $html .= '<h3>⏰ Ton adhésion expire bientôt</h3>';
-        $html .= '<p>Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
-        $html .= sprintf('<p>Ton adhésion à GéoMonkey expire dans <strong>%d jours</strong>.</p>', $daysUntilExpiry);
-        $html .= '<p>Pour continuer à profiter de tous les avantages, renouvèle ton adhésion dès maintenant :</p>';
-        $html .= '<div style="text-align: center; margin: 20px 0;">';
-        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">', $renewalUrl);
-        $html .= 'Renouveler mon adhésion';
-        $html .= '</a>';
-        $html .= '</div>';
-        $html .= '<p><small>Le tarif reste le même que celui que tu as payé l\'année dernière.</small></p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner = '<p style="margin:0 0 12px;">Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
+        $inner .= sprintf('<p style="margin:0 0 12px;">Ton adh&#233;sion &#224; G&#233;oMonkey expire dans <strong style="color:#E0C020;">%d jours</strong>.</p>', $daysUntilExpiry);
+        $inner .= '<p style="margin:0 0 12px;">Pour continuer &#224; profiter de tous les avantages, renouv&#232;le ton adh&#233;sion d&#232;s maintenant :</p>';
+        $inner .= $this->emailButton($renewalUrl, 'Renouveler mon adh&#233;sion');
+        $inner .= '<p style="margin:0;color:#999999;"><small>Le tarif reste le m&#234;me que celui que tu as pay&#233; l&#8217;ann&#233;e derni&#232;re.</small></p>';
+
+        return $this->wrapEmailContent('&#9200; Ton adh&#233;sion expire bient&#244;t', $inner);
     }
 
     /**
@@ -322,30 +341,22 @@ class MailService
      */
     private function renderDonationThankYouEmail(Donation $donation): string
     {
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<h3>🙏 Merci pour ton don !</h3>';
-        $html .= '</div>';
-        
-        $name = $donation->getDonorName() ?: 'à toi';
-        $html .= '<p>Bonjour ' . htmlspecialchars($name) . ',</p>';
-        $html .= sprintf(
-            '<p>Nous avons bien reçu ton don de <strong>%.2f€</strong> à l\'association GéoMonkey. Il contribue directement au financement de nos événements et de nos projets.</p>',
+        $inner = '<p style="margin:0 0 12px;">Bonjour ' . htmlspecialchars($donation->getDonorName() ?: 'à toi') . ',</p>';
+        $inner .= sprintf(
+            '<p style="margin:0 0 12px;">Nous avons bien re&#231;u ton don de <strong style="color:#E0C020;">%.2f&#8364;</strong> &#224; l&#8217;association G&#233;oMonkey. Il contribue directement au financement de nos &#233;v&#233;nements et de nos projets.</p>',
             $donation->getAmountInEuros()
         );
         
         if ($donation->getMessage()) {
-            $html .= '<div style="margin: 15px 0; padding: 12px; background: #fff; border-left: 4px solid #ffc107; border-radius: 4px;">';
-            $html .= '<p style="margin: 0;"><em>« ' . htmlspecialchars($donation->getMessage()) . ' »</em></p>';
-            $html .= '</div>';
+            $inner .= '<div style="margin:15px 0;padding:12px;background:#1C1C1A;border-left:4px solid #E0C020;border-radius:4px;">';
+            $inner .= '<p style="margin:0;"><em>&#171; ' . htmlspecialchars($donation->getMessage()) . ' &#187;</em></p>';
+            $inner .= '</div>';
         }
         
-        $html .= '<p>Ce message t\' sert d\'accusé de réception. Conserve-le : il peut te servir de justificatif de paiement.</p>';
-        $html .= '<p style="margin-top: 20px; color: #666;">Un grand merci de la part de toute l\'équipe GéoMonkey 🐒</p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner .= '<p style="margin:0 0 12px;">Ce message t&#8217; sert d&#8217;accus&#233; de r&#233;ception. Conserve-le : il peut te servir de justificatif de paiement.</p>';
+        $inner .= '<p style="margin:16px 0 0;color:#999999;">Un grand merci de la part de toute l&#8217;&#233;quipe G&#233;oMonkey &#128018;</p>';
+
+        return $this->wrapEmailContent('&#128591; Merci pour ton don !', $inner);
     }
 
     /**
@@ -353,22 +364,18 @@ class MailService
      */
     private function renderDonationAlertEmail(Donation $donation): string
     {
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #d4edda; padding: 20px; border-radius: 8px;">';
-        $html .= '<h3>🎁 Nouveau don reçu</h3>';
-        $html .= '<p><strong>Montant :</strong> ' . sprintf('%.2f€', $donation->getAmountInEuros()) . '</p>';
-        $html .= '<p><strong>Donateur :</strong> ' . htmlspecialchars($donation->getDonorName() ?: 'Anonyme') . '</p>';
-        $html .= '<p><strong>Email :</strong> ' . htmlspecialchars($donation->getDonorEmail() ?: 'non fourni') . '</p>';
-        $html .= '<p><strong>Date :</strong> ' . $donation->getCreatedAt()->format('d/m/Y H:i') . '</p>';
+        $inner = '<p style="margin:0 0 12px;"><strong>Montant :</strong> <strong style="color:#E0C020;">' . sprintf('%.2f&#8364;', $donation->getAmountInEuros()) . '</strong></p>';
+        $inner .= '<p style="margin:0 0 12px;"><strong>Donateur :</strong> ' . htmlspecialchars($donation->getDonorName() ?: 'Anonyme') . '</p>';
+        $inner .= '<p style="margin:0 0 12px;"><strong>Email :</strong> ' . htmlspecialchars($donation->getDonorEmail() ?: 'non fourni') . '</p>';
+        $inner .= '<p style="margin:0 0 12px;"><strong>Date :</strong> ' . $donation->getCreatedAt()->format('d/m/Y H:i') . '</p>';
         
         if ($donation->getMessage()) {
-            $html .= '<p><strong>Message :</strong> <em>« ' . htmlspecialchars($donation->getMessage()) . ' »</em></p>';
+            $inner .= '<p style="margin:0 0 12px;"><strong>Message :</strong> <em>&#171; ' . htmlspecialchars($donation->getMessage()) . ' &#187;</em></p>';
         }
         
-        $html .= '<p style="color: #666;"><small>Référence session Stripe : ' . htmlspecialchars((string) $donation->getStripeSessionId()) . '</small></p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner .= '<p style="margin:0;color:#999999;"><small>R&#233;f&#233;rence session Stripe : ' . htmlspecialchars((string) $donation->getStripeSessionId()) . '</small></p>';
+
+        return $this->wrapEmailContent('&#127873; Nouveau don re&#231;u', $inner);
     }
 
     /**
@@ -414,24 +421,13 @@ class MailService
      */
     private function renderEmailVerificationEmail(User $user, string $verificationUrl): string
     {
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<h3>✉️ Vérifie ton adresse email</h3>';
-        $html .= '</div>';
-        $html .= '<p>Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
-        $html .= '<p>Merci pour ton inscription sur GéoMonkey !</p>';
-        $html .= '<p>Pour finaliser ton inscription, clique sur le lien ci-dessous pour vérifier ton adresse email :</p>';
-        $html .= '<div style="text-align: center; margin: 20px 0;">';
-        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #007bff; color: #fff; text-decoration: none; border-radius: 4px;">', $verificationUrl);
-        $html .= 'Vérifier mon email';
-        $html .= '</a>';
-        $html .= '</div>';
-        $html .= '<p><small>Ce lien expirera dans 24 heures. Si tu n\'as pas demandé cette inscription, ignore cet email.</small></p>';
-        $html .= '<p style="margin-top: 20px; color: #666;">Cordialement,<br>L\'équipe GéoMonkey</p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner = '<p style="margin:0 0 12px;">Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
+        $inner .= '<p style="margin:0 0 12px;">Merci pour ton inscription sur G&#233;oMonkey !</p>';
+        $inner .= '<p style="margin:0 0 12px;">Pour finaliser ton inscription, clique sur le lien ci-dessous pour v&#233;rifier ton adresse email :</p>';
+        $inner .= $this->emailButton($verificationUrl, 'V&#233;rifier mon email');
+        $inner .= '<p style="margin:0;color:#999999;"><small>Ce lien expirera dans 24 heures. Si tu n&#8217;as pas demand&#233; cette inscription, ignore cet email.</small></p>';
+
+        return $this->wrapEmailContent('&#9993;&#65039; V&#233;rifie ton adresse email', $inner);
     }
 
     /**
@@ -439,24 +435,13 @@ class MailService
      */
     private function renderPasswordResetEmail(User $user, string $resetUrl): string
     {
-        $html = '<!DOCTYPE html><html><body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">';
-        $html .= '<div style="background: #fff3cd; padding: 20px; border-radius: 8px;">';
-        $html .= '<div style="text-align: center; margin-bottom: 20px;">';
-        $html .= '<h3>🔐 Réinitialisation de mot de passe</h3>';
-        $html .= '</div>';
-        $html .= '<p>Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
-        $html .= '<p>Tu as demandé une réinitialisation de ton mot de passe GéoMonkey.</p>';
-        $html .= '<p>Clique sur le lien ci-dessous pour créer un nouveau mot de passe :</p>';
-        $html .= '<div style="text-align: center; margin: 20px 0;">';
-        $html .= sprintf('<a href="%s" style="display: inline-block; padding: 12px 24px; background: #28a745; color: #fff; text-decoration: none; border-radius: 4px;">', $resetUrl);
-        $html .= 'Réinitialiser mon mot de passe';
-        $html .= '</a>';
-        $html .= '</div>';
-        $html .= '<p><small>Ce lien expirera dans 1 heure. Si tu n\'as pas demandé cette réinitialisation, ignore cet email.</small></p>';
-        $html .= '<p style="margin-top: 20px; color: #666;">Cordialement,<br>L\'équipe GéoMonkey</p>';
-        $html .= '</div></body></html>';
-        
-        return $html;
+        $inner = '<p style="margin:0 0 12px;">Bonjour ' . htmlspecialchars($user->getFirstName()) . ',</p>';
+        $inner .= '<p style="margin:0 0 12px;">Tu as demand&#233; une r&#233;initialisation de ton mot de passe G&#233;oMonkey.</p>';
+        $inner .= '<p style="margin:0 0 12px;">Clique sur le lien ci-dessous pour cr&#233;er un nouveau mot de passe :</p>';
+        $inner .= $this->emailButton($resetUrl, 'R&#233;initialiser mon mot de passe');
+        $inner .= '<p style="margin:0;color:#999999;"><small>Ce lien expirera dans 1 heure. Si tu n&#8217;as pas demand&#233; cette r&#233;initialisation, ignore cet email.</small></p>';
+
+        return $this->wrapEmailContent('&#128274; R&#233;initialisation de mot de passe', $inner);
     }
 
     /**
