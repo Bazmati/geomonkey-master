@@ -65,9 +65,9 @@ class MailService
         private MailerInterface $mailer,
         private UrlGeneratorInterface $urlGenerator,
         private string $contactEmail,
-        private string $fromAddress,
         private ?string $whatsappGroupLink = null,
-        private ?string $assuranceDetails = null
+        private ?string $assuranceDetails = null,
+        private string $fromAddress = 'noreply@geomonkey.fr'
     ) {}
 
     /**
