@@ -64,6 +64,11 @@ class GalleryImageVoter extends Voter
             return false; // Anonyme : accès refusé sauf pour les images publiques (déjà géré ci-dessus)
         }
 
+        // ROLE_SUPER_ADMIN : clé de secours (break-glass), même logique que EntityVoter
+        if (\in_array('ROLE_SUPER_ADMIN', $user->getRoles(), true)) {
+            return true;
+        }
+
         $function = $user->getOfficeFunction();
 
         // Si on a un subject (GalleryImage), appliquer la logique spécifique à l'attribut
@@ -106,6 +111,7 @@ class GalleryImageVoter extends Voter
     {
         return in_array($function, [
             OfficeFunction::President,
+            OfficeFunction::VicePresident,
             OfficeFunction::Treasurer,
             OfficeFunction::Secretary,
         ], true);
@@ -118,6 +124,7 @@ class GalleryImageVoter extends Voter
     {
         return in_array($function, [
             OfficeFunction::President,
+            OfficeFunction::VicePresident,
             OfficeFunction::Secretary,
         ], true);
     }

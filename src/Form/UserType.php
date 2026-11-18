@@ -46,6 +46,7 @@ class UserType extends AbstractType
                 'choice_value' => fn (OfficeFunction $f) => $f->value,
                 'choice_label' => fn (OfficeFunction $f) => match ($f) {
                     OfficeFunction::President => 'Président',
+                    OfficeFunction::VicePresident => 'Vice-président',
                     OfficeFunction::Treasurer => 'Trésorier',
                     OfficeFunction::Secretary => 'Secrétaire',
                     OfficeFunction::ActiveMember => 'Membre actif',

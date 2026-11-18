@@ -223,8 +223,9 @@ class UserTypeTest extends TypeTestCase
         $officeFunctionField = $form->get('officeFunction');
         $choices = $officeFunctionField->getConfig()->getOption('choices');
         
-        $this->assertCount(5, $choices);
+        $this->assertCount(6, $choices);
         $this->assertContains(OfficeFunction::President, $choices);
+        $this->assertContains(OfficeFunction::VicePresident, $choices);
         $this->assertContains(OfficeFunction::Treasurer, $choices);
         $this->assertContains(OfficeFunction::Secretary, $choices);
         $this->assertContains(OfficeFunction::ActiveMember, $choices);

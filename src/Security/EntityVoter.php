@@ -62,6 +62,7 @@ class EntityVoter extends Voter
         // Bureau (président, trésorier, secrétaire) : droits étendus
         $isBureau = in_array($function, [
             OfficeFunction::President,
+            OfficeFunction::VicePresident,
             OfficeFunction::Treasurer,
             OfficeFunction::Secretary,
         ], true);
@@ -82,6 +83,7 @@ class EntityVoter extends Voter
         // Le bureau peut éditer ; affinage plus tard (ex. le trésorier n'édite que la compta)
         return in_array($function, [
             OfficeFunction::President,
+            OfficeFunction::VicePresident,
             OfficeFunction::Secretary,
         ], true);
     }

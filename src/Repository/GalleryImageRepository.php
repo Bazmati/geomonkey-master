@@ -126,6 +126,7 @@ class GalleryImageRepository extends ServiceEntityRepository
         $function = $user->getOfficeFunction();
         $isBureau = in_array($function, [
             OfficeFunction::President,
+            OfficeFunction::VicePresident,
             OfficeFunction::Treasurer,
             OfficeFunction::Secretary,
         ], true);
