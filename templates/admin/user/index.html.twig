@@ -43,7 +43,7 @@
                 <td data-label="Email">{{ user.email }}</td>
                 <td data-label="Fonction">{{ user.officeFunction.value }}</td>
                 <td data-label="Rôle">
-                    {% if 'ROLE_ADMIN' in user.roles %}
+                    {% if 'ROLE_ADMIN' in user.roles or 'ROLE_SUPER_ADMIN' in user.roles %}
                         <span class="badge bg-gm-warning text-gm-bg">Admin</span>
                     {% else %}
                         <span class="badge bg-gm-gray-600 text-gm-white">Membre</span>
