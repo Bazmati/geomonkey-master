@@ -66,5 +66,14 @@ services:
             $whatsappGroupLink: '%env(WHATSAPP_GROUP_LINK)%'
             $fromAddress: '%env(MAIL_FROM_ADDRESS)%'
 
+    # MailboxService - consultation IMAP de la boîte mail de l'asso (onglet Messages)
+    App\Service\MailboxService:
+        arguments:
+            $host: '%env(MAILBOX_HOST)%'
+            $port: '%env(int:MAILBOX_PORT)%'
+            $encryption: '%env(MAILBOX_ENCRYPTION)%'
+            $username: '%env(MAILBOX_USER)%'
+            $password: '%env(MAILBOX_PASSWORD)%'
+
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

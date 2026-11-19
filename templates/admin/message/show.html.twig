@@ -1,0 +1,53 @@
+{# templates/admin/message/show.html.twig — lecture d'un message #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}{{ summary.subject }} - Messages - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    {% set page_title = 'Message' %}
+
+    <div class="p-4">
+
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-4 flex-wrap">
+            <div>
+                <h1 class="text-gm-green mb-2"><i class="bi bi-envelope-open-fill"></i> {{ summary.subject }}</h1>
+                <p class="mb-1">
+                    <strong>De :</strong> {{ summary.from }}
+                </p>
+                <p class="mb-0 text-gm-muted">
+                    {{ summary.date ? summary.date|date('d/m/Y à H:i') : 'Date inconnue' }}
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_admin_message_index') }}" class="btn btn-gm-surface">
+                    <i class="bi bi-arrow-left me-1"></i> Retour à la boîte
+                </a>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-gm-surface">
+                <i class="bi bi-file-text me-2"></i> Contenu du message
+            </div>
+            <div class="card-body">
+                {% if message.hasTextBody %}
+                    {# Corps texte : affiché tel quel, échappé par Twig (jamais de HTML d'email brut) #}
+                    <div class="pre-line text-break">{{ message.getTextBody }}</div>
+                {% elseif message.getHTMLBody %}
+                    <div class="alert alert-gm-info">
+                        <i class="bi bi-shield-exclamation me-2"></i>
+                        Ce message est au format HTML uniquement. Par sécurité, il n'est pas affiché
+                        ici (les emails externes ne sont jamais rendus en HTML brut dans le back office).
+                        Ouvre-le dans le webmail GMX pour le consulter pleinement.
+                    </div>
+                {% else %}
+                    <div class="alert alert-gm-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Message sans contenu texte lisible (pièces jointes ou format exotique),
+                        à consulter dans le webmail GMX.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

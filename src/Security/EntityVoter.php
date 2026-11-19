@@ -23,12 +23,13 @@ class EntityVoter extends Voter
     public const PUBLISH = 'ENTITY_PUBLISH';      // mise en ligne : président uniquement
     public const SETTINGS = 'ENTITY_SETTINGS';    // onglet Paramètres : président uniquement
     public const TREASURY = 'ENTITY_TREASURY';    // données financières (dons, future compta) : bureau étendu, trésorier inclus
+    public const MESSAGES = 'ENTITY_MESSAGES';    // boîte mail de l'asso (onglet Messages) : bureau étendu
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array(
             $attribute,
-            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS, self::TREASURY],
+            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS, self::TREASURY, self::MESSAGES],
             true
         );
     }
@@ -76,6 +77,7 @@ class EntityVoter extends Voter
             self::PUBLISH  => $this->canPublish($function, $subject),
             self::SETTINGS => $this->canManageSettings($function),
             self::TREASURY => $isBureau, // bureau étendu : président, VP, trésorier, secrétaire
+            self::MESSAGES => $isBureau, // boîte mail asso : idem bureau étendu
             default        => false,
         };
     }

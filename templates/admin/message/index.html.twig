@@ -1,0 +1,120 @@
+{# templates/admin/message/index.html.twig — module Messages #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Messages - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    {% set page_title = 'Messages' %}
+
+    <div class="p-4">
+
+        <h1 class="text-gm-green mb-4">
+            <i class="bi bi-envelope-fill"></i> Messages
+        </h1>
+
+        {% if not available %}
+
+            {# ===== Boîte indisponible : alerte propre ===== #}
+            <div class="alert {{ configured ? 'alert-gm-info' : 'alert-gm-info' }}">
+                <h5 class="mb-2">
+                    <i class="bi bi-info-circle me-2"></i>
+                    {{ configured ? 'Boîte mail indisponible' : 'Boîte mail non configurée' }}
+                </h5>
+                {% if configured %}
+                    <p class="mb-1">La connexion à <strong>{{ app.request.server.get('MAILBOX_HOST') ?: 'la boîte mail' }}</strong> a échoué. Vérifie la connectivité du serveur et les identifiants.</p>
+                    <p class="mb-0 small text-gm-muted">{{ error }}</p>
+                {% else %}
+                    <p class="mb-1">Pour activer la consultation de la boîte mail de l'association depuis le back office, renseigne les variables <code>MAILBOX_*</code> dans le fichier <code>.env.local</code> :</p>
+                    <pre class="mb-1">MAILBOX_HOST=imap.gmx.com
+MAILBOX_PORT=993
+MAILBOX_ENCRYPTION=ssl
+MAILBOX_USER=geomonkey@gmx.fr
+MAILBOX_PASSWORD=••••••••</pre>
+                    <p class="mb-0 small text-gm-muted">Lecture seule : lister et lire. Pour répondre, réorganiser ou supprimer, le webmail GMX reste l'outil complet.</p>
+                {% endif %}
+            </div>
+
+        {% else %}
+
+            {# ===== Liste ===== #}
+            <div class="card shadow-sm">
+                <div class="card-header bg-gm-surface d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h5 class="mb-0">
+                        <i class="bi bi-inbox me-2"></i>
+                        Boîte de réception{% if total is not null %} — {{ total }} message(s){% endif %}
+                    </h5>
+                    <div class="small text-gm-muted">
+                        {% if lastPage is not null %}
+                            Page {{ page }} / {{ lastPage }}
+                        {% else %}
+                            Page {{ page }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-body p-0">
+                    {% if items|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table-mobile-cards table table-gm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Statut</th>
+                                        <th>De</th>
+                                        <th>Objet</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for item in items %}
+                                        <tr>
+                                            <td data-label="Statut">
+                                                {% if item.seen %}
+                                                    <span class="badge text-bg-secondary">Lu</span>
+                                                {% else %}
+                                                    <span class="badge text-bg-success">Non lu</span>
+                                                {% endif %}
+                                            </td>
+                                            <td data-label="De">
+                                                <strong>{{ item.from }}</strong>
+                                            </td>
+                                            <td data-label="Objet">
+                                                <a class="text-decoration-none" href="{{ path('app_admin_message_show', {uid: item.uid}) }}">
+                                                    <strong>{{ item.subject }}</strong>
+                                                </a>
+                                            </td>
+                                            <td data-label="Date">
+                                                {{ item.date ? item.date|date('d/m/Y H:i') : '—' }}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-gm-info m-3 mb-0">
+                            <i class="bi bi-check-circle me-2"></i>
+                            Aucun message dans la boîte de réception.
+                        </div>
+                    {% endif %}
+                </div>
+                {% set hasNext = lastPage is not null ? page < lastPage : items|length >= perPage %}
+                {% if page > 1 or hasNext %}
+                    <div class="card-footer bg-gm-surface d-flex justify-content-between">
+                        {% if page > 1 %}
+                            <a class="btn btn-sm btn-gm-surface" href="{{ path('app_admin_message_index', {page: page - 1}) }}">
+                                <i class="bi bi-arrow-left me-1"></i> Précédente
+                            </a>
+                        {% else %}
+                            <span></span>
+                        {% endif %}
+                        {% if hasNext %}
+                            <a class="btn btn-sm btn-gm-surface" href="{{ path('app_admin_message_index', {page: page + 1}) }}">
+                                Suivante <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+
+        {% endif %}
+    </div>
+{% endblock %}
