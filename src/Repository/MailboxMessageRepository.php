@@ -107,7 +107,7 @@ class MailboxMessageRepository extends ServiceEntityRepository
 
         $rows = $this->createQueryBuilder('m')
             ->select('m.uid')
-            ->andWhere('m.uid IN (\:uids)')
+            ->andWhere('m.uid IN (:uids)')
             ->setParameter('uids', $uids)
             ->getQuery()
             ->getSingleColumnResult();
