@@ -11,21 +11,21 @@ use Webklex\PHPIMAP\Message;
 use Webklex\PHPIMAP\Query\WhereQuery;
 
 /**
- * Consultation de la boîte mail de l'association (IMAP, lecture seule).
+ * Consultation de la boîte mail de l'association (IMAP).
  *
  * Choix d'architecture (règle "bundle utile / code maison produit") :
  * le protocole IMAP est délégué à webklex/php-imap (pure PHP, aucune
  * extension serveur requise), MAIS l'application ne parle qu'au présent
  * service. Si la bibliothèque change un jour, un seul fichier bouge.
  *
- * Lecture seule assumée : on liste, on lit, on marque comme lu (\Seen).
- * Répondre, supprimer, déplacer : c'est le rôle du webmail GMX complet.
+ * Rôles :
+ *   - synchronisation du cache local (fetchHeadersChunk) ;
+ *   - lecture d'un message précis (getMessage, marque \Seen) ;
+ *   - archivage des messages envoyés dans le dossier « Envoyés »
+ *     (appendToSent) : le bureau retrouve tout dans le webmail GMX.
  *
- * Performance : la page de liste ne fait PLUS d'IMAP du tout — elle lit
+ * Performance : la page de liste ne fait PAS d'IMAP du tout — elle lit
  * le cache local rempli par MailboxSynchronizer (app:mailbox:sync).
- * Ce service ne sert plus qu'à :
- *   - la synchronisation (fetchHeadersChunk) ;
- *   - la lecture d'un message précis (getMessage).
  */
 final class MailboxService
 {
@@ -37,11 +37,21 @@ final class MailboxService
         private readonly string $encryption,
         private readonly string $username,
         private readonly string $password,
+        private readonly string $sentFolder = 'INBOX.Sent',
     ) {}
 
     public function isConfigured(): bool
     {
         return $this->host !== '' && $this->username !== '' && $this->password !== '';
+    }
+
+    /**
+     * Adresse d'expédition de l'asso : MAILBOX_USER, qui DOIT être
+     * exactement geomonkey@gmx.fr (GMX impose From = compte authentifié).
+     */
+    public function getFromAddress(): string
+    {
+        return $this->username;
     }
 
     /**
@@ -100,9 +110,55 @@ final class MailboxService
     }
 
     /**
+     * Archive un message envoyé (source MIME brute) dans le dossier
+     * « Envoyés » du webmail GMX : le bureau garde l'historique complet
+     * côté webmail, comme si le message avait été écrit là.
+     *
+     * Non bloquant : l'envoi SMTP a déjà réussi quand on appelle ceci.
+     */
+    public function appendToSent(string $rawMessage): bool
+    {
+        if (!$this->isConfigured()) {
+            return false;
+        }
+
+        try {
+            $client = $this->makeConnectedClient();
+            $folder = $client->getFolder($this->sentFolder);
+
+            if (!$folder instanceof Folder) {
+                return false;
+            }
+
+            $folder->appendMessage($rawMessage);
+
+            return true;
+        } catch (\Throwable) {
+            // On ne fait jamais échouer un envoi réussi pour l'archive :
+            // l'appelant log l'échec, le message est dans le Sent du SMTP.
+            return false;
+        }
+    }
+
+    /**
      * Connexion + selection INBOX, avec échec propre en MailboxUnavailableException.
      */
     private function getInboxFolder(): Folder
+    {
+        $client = $this->makeConnectedClient();
+
+        $folder = $client->getFolder('INBOX');
+        if (!$folder instanceof Folder) {
+            throw new MailboxUnavailableException('Dossier INBOX introuvable sur le serveur.');
+        }
+
+        return $folder;
+    }
+
+    /**
+     * Client IMAP connecté (partagé par INBOX et dossier Envoyés).
+     */
+    private function makeConnectedClient(): Client
     {
         if (!$this->isConfigured()) {
             throw new MailboxUnavailableException('La boîte mail n’est pas configurée (MAILBOX_* dans .env.local).');
@@ -121,12 +177,7 @@ final class MailboxService
             ]);
             $client->connect();
 
-            $folder = $client->getFolder('INBOX');
-            if (!$folder instanceof Folder) {
-                throw new MailboxUnavailableException('Dossier INBOX introuvable sur le serveur.');
-            }
-
-            return $folder;
+            return $client;
         } catch (MailboxUnavailableException $e) {
             throw $e;
         } catch (\Throwable $e) {

@@ -1,4 +1,4 @@
-{# templates/admin/message/index.html.twig — module Messages (cache local #}
+{# templates/admin/message/index.html.twig — module Messages (cache local) #}
 {% extends 'admin/base.html.twig' %}
 
 {% block title %}Messages - GéoMonkey{% endblock %}
@@ -8,9 +8,14 @@
 
     <div class="p-4">
 
-        <h1 class="text-gm-green mb-4">
-            <i class="bi bi-envelope-fill"></i> Messages
-        </h1>
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+            <h1 class="text-gm-green mb-0">
+                <i class="bi bi-envelope-fill"></i> Messages
+            </h1>
+            <a href="{{ path('app_admin_message_compose') }}" class="btn btn-gm-green">
+                <i class="bi bi-pencil-square me-1"></i> Nouveau message
+            </a>
+        </div>
 
         {% if not available %}
 

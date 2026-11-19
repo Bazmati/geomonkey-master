@@ -1,15 +1,16 @@
 # This file is the entry point to configure your own services.
-# Files in the packages/ subdirectory configure your dependencies.
-# See also https://symfony.com/doc/current/service_container/import.html
+# Files in the packages/ subdirectory are the container's configuration.
+# See https://symfony.com/doc/current/service_container/import.html
 
 # Put parameters here that don't need to change on each machine where the app is deployed
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     # Public directory for image storage
     public_dir: '%kernel.project_dir%/public'
+    env(MAILBOX_SENT_FOLDER): 'INBOX.Sent'
 
 services:
-    # default configuration for services in *this* file
+    # default configuration for services in this *file*
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
@@ -67,6 +68,8 @@ services:
             $fromAddress: '%env(MAIL_FROM_ADDRESS)%'
 
     # MailboxService - consultation IMAP de la boîte mail de l'asso (onglet Messages)
+    # $sentFolder : dossier d'archivage des envois du module Messages
+    # (modifiable via MAILBOX_SENT_FOLDER, par défaut le dossier GMX).
     App\Service\MailboxService:
         arguments:
             $host: '%env(MAILBOX_HOST)%'
@@ -74,6 +77,7 @@ services:
             $encryption: '%env(MAILBOX_ENCRYPTION)%'
             $username: '%env(MAILBOX_USER)%'
             $password: '%env(MAILBOX_PASSWORD)%'
+            $sentFolder: '%env(MAILBOX_SENT_FOLDER)%'
 
-    # add more service definitions when explicit configuration is needed
+    # add more service definitions only when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

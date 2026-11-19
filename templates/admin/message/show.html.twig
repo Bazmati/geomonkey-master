@@ -19,6 +19,14 @@
                 </p>
             </div>
             <div class="d-flex gap-2">
+                {% if replyTo %}
+                    <a href="{{ path('app_admin_message_compose', {
+                        to: replyTo,
+                        subject: summary.subject starts with 'Re:' ? summary.subject : 'Re: ' ~ summary.subject
+                    }) }}" class="btn btn-gm-green">
+                        <i class="bi bi-reply me-1"></i> Répondre
+                    </a>
+                {% endif %}
                 <a href="{{ path('app_admin_message_index') }}" class="btn btn-gm-surface">
                     <i class="bi bi-arrow-left me-1"></i> Retour à la boîte
                 </a>
