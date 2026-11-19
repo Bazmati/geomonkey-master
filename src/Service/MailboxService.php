@@ -21,9 +21,11 @@ use Webklex\PHPIMAP\Query\WhereQuery;
  * Lecture seule assumée : on liste, on lit, on marque comme lu (\Seen).
  * Répondre, supprimer, déplacer : c'est le rôle du webmail GMX complet.
  *
- * Performance : la page de liste ne charge QUE les en-têtes
- * (setFetchBody(false)) — les corps ne sont récupérés que sur la page
- * de détail d'un message.
+ * Performance : la page de liste ne fait PLUS d'IMAP du tout — elle lit
+ * le cache local rempli par MailboxSynchronizer (app:mailbox:sync).
+ * Ce service ne sert plus qu'à :
+ *   - la synchronisation (fetchHeadersChunk) ;
+ *   - la lecture d'un message précis (getMessage).
  */
 final class MailboxService
 {
@@ -43,50 +45,34 @@ final class MailboxService
     }
 
     /**
-     * Page de la boîte de réception (les plus récents d'abord).
+     * Chunk d'en-têtes pour la synchronisation : les plus récents d'abord,
+     * SANS les corps (setFetchBody(false)) — la synchro ne stocke jamais
+     * de corps, jamais de pièces jointes.
      *
-     * $search : filtre plein texte sur l'objet (recherche serveur IMAP).
-     * $unreadOnly : uniquement les messages non lus.
-     * $knownTotal : si le contrôleur connaît déjà le total (cache session),
-     *               on saute la requête de comptage.
-     *
-     * @return array{items: MessageSummary[], total: int|null, page: int}
+     * @return list<Message>
      */
-    public function getInboxPage(int $page, string $search = '', bool $unreadOnly = false, ?int $knownTotal = null): array
+    public function fetchHeadersChunk(int $page, int $size): array
     {
         $page = max(1, $page);
-        $search = trim($search);
         $folder = $this->getInboxFolder();
 
-        $total = $knownTotal;
-        if ($total === null) {
-            try {
-                $total = (int) $this->makeQuery($folder, $search, $unreadOnly)->count();
-            } catch (\Throwable) {
-                // Comptage refusé par ce serveur : la liste reste utilisable,
-                // seule la pagination « page X / Y » devient approximative.
-                $total = null;
-            }
-        }
-
         try {
-            $messages = $this->makeQuery($folder, $search, $unreadOnly)
+            $collection = $folder->messages()
+                ->whereAll()
                 ->setFetchOrder('desc')
-                // En-têtes seuls : la liste n'utilise ni corps ni pièces jointes.
-                // C'est le principal gain de performance du module.
                 ->setFetchBody(false)
-                ->limit(self::PER_PAGE, $page)
+                ->limit($size, $page)
                 ->get();
         } catch (\Throwable $e) {
             throw new MailboxUnavailableException('Lecture de la boîte impossible : ' . $e->getMessage(), 0, $e);
         }
 
-        $items = [];
-        foreach ($messages as $message) {
-            $items[] = $this->summarize($message);
+        $messages = [];
+        foreach ($collection as $message) {
+            $messages[] = $message;
         }
 
-        return ['items' => $items, 'total' => $total, 'page' => $page];
+        return $messages;
     }
 
     /**
@@ -111,27 +97,6 @@ final class MailboxService
         }
 
         return $message;
-    }
-
-    /**
-     * Construit une requête de listing qualifiée :
-     * - recherche sur l'objet si $search est fourni ;
-     * - sinon « ALL » (GMX, comme tout serveur strict, refuse un SEARCH
-     *   sans critère) ;
-     * - filtre non lus si demandé.
-     */
-    private function makeQuery(Folder $folder, string $search, bool $unreadOnly): WhereQuery
-    {
-        /** @var WhereQuery $query */
-        $query = $search !== ''
-            ? $folder->messages()->whereSubject($search)
-            : $folder->messages()->whereAll();
-
-        if ($unreadOnly) {
-            $query = $query->whereUnseen();
-        }
-
-        return $query;
     }
 
     /**
