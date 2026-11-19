@@ -22,12 +22,13 @@ class EntityVoter extends Voter
     public const DELETE = 'ENTITY_DELETE';
     public const PUBLISH = 'ENTITY_PUBLISH';      // mise en ligne : président uniquement
     public const SETTINGS = 'ENTITY_SETTINGS';    // onglet Paramètres : président uniquement
+    public const TREASURY = 'ENTITY_TREASURY';    // données financières (dons, future compta) : bureau étendu, trésorier inclus
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array(
             $attribute,
-            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS],
+            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS, self::TREASURY],
             true
         );
     }
@@ -74,6 +75,7 @@ class EntityVoter extends Voter
             self::DELETE   => $this->canDelete($function),
             self::PUBLISH  => $this->canPublish($function, $subject),
             self::SETTINGS => $this->canManageSettings($function),
+            self::TREASURY => $isBureau, // bureau étendu : président, VP, trésorier, secrétaire
             default        => false,
         };
     }

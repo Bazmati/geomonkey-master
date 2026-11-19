@@ -2,8 +2,10 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Donation;
 use App\Entity\Event;
 use App\Entity\Membership;
+use App\Repository\DonationRepository;
 use App\Repository\EventParticipantRepository;
 use App\Repository\MembershipRepository;
 use App\Repository\UserRepository;
@@ -96,6 +98,28 @@ class ExportController extends AbstractController
                 $p->getRegisteredAt()->format('d/m/Y H:i'),
                 $p->hasAttended() ? 'oui' : 'non',
                 $p->getNotes() ?? '',
+            ]
+        );
+    }
+
+    #[Route('/donations', name: 'donations', methods: ['GET'])]
+    #[IsGranted('ENTITY_TREASURY')]
+    public function donations(DonationRepository $donations, CsvExporter $csv): StreamedResponse
+    {
+        $records = $donations->findForAdmin();
+
+        return $csv->response(
+            'dons_' . (new \DateTimeImmutable())->format('Y-m-d') . '.csv',
+            ['ID', 'Date', 'Montant (€)', 'Donateur', 'Email', 'Statut', 'Message'],
+            $records,
+            fn (Donation $d) => [
+                $d->getId(),
+                $d->getCreatedAt()->format('d/m/Y H:i'),
+                \number_format($d->getAmountInEuros(), 2, '.', ''),
+                $d->getDonorName() ?? 'Anonyme',
+                $d->getDonorEmail() ?? '',
+                $d->getPaymentStatus(),
+                $d->getMessage() ?? '',
             ]
         );
     }
