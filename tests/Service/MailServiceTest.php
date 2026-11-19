@@ -23,7 +23,7 @@ class MailServiceTest extends TestCase
         $this->mailService = new MailService(
             $this->mailer,
             $this->urlGenerator,
-            'contact@geomonkey.fr',
+            'geomonkey@gmx.fr',
             'https://whatsapp.com/invite/group',
             'Assurance RC et individuelle accident incluse'
         );
@@ -75,7 +75,7 @@ class MailServiceTest extends TestCase
         $this->mailer->expects($this->once())
             ->method('send')
             ->with($this->callback(function (Email $email) {
-                return $email->getTo()[0]->getAddress() === 'contact@geomonkey.fr';
+                return $email->getTo()[0]->getAddress() === 'geomonkey@gmx.fr';
             }));
 
         $this->mailService->sendMembershipRequestAlert($user);

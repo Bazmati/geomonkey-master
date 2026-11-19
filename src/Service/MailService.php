@@ -21,7 +21,7 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
  * 
  * M2 - Inscription « membre actif »
  *   Déclencheur: Utilisateur choisit "membre_actif"
- *   Destinataire: CONTACT_EMAIL (ex: contact@geomonkey.fr)
+ *   Destinataire: CONTACT_EMAIL (ex: geomonkey@gmx.fr)
  *   Contenu: Alerte "X souhaite rejoindre l'asso" + bouton vers /admin/membership/requests
  * 
  * M3 - Validation bureau
@@ -471,7 +471,7 @@ HTML;
         <tr><td style="padding:24px 0 0;color:#999999;font-size:12px;line-height:1.6;">
           Tu peux te d&#233;sinscrire &#224; tout moment en cliquant sur ce lien :
           <br><a href="' . $unsubscribeUrl . '" style="color:#E0C020;">Me d&#233;sinscrire de la newsletter</a>
-          <br>Ou en &#233;crivant &#224; contact@geomonkey.fr.
+          <br>Ou en &#233;crivant &#224; geomonkey@gmx.fr.
         </td></tr>
       </table>
     </td></tr>
@@ -514,7 +514,7 @@ HTML;
         </td></tr>
         <tr><td style="padding-top:24px;border-top:1px solid #444444;margin-top:16px;color:#999999;font-size:12px;line-height:1.6;">
           Tu re&#231;ois cet email car tu es inscrit &#224; la newsletter G&#233;oMonkey.
-          <br><a href="' . $unsubscribeUrl . '" style="color:#E0C020;">Me d&#233;sinscrire</a> &#8212; ou &#233;cris &#224; contact@geomonkey.fr.
+          <br><a href="' . $unsubscribeUrl . '" style="color:#E0C020;">Me d&#233;sinscrire</a> &#8212; ou &#233;cris &#224; geomonkey@gmx.fr.
         </td></tr>
       </table>
     </td></tr>
