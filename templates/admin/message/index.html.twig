@@ -38,17 +38,59 @@ MAILBOX_PASSWORD=••••••••</pre>
 
             {# ===== Liste ===== #}
             <div class="card shadow-sm">
-                <div class="card-header bg-gm-surface d-flex justify-content-between align-items-center flex-wrap gap-2">
-                    <h5 class="mb-0">
-                        <i class="bi bi-inbox me-2"></i>
-                        Boîte de réception{% if total is not null %} — {{ total }} message(s){% endif %}
-                    </h5>
-                    <div class="small text-gm-muted">
-                        {% if lastPage is not null %}
-                            Page {{ page }} / {{ lastPage }}
-                        {% else %}
-                            Page {{ page }}
-                        {% endif %}
+                <div class="card-header bg-gm-surface">
+
+                    {# -- Barre de recherche + filtres -- #}
+                    <form method="get" action="{{ path('app_admin_message_index') }}"
+                          class="row g-2 align-items-center mb-2">
+                        <div class="col-12 col-md-6 col-lg-5">
+                            <div class="input-group">
+                                <span class="input-group-text bg-gm-surface border-0">
+                                    <i class="bi bi-search"></i>
+                                </span>
+                                <input type="search" class="form-control" name="q" value="{{ q }}"
+                                       placeholder="Rechercher un objet…" aria-label="Rechercher un objet">
+                            </div>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-2">
+                            <select class="form-select" name="unread" onchange="this.form.submit()">
+                                <option value="">Tous</option>
+                                <option value="1" {% if unreadOnly %}selected{% endif %}>Non lus</option>
+                            </select>
+                        </div>
+                        <div class="col-6 col-md-3 col-lg-3 d-flex gap-2">
+                            <button type="submit" class="btn btn-sm btn-gm-green w-100">
+                                <i class="bi bi-funnel me-1"></i> Filtrer
+                            </button>
+                            {% if q or unreadOnly %}
+                                <a href="{{ path('app_admin_message_index') }}"
+                                   class="btn btn-sm btn-gm-surface w-100" title="Réinitialiser">
+                                    <i class="bi bi-x-lg"></i>
+                                </a>
+                            {% endif %}
+                        </div>
+                    </form>
+
+                    {# -- Titre + pagination info -- #}
+                    <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                        <h5 class="mb-0">
+                            <i class="bi bi-inbox me-2"></i>
+                            {% if q %}
+                                Recherche « {{ q }} »
+                            {% elseif unreadOnly %}
+                                Messages non lus
+                            {% else %}
+                                Boîte de réception
+                            {% endif %}
+                            {% if total is not null %} — {{ total }} message(s){% endif %}
+                        </h5>
+                        <div class="small text-gm-muted">
+                            {% if lastPage is not null %}
+                                Page {{ page }} / {{ lastPage }}
+                            {% else %}
+                                Page {{ page }}
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
                 <div class="card-body p-0">
@@ -91,23 +133,30 @@ MAILBOX_PASSWORD=••••••••</pre>
                         </div>
                     {% else %}
                         <div class="alert alert-gm-info m-3 mb-0">
-                            <i class="bi bi-check-circle me-2"></i>
-                            Aucun message dans la boîte de réception.
+                            <i class="bi bi-info-circle me-2"></i>
+                            {% if q or unreadOnly %}
+                                Aucun message ne correspond à ce filtre.
+                            {% else %}
+                                Aucun message dans la boîte de réception.
+                            {% endif %}
                         </div>
                     {% endif %}
                 </div>
                 {% set hasNext = lastPage is not null ? page < lastPage : items|length >= perPage %}
                 {% if page > 1 or hasNext %}
                     <div class="card-footer bg-gm-surface d-flex justify-content-between">
+                        {# Les filtres sont conservés quand on change de page #}
                         {% if page > 1 %}
-                            <a class="btn btn-sm btn-gm-surface" href="{{ path('app_admin_message_index', {page: page - 1}) }}">
+                            <a class="btn btn-sm btn-gm-surface"
+                               href="{{ path('app_admin_message_index', {page: page - 1, q: q, unread: unreadOnly ? '1' : null}) }}">
                                 <i class="bi bi-arrow-left me-1"></i> Précédente
                             </a>
                         {% else %}
                             <span></span>
                         {% endif %}
                         {% if hasNext %}
-                            <a class="btn btn-sm btn-gm-surface" href="{{ path('app_admin_message_index', {page: page + 1}) }}">
+                            <a class="btn btn-sm btn-gm-surface"
+                               href="{{ path('app_admin_message_index', {page: page + 1, q: q, unread: unreadOnly ? '1' : null}) }}">
                                 Suivante <i class="bi bi-arrow-right ms-1"></i>
                             </a>
                         {% endif %}
