@@ -1,0 +1,135 @@
+{# templates/admin/donation/index.html.twig — module Dons #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Dons - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    {% set page_title = 'Dons' %}
+
+    <div class="p-4">
+
+        <h1 class="text-gm-green mb-4">
+            <i class="bi bi-heart-fill"></i> Dons
+        </h1>
+
+        {# ===== Totaux (trésorerie / assemblée générale) ===== #}
+        <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <i class="bi bi-cash-coin display-6 text-gm-green"></i>
+                        <div>
+                            <div class="text-gm-muted small">Total des dons payés — {{ 'now'|date('Y') }}</div>
+                            <div class="fs-4 fw-bold">{{ (totalPaidThisYear / 100)|number_format(2, ',', ' ') }} €</div>
+                            <div class="small text-gm-muted">Net après frais Stripe : {{ (totalNetThisYear / 100)|number_format(2, ',', ' ') }} €</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-md-6">
+                <div class="card shadow-sm">
+                    <div class="card-body d-flex align-items-center gap-3">
+                        <i class="bi bi-piggy-bank display-6 text-gm-warning"></i>
+                        <div>
+                            <div class="text-gm-muted small">Total des dons payés — depuis toujours</div>
+                            <div class="fs-4 fw-bold">{{ (totalPaidAllTime / 100)|number_format(2, ',', ' ') }} €</div>
+                            <div class="small text-gm-muted">Net après frais Stripe : {{ (totalNetAllTime / 100)|number_format(2, ',', ' ') }} €</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {# ===== Liste + filtres ===== #}
+        <div class="card shadow-sm">
+            <div class="card-header bg-gm-surface d-flex justify-content-between align-items-center flex-wrap gap-2">
+                <h5 class="mb-0">
+                    <i class="bi bi-list-ul me-2"></i>
+                    {{ donations|length }} don(s)
+                    {% if status %}— filtre : {{ {'paid': 'payés', 'pending': 'en attente', 'failed': 'échoués'}[status] }}{% endif %}
+                </h5>
+                <div class="d-flex gap-2 flex-wrap">
+                    <a href="{{ path('app_admin_donation_index') }}"
+                       class="btn btn-sm {{ status ? 'btn-gm-surface' : 'btn-gm-green' }} btn-gm-surface-outline">
+                        Tous
+                    </a>
+                    <a href="{{ path('app_admin_donation_index', {status: 'paid'}) }}"
+                       class="btn btn-sm {{ status == 'paid' ? 'btn-gm-green' : 'btn-gm-surface' }} btn-gm-surface-outline">
+                        Payés ({{ counts.paid }})
+                    </a>
+                    <a href="{{ path('app_admin_donation_index', {status: 'pending'}) }}"
+                       class="btn btn-sm {{ status == 'pending' ? 'btn-gm-green' : 'btn-gm-surface' }} btn-gm-surface-outline">
+                        En attente ({{ counts.pending }})
+                    </a>
+                    <a href="{{ path('app_admin_donation_index', {status: 'failed'}) }}"
+                       class="btn btn-sm {{ status == 'failed' ? 'btn-gm-green' : 'btn-gm-surface' }} btn-gm-surface-outline">
+                        Échoués ({{ counts.failed }})
+                    </a>
+                    <a href="{{ path('app_admin_export_donations') }}" class="btn btn-sm btn-gm-surface">
+                        <i class="bi bi-download me-1"></i> Export CSV
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                {% if donations|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table-mobile-cards table table-gm table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Donateur</th>
+                                    <th>Message</th>
+                                    <th>Montant</th>
+                                    <th>Statut</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for donation in donations %}
+                                    <tr>
+                                        <td data-label="Date">
+                                            <strong>{{ donation.createdAt|date('d/m/Y H:i') }}</strong>
+                                        </td>
+                                        <td data-label="Donateur">
+                                            {% include 'admin/partials/_card_media.html.twig' with {media: null, icon: 'bi-person-heart'} %}
+                                            <strong>{{ donation.donorName ?: 'Anonyme' }}</strong>
+                                            {% if donation.donorEmail %}
+                                                <div class="small text-gm-muted">{{ donation.donorEmail }}</div>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Message">
+                                            {% if donation.message %}
+                                                {{ donation.message|slice(0, 120) }}{% if donation.message|length > 120 %}…{% endif %}
+                                            {% else %}
+                                                <span class="text-gm-muted">—</span>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Montant">
+                                            <strong>{{ donation.amountInEuros|number_format(2, ',', ' ') }} €</strong>
+                                            {% if donation.netAmount is not null %}
+                                                <div class="small text-gm-muted">net {{ donation.netInEuros|number_format(2, ',', ' ') }} €</div>
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="Statut">
+                                            {% if donation.paymentStatus == 'paid' %}
+                                                <span class="badge text-bg-success">Payé</span>
+                                            {% elseif donation.paymentStatus == 'pending' %}
+                                                <span class="badge text-bg-warning text-dark">En attente</span>
+                                            {% else %}
+                                                <span class="badge text-bg-danger">Échoué</span>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-gm-info m-3 mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Aucun don dans cette catégorie pour le moment.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

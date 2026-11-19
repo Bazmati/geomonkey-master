@@ -40,6 +40,28 @@ class DonationRepository extends ServiceEntityRepository
     }
 
     /**
+     * Total NET (après frais Stripe) des dons payés pour une année (en centimes)
+     */
+    public function getNetTotalForYear(int $year): int
+    {
+        $start = new \DateTimeImmutable(sprintf('%d-01-01 00:00:00', $year));
+        $end = $start->add(new \DateInterval('P1Y'));
+
+        $result = $this->createQueryBuilder('d')
+            ->select('SUM(d.netAmount)')
+            ->andWhere('d.paymentStatus = :status')
+            ->andWhere('d.createdAt >= :start')
+            ->andWhere('d.createdAt < :end')
+            ->setParameter('status', Donation::STATUS_PAID)
+            ->setParameter('start', $start)
+            ->setParameter('end', $end)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) ($result ?? 0);
+    }
+
+    /**
      * Liste des dons payés pour une année (ordre décroissant)
      *
      * @return Donation[]
@@ -114,6 +136,21 @@ class DonationRepository extends ServiceEntityRepository
     {
         $result = $this->createQueryBuilder('d')
             ->select('SUM(d.amount)')
+            ->andWhere('d.paymentStatus = :status')
+            ->setParameter('status', Donation::STATUS_PAID)
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return (int) ($result ?? 0);
+    }
+
+    /**
+     * Total NET (après frais Stripe) des dons payés, toutes années (en centimes)
+     */
+    public function getNetTotal(): int
+    {
+        $result = $this->createQueryBuilder('d')
+            ->select('SUM(d.netAmount)')
             ->andWhere('d.paymentStatus = :status')
             ->setParameter('status', Donation::STATUS_PAID)
             ->getQuery()

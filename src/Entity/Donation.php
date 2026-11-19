@@ -22,6 +22,12 @@ class Donation
     #[ORM\Column(type: Types::INTEGER)]
     private int $amount; // **En centimes** (ex: 2000 = 20,00€)
 
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $feeAmount = null; // Frais Stripe en centimes (ex: 27 = 0,27€)
+
+    #[ORM\Column(type: Types::INTEGER, nullable: true)]
+    private ?int $netAmount = null; // Net perçu en centimes (ex: 73 = 0,73€)
+
     #[ORM\Column(type: Types::STRING, length: 255, nullable: true)]
     private ?string $donorName = null;
 
@@ -65,6 +71,33 @@ class Donation
     public function getAmountInEuros(): float
     {
         return $this->amount / 100;
+    }
+
+    public function getFeeAmount(): ?int
+    {
+        return $this->feeAmount;
+    }
+
+    public function setFeeAmount(?int $feeAmount): self
+    {
+        $this->feeAmount = $feeAmount;
+        return $this;
+    }
+
+    public function getNetAmount(): ?int
+    {
+        return $this->netAmount;
+    }
+
+    public function setNetAmount(?int $netAmount): self
+    {
+        $this->netAmount = $netAmount;
+        return $this;
+    }
+
+    public function getNetInEuros(): ?float
+    {
+        return $this->netAmount !== null ? $this->netAmount / 100 : null;
     }
 
     public function getDonorName(): ?string

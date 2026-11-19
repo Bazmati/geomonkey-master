@@ -20,13 +20,13 @@ use Symfony\Component\Routing\Attribute\Route;
 
 /**
  * Contrôleur pour gérer les webhooks Stripe
- * 
+ *
  * Ce contrôleur écoute les événements Stripe, notamment :
  * - checkout.session.completed : Paiement réussi
  *   → metadata.type = 'donation' : enregistrement du don + M8/M9
  *   → sinon : adhésion (M4 Félicitations)
  * - payment_intent.succeeded : Alternative pour confirmer le paiement (adhésion)
- * 
+ *
  * POUR TESTER EN LOCAL :
  * 1. Lancer ngrok : ngrok http 8000
  * 2. Dans Stripe Dashboard → Developers → Webhooks → Add endpoint
@@ -86,7 +86,8 @@ class StripeWebhookController extends AbstractController
 
     /**
      * Traite un paiement de don réussi
-     * Enregistre le don en "paid" et déclenche :
+     * Enregistre le don en "paid" (avec frais Stripe et net pour la comptabilité)
+     * et déclenche :
      * - M8: email de remerciement au donateur (si email fourni)
      * - M9: alerte trésorerie à CONTACT_EMAIL
      */
@@ -113,6 +114,17 @@ class StripeWebhookController extends AbstractController
         $donation->setAmount($session->amount_total ?? $donation->getAmount());
         $donation->setStripeSessionId($session->id);
         $donation->setPaymentStatus(Donation::STATUS_PAID);
+
+        // Comptabilité : récupérer les frais Stripe (brut / net).
+        // En cas d'échec de récupération, le don reste "paid" avec frais à null :
+        // l'argent est bien reçu, on ne doit jamais renvoyer un statut d'erreur à Stripe.
+        $fees = $session instanceof \Stripe\Checkout\Session
+            ? $this->stripeService->getDonationFees($session)
+            : null;
+        if ($fees !== null) {
+            $donation->setFeeAmount($fees['fee']);
+            $donation->setNetAmount($fees['net']);
+        }
 
         $this->em->persist($donation);
         $this->em->flush();
@@ -158,14 +170,14 @@ class StripeWebhookController extends AbstractController
 
         // Récupérer le montant du paiement depuis Stripe (en cents)
         $amountCents = $session->amount_total ?? null;
-        
+
         // Récupérer ou créer une membership pour cet utilisateur
         // Cette méthode crée aussi la membership et met à jour l'utilisateur
         $membership = $this->createOrUpdateMembership($user, $session, $amountCents);
 
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
-        
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -193,13 +205,13 @@ class StripeWebhookController extends AbstractController
 
         // Récupérer le montant du paiement depuis Stripe (en cents)
         $amountCents = $paymentIntent->amount ?? null;
-        
+
         // Créer ou mettre à jour la membership (similaire à checkout.session.completed)
         $membership = $this->createOrUpdateMembership($user, $paymentIntent, $amountCents);
 
         // M4: Envoyer le mail de confirmation
         $this->mailService->sendMembershipConfirmedEmail($user);
-        
+
         $this->em->persist($user);
         $this->em->flush();
 
@@ -208,7 +220,7 @@ class StripeWebhookController extends AbstractController
 
     /**
      * Crée ou met à jour une membership pour l'utilisateur
-     * 
+     *
      * Règle métier :
      * - Si l'utilisateur avait déjà une fonction de bureau (président, trésorier, secrétaire) → conserve sa fonction
      * - Si l'utilisateur était None (visiteur) → passe en membre_actif
@@ -237,7 +249,7 @@ class StripeWebhookController extends AbstractController
         $now = new \DateTime();                        // Pour User.membershipValidUntil
         $nowImmutable = new \DateTimeImmutable();      // Pour User.registrationValidatedAt et Membership
         $expiresAt = $nowImmutable->add(new \DateInterval('P1Y'));
-        
+
         $membership = new Membership();
         $membership->setUser($user);
         $membership->setAmount($amountCents);
@@ -246,24 +258,24 @@ class StripeWebhookController extends AbstractController
         $membership->setExpiresAt($expiresAt);
         $membership->setStripePaymentId($session->id ?? $session->getId());
         $membership->setPaymentStatus('paid');
-        
+
         // Maintenir la relation bidirectionnelle
         $user->addMembership($membership);
-        
+
         // Mettre à jour le statut utilisateur :
         // Si None → membre_actif, sinon conserver la fonction existante
         if ($user->getOfficeFunction() === \App\Enum\OfficeFunction::None) {
             $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         }
-        
+
         // Marquer l'inscription comme confirmée et mettre à jour la date d'expiration
         $user->setIsRegistrationConfirmed(true);
         $user->setRegistrationValidatedAt($nowImmutable);
         // "Valide jusqu'au" = date de paiement + 1 an (aligné sur Membership.expiresAt)
         $user->setMembershipValidUntil(\DateTime::createFromImmutable($expiresAt));
-        
+
         $this->em->persist($membership);
-        
+
         return $membership;
     }
 }

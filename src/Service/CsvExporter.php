@@ -10,6 +10,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
  * - Delimiter ";" : ouverture directe dans Excel FR
  * - BOM UTF-8 : accents corrects dans Excel
  * - StreamedResponse : aucun buffer mémoire, même sur des milliers de lignes
+ *
+ * PHP 8.4 : le paramètre $escape doit être fourni explicitement à fputcsv
+ * (déprecation sinon). Valeur '' : pas d'échappement anti-historique,
+ * comportement recommandé par la RFC pour les nouveaux exports.
  */
 class CsvExporter
 {
@@ -25,10 +29,10 @@ class CsvExporter
         $response = new StreamedResponse(function () use ($headers, $records, $rowFormatter): void {
             $out = fopen('php://output', 'w');
             fwrite($out, "\xEF\xBB\xBF"); // BOM UTF-8 pour Excel
-            fputcsv($out, $headers, self::DELIMITER);
+            fputcsv($out, $headers, self::DELIMITER, '"', '');
 
             foreach ($records as $record) {
-                fputcsv($out, $rowFormatter($record), self::DELIMITER);
+                fputcsv($out, $rowFormatter($record), self::DELIMITER, '"', '');
             }
 
             fclose($out);

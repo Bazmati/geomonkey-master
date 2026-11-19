@@ -21,6 +21,7 @@
                         <div>
                             <div class="text-gm-muted small">Total des dons payés — {{ 'now'|date('Y') }}</div>
                             <div class="fs-4 fw-bold">{{ (totalPaidThisYear / 100)|number_format(2, ',', ' ') }} €</div>
+                            <div class="small text-gm-muted">Net après frais Stripe : {{ (totalNetThisYear / 100)|number_format(2, ',', ' ') }} €</div>
                         </div>
                     </div>
                 </div>
@@ -32,6 +33,7 @@
                         <div>
                             <div class="text-gm-muted small">Total des dons payés — depuis toujours</div>
                             <div class="fs-4 fw-bold">{{ (totalPaidAllTime / 100)|number_format(2, ',', ' ') }} €</div>
+                            <div class="small text-gm-muted">Net après frais Stripe : {{ (totalNetAllTime / 100)|number_format(2, ',', ' ') }} €</div>
                         </div>
                     </div>
                 </div>
@@ -103,6 +105,9 @@
                                         </td>
                                         <td data-label="Montant">
                                             <strong>{{ donation.amountInEuros|number_format(2, ',', ' ') }} €</strong>
+                                            {% if donation.netAmount is not null %}
+                                                <div class="small text-gm-muted">net {{ donation.netInEuros|number_format(2, ',', ' ') }} €</div>
+                                            {% endif %}
                                         </td>
                                         <td data-label="Statut">
                                             {% if donation.paymentStatus == 'paid' %}

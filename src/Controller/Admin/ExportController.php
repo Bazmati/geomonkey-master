@@ -110,12 +110,14 @@ class ExportController extends AbstractController
 
         return $csv->response(
             'dons_' . (new \DateTimeImmutable())->format('Y-m-d') . '.csv',
-            ['ID', 'Date', 'Montant (€)', 'Donateur', 'Email', 'Statut', 'Message'],
+            ['ID', 'Date', 'Montant (€)', 'Frais Stripe (€)', 'Net (€)', 'Donateur', 'Email', 'Statut', 'Message'],
             $records,
             fn (Donation $d) => [
                 $d->getId(),
                 $d->getCreatedAt()->format('d/m/Y H:i'),
                 \number_format($d->getAmountInEuros(), 2, '.', ''),
+                $d->getFeeAmount() !== null ? \number_format($d->getFeeAmount() / 100, 2, '.', '') : '',
+                $d->getNetAmount() !== null ? \number_format($d->getNetAmount() / 100, 2, '.', '') : '',
                 $d->getDonorName() ?? 'Anonyme',
                 $d->getDonorEmail() ?? '',
                 $d->getPaymentStatus(),

@@ -17,6 +17,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  * ce contrôleur donne au bureau la visibilité qui manquait : liste, filtres
  * par statut, totaux pour la trésorerie et l'assemblée générale, export CSV.
  *
+ * Totaux : brut (montant donné par le donateur) et net (après frais Stripe),
+ * pour la comptabilité de l'association.
+ *
  * Accès : ENTITY_TREASURY (bureau étendu, trésorier inclus).
  * Les dons sont des données financières ET des données personnelles
  * (nom, email du donateur) : pas d'accès membre simple.
@@ -35,12 +38,16 @@ class DonationController extends AbstractController
             $status = null;
         }
 
+        $year = (int) (new \DateTimeImmutable())->format('Y');
+
         return $this->render('admin/donation/index.html.twig', [
             'donations' => $this->donations->findForAdmin($status),
             'status' => $status,
             'counts' => $this->donations->countsByStatus(),
-            'totalPaidThisYear' => $this->donations->getPaidTotalForYear((int) (new \DateTimeImmutable())->format('Y')),
+            'totalPaidThisYear' => $this->donations->getPaidTotalForYear($year),
             'totalPaidAllTime' => $this->donations->getPaidTotal(),
+            'totalNetThisYear' => $this->donations->getNetTotalForYear($year),
+            'totalNetAllTime' => $this->donations->getNetTotal(),
         ]);
     }
 }

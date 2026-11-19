@@ -109,4 +109,34 @@ class StripeService
     {
         return $this->webhookSecret;
     }
+
+    /**
+     * Récupère les frais Stripe d'un paiement de don (checkout session).
+     * Source de vérité : le balance_transaction officiel de Stripe.
+     *
+     * Retourne ['fee' => int, 'net' => int] en centimes, ou null si indisponible.
+     * Ne jette jamais : un échec de récupération des frais ne doit pas
+     * faire échouer le webhook (Stripe réessaierait le paiement déjà acquis).
+     */
+    public function getDonationFees(\Stripe\Checkout\Session $session): ?array
+    {
+        try {
+            $paymentIntentId = $session->payment_intent ?? null;
+            if (!$paymentIntentId) {
+                return null;
+            }
+
+            $intent = \Stripe\PaymentIntent::retrieve($paymentIntentId);
+            $balanceTxId = $intent->latest_balance_transaction ?? null;
+            if (!$balanceTxId) {
+                return null;
+            }
+
+            $balanceTx = \Stripe\BalanceTransaction::retrieve($balanceTxId);
+
+            return ['fee' => (int) $balanceTx->fee, 'net' => (int) $balanceTx->net];
+        } catch (\Throwable $e) {
+            return null;
+        }
+    }
 }
