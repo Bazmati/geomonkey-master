@@ -274,7 +274,9 @@ class Event implements ImageableInterface
 
     public function __construct()
     {
+        $this->blogPosts = new ArrayCollection();
         $this->galleryImages = new ArrayCollection();
+        $this->tags = new ArrayCollection();
         $this->participants = new ArrayCollection();
         $this->projects = new ArrayCollection();
     }
