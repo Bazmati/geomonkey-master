@@ -23,6 +23,7 @@ class ProfileType extends AbstractType
             ->add('firstName', TextType::class, [
                 'label' => 'Prénom',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Jean'],
+                'empty_data' => '',
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le prénom est obligatoire'),
                     new Assert\Length(max: 50, maxMessage: 'Le prénom ne peut pas dépasser {{ limit }} caractères'),
@@ -31,6 +32,7 @@ class ProfileType extends AbstractType
             ->add('lastName', TextType::class, [
                 'label' => 'Nom',
                 'attr' => ['class' => 'form-control', 'placeholder' => 'Dupont'],
+                'empty_data' => '',
                 'constraints' => [
                     new Assert\NotBlank(message: 'Le nom est obligatoire'),
                     new Assert\Length(max: 50, maxMessage: 'Le nom ne peut pas dépasser {{ limit }} caractères'),
