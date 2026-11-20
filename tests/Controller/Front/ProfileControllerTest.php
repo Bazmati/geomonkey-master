@@ -78,7 +78,10 @@ class ProfileControllerTest extends WebTestCase
         $this->client->followRedirect();
         $this->assertSelectorTextContains('', 'mis à jour');
 
-        $this->em->refresh($user);
+        // Après la requête kernel, l'entité de test est détachée (DAMA reboot) :
+        // on relit l'utilisateur frais depuis la base via son identifiant.
+        $user = $this->em->getRepository(User::class)->find($user->getId());
+
         $this->assertSame('Jeanne', $user->getFirstName());
         $this->assertSame('Profilto', $user->getLastName());
         $this->assertTrue($user->getImageConsent());
@@ -98,11 +101,12 @@ class ProfileControllerTest extends WebTestCase
         ]);
         $this->client->submit($form);
 
-        // Validation : refus, pas de redirection.
-        $this->assertResponseIsSuccessful();
+        // Symfony 7+ : soumission invalide via handleRequest -> 422 automatique,
+        // avec la page re-rendue et le message d'erreur du formulaire.
+        $this->assertResponseStatusCodeSame(422);
         $this->assertSelectorTextContains('', 'obligatoire');
 
-        $this->em->refresh($user);
+        $user = $this->em->getRepository(User::class)->find($user->getId());
         $this->assertSame('Jean', $user->getFirstName(), 'Le prénom ne doit pas être vidé en base');
     }
 
