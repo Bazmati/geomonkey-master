@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: PHP 8.4
         uses: shivammathur/setup-php@v2
@@ -63,8 +63,12 @@ jobs:
           path: ~/.cache/composer
           key: composer-${{ hashFiles('composer.lock') }}
 
+      # --no-scripts : les auto-scripts (cache:clear, assets:install,
+      # importmap:install) crashent en 255 sans .env local et sont inutiles
+      # pour les tests — le kernel de test construit son propre cache et
+      # l'AssetMapper sert les sources directement en env test.
       - name: Composer install
-        run: composer install --no-interaction --no-progress
+        run: composer install --no-interaction --no-progress --no-scripts
 
       - name: Base de test (création + schéma)
         run: |
