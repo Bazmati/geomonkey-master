@@ -1,15 +1,26 @@
-Correctifs des tests après le lot 1b :
+i18n Lot 1c — Pages légales (CGU + Politique de confidentialité)
+================================================================
 
-1. ListingTranslationTest : assertions du hero FR passees par assertSelectorTextContains
-   (le HTML brut contient les apostrophes echappees &#039;, la comparaison de chaine brute echouait).
+APPROCHE (décision actée) :
+- Structure bilingue : hero, badge, sommaire, titres d'articles, boutons -> clés |trans
+- Le corps juridique des articles RESTE EN FRANÇAIS (version faisant foi)
+- Une mention "Seule la version française de ce document fait foi" (legal.notice)
+  est affichée uniquement quand la locale != fr
 
-2. LoginControllerTest : attente alignee sur le message custom du site
-   "Erreur : Identifiants invalides." (ancien assertion Symfony "Invalid credentials." ;- message FR affiche depuis ton custom).
+Contenu du zip (à extraire à la racine du projet) :
+  templates/front/legal/cgu.html.twig
+  templates/front/legal/privacy.html.twig
+  translations/messages.fr.php        (117 -> 153 clés, lots 0+1a+1b+1c fusionnés)
+  translations/messages.en.php        (153 clés, symétrique)
+  tests/Controller/Front/LegalTranslationTest.php   (2 tests)
 
-Remplacer dans le repo :
-  tests/Controller/Front/ListingTranslationTest.php
-  tests/LoginControllerTest.php
+Nouvelles clés : legal.* (6), cgu.* (15), privacy.* (15)
 
-Puis :
-  php bin/phpunit --filter "ListingTranslationTest|LoginControllerTest"
+Tests :
+  php bin/phpunit --filter LegalTranslationTest
   php bin/phpunit
+
+Déploiement :
+  git add/commit/push, puis sur le CT 202 :
+  cd /var/www/geomonkey (ou chemin du projet) && git pull
+  php bin/console cache:clear --env=prod (et reload php-fpm si besoin)

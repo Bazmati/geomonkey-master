@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Politique de Confidentialité - GéoMonkey{% endblock %}
+{% block title %}{{ 'privacy.title'|trans }} - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
@@ -10,16 +10,14 @@
     {# ===== Hero anthracite (sans vidéo) ===== #}
     <header class="gm-legal-hero">
         <div class="container text-center py-5">
-            <span class="gm-legal-badge"><i class="bi bi-shield-lock-fill me-2"></i>Vos données, notre engagement</span>
+            <span class="gm-legal-badge"><i class="bi bi-shield-lock-fill me-2"></i>{{ 'privacy.badge'|trans }}</span>
             <h1 class="gm-legal-title mt-3">
-                <i class="bi bi-shield-check me-2"></i>Politique de Confidentialité
+                <i class="bi bi-shield-check me-2"></i>{{ 'privacy.title'|trans }}
             </h1>
             <p class="gm-legal-sub mx-auto mt-3">
-                GéoMonkey prend très au sérieux la protection de vos données personnelles.
-                Cette politique explique, en toute transparence, comment nous les collectons,
-                les utilisons et les protégeons — conformément au RGPD.
+                {{ 'privacy.sub'|trans }}
             </p>
-            <p class="gm-legal-date mt-2">Dernière mise à jour : novembre 2026</p>
+            <p class="gm-legal-date mt-2">{{ 'legal.updated'|trans }}</p>
         </div>
     </header>
 
@@ -27,34 +25,42 @@
         <div class="row justify-content-center">
             <div class="col-lg-8">
 
+                {# ===== Mention version française fait foi (uniquement si locale != fr) ===== #}
+                {% if app.request.locale != 'fr' %}
+                    <div class="alert alert-gm-info" role="note">
+                        <i class="bi bi-info-circle me-2"></i>{{ 'legal.notice'|trans }}
+                    </div>
+                {% endif %}
+
                 {# ===== Sommaire ===== #}
-                <nav class="gm-legal-toc mb-4" aria-label="Sommaire">
-                    <p class="gm-legal-toc-title mb-2"><i class="bi bi-list-ul me-2"></i>Sommaire</p>
+                <nav class="gm-legal-toc mb-4" aria-label="{{ 'legal.toc'|trans }}">
+                    <p class="gm-legal-toc-title mb-2"><i class="bi bi-list-ul me-2"></i>{{ 'legal.toc'|trans }}</p>
                     <ol>
-                        <li><a href="#resp">Responsable du traitement</a></li>
-                        <li><a href="#finalites">Finalités du traitement</a></li>
-                        <li><a href="#donnees">Données collectées</a></li>
-                        <li><a href="#base">Base légale du traitement</a></li>
-                        <li><a href="#duree">Durée de conservation</a></li>
-                        <li><a href="#droits">Vos droits</a></li>
-                        <li><a href="#securite">Sécurité des données</a></li>
-                        <li><a href="#sous-traitants">Sous-traitants et transferts</a></li>
-                        <li><a href="#cookies">Cookies</a></li>
-                        <li><a href="#image">Droit à l'image</a></li>
-                        <li><a href="#reclamation">Réclamation</a></li>
-                        <li><a href="#modifications">Modifications</a></li>
+                        <li><a href="#resp">{{ 'privacy.a1'|trans }}</a></li>
+                        <li><a href="#finalites">{{ 'privacy.a2'|trans }}</a></li>
+                        <li><a href="#donnees">{{ 'privacy.a3'|trans }}</a></li>
+                        <li><a href="#base">{{ 'privacy.a4'|trans }}</a></li>
+                        <li><a href="#duree">{{ 'privacy.a5'|trans }}</a></li>
+                        <li><a href="#droits">{{ 'privacy.a6'|trans }}</a></li>
+                        <li><a href="#securite">{{ 'privacy.a7'|trans }}</a></li>
+                        <li><a href="#sous-traitants">{{ 'privacy.a8'|trans }}</a></li>
+                        <li><a href="#cookies">{{ 'privacy.a9'|trans }}</a></li>
+                        <li><a href="#image">{{ 'privacy.a10'|trans }}</a></li>
+                        <li><a href="#reclamation">{{ 'privacy.a11'|trans }}</a></li>
+                        <li><a href="#modifications">{{ 'privacy.a12'|trans }}</a></li>
                     </ol>
                 </nav>
 
+                {# ===== Corps : le texte juridique reste en français (version faisant foi) ===== #}
                 <div class="gm-legal-card">
-                    <h2 id="resp" class="gm-legal-h2"><i class="bi bi-person-badge me-2"></i>1. Responsable du traitement</h2>
+                    <h2 id="resp" class="gm-legal-h2"><i class="bi bi-person-badge me-2"></i>1. {{ 'privacy.a1'|trans }}</h2>
                     <p>
                         Le responsable du traitement des données est l'association GéoMonkey (association loi 1901),
                         représentée par son président. Vous pouvez nous contacter à l'adresse :
                         <strong>geomonkey@gmx.fr</strong>
                     </p>
 
-                    <h2 id="finalites" class="gm-legal-h2"><i class="bi bi-bullseye me-2"></i>2. Finalités du traitement</h2>
+                    <h2 id="finalites" class="gm-legal-h2"><i class="bi bi-bullseye me-2"></i>2. {{ 'privacy.a2'|trans }}</h2>
                     <p>Nous traitons vos données personnelles uniquement pour les finalités suivantes :</p>
                     <ul>
                         <li><strong>Gestion des adhérents</strong> : création et gestion de votre compte, suivi de votre adhésion ;</li>
@@ -64,7 +70,7 @@
                         <li><strong>Support et communication</strong> : réponse à vos questions et envoi de communications importantes.</li>
                     </ul>
 
-                    <h2 id="donnees" class="gm-legal-h2"><i class="bi bi-database me-2"></i>3. Données collectées</h2>
+                    <h2 id="donnees" class="gm-legal-h2"><i class="bi bi-database me-2"></i>3. {{ 'privacy.a3'|trans }}</h2>
                     <ul>
                         <li><strong>Données d'identification</strong> : nom, prénom, adresse email ;</li>
                         <li><strong>Données de connexion</strong> : mot de passe (stocké de manière sécurisée, jamais en clair) ;</li>
@@ -73,7 +79,7 @@
                             par Stripe ; nous conservons uniquement l'identifiant de transaction pour la traçabilité comptable.</li>
                     </ul>
 
-                    <h2 id="base" class="gm-legal-h2"><i class="bi bi-bank me-2"></i>4. Base légale du traitement</h2>
+                    <h2 id="base" class="gm-legal-h2"><i class="bi bi-bank me-2"></i>4. {{ 'privacy.a4'|trans }}</h2>
                     <p><strong>Pour les visiteurs (gratuit)</strong> : votre consentement explicite (case à cocher lors de l'inscription).</p>
                     <p><strong>Pour les membres actifs (payant)</strong> :</p>
                     <ul>
@@ -86,7 +92,7 @@
                         sans affecter la licéité du traitement antérieur.
                     </p>
 
-                    <h2 id="duree" class="gm-legal-h2"><i class="bi bi-hourglass-split me-2"></i>5. Durée de conservation</h2>
+                    <h2 id="duree" class="gm-legal-h2"><i class="bi bi-hourglass-split me-2"></i>5. {{ 'privacy.a5'|trans }}</h2>
                     <p>Vos données sont conservées :</p>
                     <ul>
                         <li>Tant que votre adhésion est active ;</li>
@@ -94,7 +100,7 @@
                         <li>Après quoi elles sont anonymisées ou supprimées, sauf consentement spécifique pour une conservation plus longue.</li>
                     </ul>
 
-                    <h2 id="droits" class="gm-legal-h2"><i class="bi bi-person-check me-2"></i>6. Vos droits</h2>
+                    <h2 id="droits" class="gm-legal-h2"><i class="bi bi-person-check me-2"></i>6. {{ 'privacy.a6'|trans }}</h2>
                     <p>Conformément au RGPD, vous disposez des droits suivants :</p>
                     <ul>
                         <li><strong>Droit d'accès</strong> : accéder à vos données personnelles ;</li>
@@ -110,7 +116,7 @@
                         Nous nous engageons à répondre dans un délai d'un mois.
                     </p>
 
-                    <h2 id="securite" class="gm-legal-h2"><i class="bi bi-lock-fill me-2"></i>7. Sécurité des données</h2>
+                    <h2 id="securite" class="gm-legal-h2"><i class="bi bi-lock-fill me-2"></i>7. {{ 'privacy.a7'|trans }}</h2>
                     <ul>
                         <li>Chiffrement des mots de passe ;</li>
                         <li>Hébergement sécurisé directement par l'association sur son propre serveur, situé dans l'Union européenne ;</li>
@@ -118,7 +124,7 @@
                         <li>Paiements sécurisés via Stripe (conforme PCI-DSS).</li>
                     </ul>
 
-                    <h2 id="sous-traitants" class="gm-legal-h2"><i class="bi bi-box-seam me-2"></i>8. Sous-traitants et transferts</h2>
+                    <h2 id="sous-traitants" class="gm-legal-h2"><i class="bi bi-box-seam me-2"></i>8. {{ 'privacy.a8'|trans }}</h2>
                     <p>Nous faisons appel aux prestataires suivants, dans le cadre de leurs obligations professionnelles de confidentialité et de sécurité :</p>
                     <ul>
                         <li><strong>Stripe</strong> : traitement sécurisé des paiements (conformité PCI-DSS).
@@ -131,7 +137,7 @@
                         Stripe peut transférer certaines données aux États-Unis conformément à ses conditions de confidentialité.
                     </p>
 
-                    <h2 id="cookies" class="gm-legal-h2"><i class="bi bi-cookie me-2"></i>9. Cookies</h2>
+                    <h2 id="cookies" class="gm-legal-h2"><i class="bi bi-cookie me-2"></i>9. {{ 'privacy.a9'|trans }}</h2>
                     <p>
                         Le site GéoMonkey n'utilise <strong>aucun cookie publicitaire ni traceur d'analyse d'audience</strong>.
                         Seuls des cookies techniques strictement nécessaires au fonctionnement du site sont déposés :
@@ -145,7 +151,7 @@
                         Vous pouvez néanmoins les supprimer à tout moment via les réglages de votre navigateur.
                     </p>
 
-                    <h2 id="image" class="gm-legal-h2"><i class="bi bi-camera me-2"></i>10. Droit à l'image</h2>
+                    <h2 id="image" class="gm-legal-h2"><i class="bi bi-camera me-2"></i>10. {{ 'privacy.a10'|trans }}</h2>
                     <p>
                         La publication de vos photos prises lors des événements fait l'objet d'un
                         <strong>consentement distinct et facultatif</strong>, recueilli lors de l'inscription
@@ -153,7 +159,7 @@
                         geomonkey@gmx.fr : les photos concernées seront retirées du site dans les meilleurs délais.
                     </p>
 
-                    <h2 id="reclamation" class="gm-legal-h2"><i class="bi bi-exclamation-octagon me-2"></i>11. Réclamation</h2>
+                    <h2 id="reclamation" class="gm-legal-h2"><i class="bi bi-exclamation-octagon me-2"></i>11. {{ 'privacy.a11'|trans }}</h2>
                     <p>
                         Si vous estimez, après nous avoir contactés, que vos droits ne sont pas respectés,
                         vous pouvez introduire une réclamation auprès de la
@@ -161,20 +167,20 @@
                         (Commission Nationale de l'Informatique et des Libertés).
                     </p>
 
-                    <h2 id="modifications" class="gm-legal-h2"><i class="bi bi-pencil-square me-2"></i>12. Modifications de la politique</h2>
+                    <h2 id="modifications" class="gm-legal-h2"><i class="bi bi-pencil-square me-2"></i>12. {{ 'privacy.a12'|trans }}</h2>
                     <p>
                         Cette politique de confidentialité peut être modifiée à tout moment.
                         Vous serez informé de toute modification par email.
                     </p>
 
                     <div class="gm-legal-foot mt-4">
-                        <p>Hébergement : Association GéoMonkey (auto-hébergement sur serveur situé dans l'Union européenne)</p>
+                        <p>{{ 'legal.foot.hosting'|trans }}</p>
                         <div class="d-flex justify-content-center gap-2 flex-wrap mt-3">
                             <a href="{{ path('app_cgu') }}" class="btn btn-outline-gm-yellow">
-                                <i class="bi bi-file-earmark-text me-2"></i>Conditions Générales d'Adhésion
+                                <i class="bi bi-file-earmark-text me-2"></i>{{ 'footer.cgu'|trans }}
                             </a>
                             <a href="{{ path('app_home') }}" class="btn btn-gm-surface">
-                                <i class="bi bi-arrow-left me-2"></i>Retour à l'accueil
+                                <i class="bi bi-arrow-left me-2"></i>{{ 'legal.back_home'|trans }}
                             </a>
                         </div>
                     </div>
