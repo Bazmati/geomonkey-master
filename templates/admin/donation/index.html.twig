@@ -8,9 +8,16 @@
 
     <div class="p-4">
 
-        <h1 class="text-gm-green mb-4">
-            <i class="bi bi-heart-fill"></i> Dons
-        </h1>
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <h1 class="text-gm-green mb-0">
+                <i class="bi bi-heart-fill"></i> Dons
+            </h1>
+            {% if is_granted('ENTITY_CASH') %}
+                <a href="{{ path('app_admin_donation_offline') }}" class="btn btn-gm-green btn-sm">
+                    <i class="bi bi-cash-coin me-1"></i> Encaisser hors-ligne
+                </a>
+            {% endif %}
+        </div>
 
         {# ===== Totaux (trésorerie / assemblée générale) ===== #}
         <div class="row g-3 mb-4">
@@ -112,6 +119,9 @@
                                         <td data-label="Statut">
                                             {% if donation.paymentStatus == 'paid' %}
                                                 <span class="badge text-bg-success">Payé</span>
+                                                {% if donation.stripeSessionId and donation.stripeSessionId starts with 'MANUEL-' %}
+                                                    <span class="badge text-bg-info">hors-ligne</span>
+                                                {% endif %}
                                             {% elseif donation.paymentStatus == 'pending' %}
                                                 <span class="badge text-bg-warning text-dark">En attente</span>
                                             {% else %}

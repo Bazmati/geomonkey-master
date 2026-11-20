@@ -1,0 +1,78 @@
+{# templates/admin/donation/offline.html.twig — encaisser un don hors-ligne #}
+{% extends 'admin/base.html.twig' %}
+
+{% block title %}Encaisser un don hors-ligne - GéoMonkey{% endblock %}
+
+{% block admin_content %}
+    <div class="p-4">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+            <h1 class="text-gm-green mb-0"><i class="bi bi-cash-coin"></i> Encaisser un don hors-ligne</h1>
+            <a href="{{ path('app_admin_donation_index') }}" class="btn btn-gm-surface btn-sm">
+                <i class="bi bi-arrow-left me-1"></i> Tous les dons
+            </a>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card shadow-sm">
+                    <div class="card-body p-4">
+                        <p class="text-gm-muted small mb-4">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Pour un don récolté en main propre (espèces, chèque, virement) :
+                            il est enregistré payé, sans frais de paiement (net = brut), avec la
+                            mention « hors-ligne » dans la liste. Laisser le donateur anonyme
+                            si la personne ne souhaite pas laisser de coordonnées.
+                        </p>
+
+                        <form method="post">
+                            <input type="hidden" name="_token" value="{{ csrf_token('offline_donation') }}">
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="donor_name" class="form-label">Nom du donateur</label>
+                                    <input type="text" class="form-control" id="donor_name" name="donor_name"
+                                           maxlength="255" placeholder="Facultatif">
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="donor_email" class="form-label">Email du donateur</label>
+                                    <input type="email" class="form-control" id="donor_email" name="donor_email"
+                                           maxlength="255" placeholder="Facultatif">
+                                </div>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-sm-6">
+                                    <label for="amount" class="form-label">Montant encaissé (€) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" id="amount" name="amount"
+                                           min="0.01" step="0.01" required placeholder="20">
+                                    <div class="form-text">Saisir le montant réellement encaissé.</div>
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="method" class="form-label">Moyen de paiement <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="method" name="method" required>
+                                        <option value="especes" selected>Espèces</option>
+                                        <option value="cheque">Chèque</option>
+                                        <option value="virement">Virement</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="message" class="form-label">Message / précisions</label>
+                                <textarea class="form-control" id="message" name="message" rows="2"
+                                          placeholder="Facultatif (ex : don collecté lors de la sortie du 14 juillet)"></textarea>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-gm-green fw-semibold">
+                                    <i class="bi bi-cash-stack me-1"></i> Encaisser le don
+                                </button>
+                                <a href="{{ path('app_admin_donation_index') }}" class="btn btn-gm-surface">Annuler</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

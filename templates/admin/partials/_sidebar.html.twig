@@ -95,7 +95,16 @@
         {{ _self.navItem({label: 'Adhésions', icon: 'person-plus', route: 'app_admin_membership_requests', match: 'app_admin_membership'}, route) }}
     {% endif %}
     {{ _self.navItem({label: 'Tarif adhésion', icon: 'currency-euro', route: 'app_admin_membership_fee_index', match: 'app_admin_membership_fee'}, route) }}
-    {{ _self.navItem({label: 'Dons', icon: 'heart', route: 'app_admin_donation_index', match: 'app_admin_donation'}, route) }}
+    {# Dons : dropdown si encaissement hors-ligne autorisé (ENTITY_CASH :
+       trésorier et président) ; le reste du bureau garde l'entrée simple. #}
+    {% if is_granted('ENTITY_CASH') %}
+        {{ _self.navGroup('dons', 'heart', 'Dons', [
+            {label: 'Liste des dons', icon: 'list-ul', route: 'app_admin_donation_index', match: 'app_admin_donation_index'},
+            {label: 'Encaisser un don', icon: 'cash-coin', route: 'app_admin_donation_offline', match: 'app_admin_donation_offline'},
+        ], route) }}
+    {% else %}
+        {{ _self.navItem({label: 'Dons', icon: 'heart', route: 'app_admin_donation_index', match: 'app_admin_donation'}, route) }}
+    {% endif %}
 
     {# ============ Modules à venir (placeholders) ============ #}
     {{ _self.navSection('Modules') }}
