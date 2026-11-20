@@ -1,7 +1,7 @@
 {# templates/front/donation/cancel.html.twig #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Don annulé - GéoMonkey{% endblock %}
+{% block title %}{{ 'donation.cancel.page_title'|trans }} - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
@@ -11,20 +11,19 @@
             <div class="col-lg-6 col-md-8 text-center">
                 <div class="card shadow-sm">
                     <div class="card-header bg-gm-muted">
-                        <h2 class="mb-0"><i class="bi bi-x-circle me-2"></i>Don annulé</h2>
+                        <h2 class="mb-0"><i class="bi bi-x-circle me-2"></i>{{ 'donation.cancel.header'|trans }}</h2>
                     </div>
                     <div class="card-body">
                         <div class="py-4">
                             <p class="lead text-gm-muted">
-                                Le paiement a été annulé — aucun montant n'a été débité.
+                                {{ 'donation.cancel.p1'|trans }}
                             </p>
                             <p class="text-gm-muted">
-                                Si c'était un souci de dernière minute, sache que tu peux
-                                revenir quand tu veux : chaque don compte, quel que soit son montant.
+                                {{ 'donation.cancel.p2'|trans }}
                             </p>
                         </div>
                         <a href="{{ path('app_donation') }}" class="btn btn-gm-green btn-lg px-4">
-                            <i class="bi bi-arrow-counterclockwise me-2"></i> Revenir au don
+                            <i class="bi bi-arrow-counterclockwise me-2"></i> {{ 'donation.cancel.back'|trans }}
                         </a>
                     </div>
                 </div>

@@ -1,7 +1,7 @@
 {# templates/front/membership/success.html.twig #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Adhésion confirmée - GéoMonkey{% endblock %}
+{% block title %}{{ 'register.ok.page_title'|trans }} - GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
@@ -11,7 +11,7 @@
             <div class="col-lg-6 col-md-8 text-center">
                 <div class="card shadow-sm border-gm-green">
                     <div class="card-header bg-gm-green text-gm-white">
-                        <h2 class="mb-0"><i class="bi bi-check-circle-fill me-2"></i>Adhésion confirmée !</h2>
+                        <h2 class="mb-0"><i class="bi bi-check-circle-fill me-2"></i>{{ 'register.ok.header'|trans }}</h2>
                     </div>
                     <div class="card-body">
                         {# Marque : logo + wordmark commun au site #}
@@ -19,20 +19,20 @@
                         <div class="fw-bold mb-2">Géo<span class="text-gm-yellow">Monkey</span></div>
                         <div class="py-4">
                             <i class="bi bi-emoji-smile text-gm-green display-4"></i>
-                            <h3 class="mt-3 text-gm-green">Bienvenue officiellement chez GéoMonkey ! 🎉</h3>
+                            <h3 class="mt-3 text-gm-green">{{ 'register.ok.welcome'|trans }}</h3>
                             <p class="lead text-gm-muted">
-                                Ton adhésion a été confirmée avec succès.
+                                {{ 'register.ok.p1'|trans }}
                             </p>
                             <p class="text-gm-muted">
-                                Tu as maintenant accès à tous les contenus réservés aux membres actifs.
+                                {{ 'register.ok.p2'|trans }}
                             </p>
                             <div class="alert alert-gm-info">
                                 <i class="bi bi-envelope me-2"></i>
-                                Un email de confirmation t'a été envoyé à ton adresse email.
+                                {{ 'register.ok.email_note'|trans }}
                             </div>
                         </div>
                         <a href="{{ path('app_home') }}" class="btn btn-gm-green btn-lg px-4">
-                            <i class="bi bi-house me-2"></i> Retour à l'accueil
+                            <i class="bi bi-house me-2"></i> {{ 'legal.back_home'|trans }}
                         </a>
                     </div>
                 </div>

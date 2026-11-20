@@ -1,9 +1,9 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Faire un don - GéoMonkey{% endblock %}
+{% block title %}{{ 'donation.title'|trans }} - GéoMonkey{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Soutenir l'association GéoMonkey : chaque don finance directement nos événements culturels et nos projets collectifs. Merci !">
+    <meta name="description" content="{{ 'donation.meta'|trans }}">
 {% endblock %}
 
 {% block body %}
@@ -27,43 +27,39 @@
             {# ===== Colonne pitch : pourquoi donner ===== #}
             <div class="col-lg-5 text-center text-lg-start">
                 <span class="badge home-hero-badge mb-3">
-                    <i class="bi bi-heart-fill me-1"></i> Faire un don
+                    <i class="bi bi-heart-fill me-1"></i> {{ 'donation.badge'|trans }}
                 </span>
-                <h1 class="gm-join-title mb-3">Un petit geste,<br>une grande aventure</h1>
+                <h1 class="gm-join-title mb-3">{{ 'donation.title_a'|trans }}<br>{{ 'donation.title_b'|trans }}</h1>
                 <p class="gm-join-sub mb-4">
-                    GéoMonkey est une association à but non lucratif : chaque
-                    euro donné part directement dans les projets, le matériel
-                    et les événements. Pas de salaires, pas de frais cachés —
-                    juste des idées qui prennent vie.
+                    {{ 'donation.sub'|trans }}
                 </p>
 
                 <ul class="list-unstyled gm-join-benefits">
                     <li>
                         <i class="bi bi-tools"></i>
-                        <div><strong>Matériel &amp; constructions</strong><br>
-                        <span class="small">Bois, outils, consommables pour les chantiers collectifs</span></div>
+                        <div><strong>{{ 'donation.b1t'|trans }}</strong><br>
+                        <span class="small">{{ 'donation.b1s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-calendar-event"></i>
-                        <div><strong>Événements accessibles</strong><br>
-                        <span class="small">Les dons aident à garder les sorties et ateliers à petit prix</span></div>
+                        <div><strong>{{ 'donation.b2t'|trans }}</strong><br>
+                        <span class="small">{{ 'donation.b2s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-piggy-bank"></i>
-                        <div><strong>100 % investi localement</strong><br>
-                        <span class="small">Une gestion par des bénévoles, présentée en assemblée générale</span></div>
+                        <div><strong>{{ 'donation.b3t'|trans }}</strong><br>
+                        <span class="small">{{ 'donation.b3s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-receipt"></i>
-                        <div><strong>Reçu de don</strong><br>
-                        <span class="small">Un accusé de réception vous est délivré pour votre comptabilité</span></div>
+                        <div><strong>{{ 'donation.b4t'|trans }}</strong><br>
+                        <span class="small">{{ 'donation.b4s'|trans }}</span></div>
                     </li>
                 </ul>
 
                 <p class="text-gm-muted small mb-0">
                     <i class="bi bi-info-circle me-1"></i>
-                    GéoMonkey n'étant pas un organisme d'intérêt général, les dons
-                    n'ouvrent pas droit à une réduction d'impôt.
+                    {{ 'donation.tax_note'|trans }}
                 </p>
             </div>
 
@@ -71,10 +67,10 @@
             <div class="col-lg-6 col-md-9">
                 <div class="gm-join-card" data-controller="donation-presets">
                     <h2 class="gm-join-card-title">
-                        <i class="bi bi-heart-fill me-2"></i>Soutenir GéoMonkey
+                        <i class="bi bi-heart-fill me-2"></i>{{ 'donation.card_title'|trans }}
                     </h2>
                     <p class="text-gm-muted small mb-4">
-                        Choisis un montant — ou laisse parler ton cœur. 🐒
+                        {{ 'donation.card_sub'|trans }}
                     </p>
 
                     {% for message in app.flashes('error') %}
@@ -109,15 +105,14 @@
 
                         <div class="d-grid">
                             <button type="submit" class="btn btn-gm-green btn-lg py-3">
-                                <i class="bi bi-heart-fill me-2"></i>Donner
+                                <i class="bi bi-heart-fill me-2"></i>{{ 'donation.submit'|trans }}
                             </button>
                         </div>
                     {{ form_end(form) }}
 
                     <p class="text-center small text-gm-muted mt-3 mb-0">
                         <i class="bi bi-shield-check me-1"></i>
-                        Paiement sécurisé par Stripe. Tu peux donner anonymement :
-                        nom, email et message sont optionnels.
+                        {{ 'donation.secure_note'|trans }}
                     </p>
                 </div>
             </div>

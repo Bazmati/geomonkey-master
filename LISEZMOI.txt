@@ -1,26 +1,50 @@
-i18n Lot 1c — Pages légales (CGU + Politique de confidentialité)
-================================================================
+i18n Lot 2a — Formulaires front (connexion, inscription, don)
+==============================================================
 
-APPROCHE (décision actée) :
-- Structure bilingue : hero, badge, sommaire, titres d'articles, boutons -> clés |trans
-- Le corps juridique des articles RESTE EN FRANÇAIS (version faisant foi)
-- Une mention "Seule la version française de ce document fait foi" (legal.notice)
-  est affichée uniquement quand la locale != fr
+PÉRIMÈTRE :
+- 12 templates convertis : security/{login,forgot_password,reset_password},
+  membership/{register,payment_required,success,check_email,wait_validation,cancel},
+  donation/{index,success,cancel}
+- Textes statiques + placeholders des inputs (les placeholders inline sont
+  traduits via clés ; les 3 templates à formulaire ont aussi leurs pitchs
+  "pourquoi rejoindre/donner" traduits)
+- Catalogues : 153 -> 278 clés symétriques (125 nouvelles : auth.*, register.*, donation.*,
+  + réut. form.email, legal.back_home)
 
-Contenu du zip (à extraire à la racine du projet) :
-  templates/front/legal/cgu.html.twig
-  templates/front/legal/privacy.html.twig
-  translations/messages.fr.php        (117 -> 153 clés, lots 0+1a+1b+1c fusionnés)
-  translations/messages.en.php        (153 clés, symétrique)
-  tests/Controller/Front/LegalTranslationTest.php   (2 tests)
+FRONTIÈRE (à connaître) :
+- Les LIBELLÉS des champs Symfony (form_label) viennent des FormType
+  (RegistrationType, DonationType...) : ils restent en FR pour l'instant.
+- Les messages de VALIDATION Symfony (contraintes) restent en FR.
+- Le CONTENU des flashs (addFlash dans les contrôleurs) reste en FR.
+  -> traités dans un Lot 2b ultérieur (FormType + flashs + validators).
+- Le message d'erreur de connexion est auto-adapté : error.messageKey|trans(...,'security')
+  suit la locale (domaine security de Symfony).
 
-Nouvelles clés : legal.* (6), cgu.* (15), privacy.* (15)
+Détail technique : les clés contenant du HTML (register.price_label,
+register.pay.secure, register.check.warn, register.wait.important,
+register.cancel.no_fee, auth.already_logged) sont rendues avec |raw
+(car Twig auto-escape la sortie de trans).
+
+Contenu du zip (extraire à la racine du projet) :
+  templates/front/security/login.html.twig
+  templates/front/security/forgot_password.html.twig
+  templates/front/security/reset_password.html.twig
+  templates/front/membership/register.html.twig
+  templates/front/membership/payment_required.html.twig
+  templates/front/membership/success.html.twig
+  templates/front/membership/check_email.html.twig
+  templates/front/membership/wait_validation.html.twig
+  templates/front/membership/cancel.html.twig
+  templates/front/donation/index.html.twig
+  templates/front/donation/success.html.twig
+  templates/front/donation/cancel.html.twig
+  translations/messages.fr.php  (278 clés, lots 0+1a+1b+1c+2a fusionnés)
+  translations/messages.en.php  (278 clés, symétrique)
+  tests/Controller/Front/FormTranslationTest.php  (2 tests)
 
 Tests :
-  php bin/phpunit --filter LegalTranslationTest
+  php bin/phpunit --filter FormTranslationTest
   php bin/phpunit
 
-Déploiement :
-  git add/commit/push, puis sur le CT 202 :
-  cd /var/www/geomonkey (ou chemin du projet) && git pull
-  php bin/console cache:clear --env=prod (et reload php-fpm si besoin)
+Déploiement : commit + push, puis CT 202 : git pull, cache:clear --env=prod,
+reload php8.4-fpm (catalogues + templates passent par l'opcache).

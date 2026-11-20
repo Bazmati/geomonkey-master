@@ -1,10 +1,10 @@
 {# templates/front/membership/register.html.twig #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Rejoindre GéoMonkey - Adhésion{% endblock %}
+{% block title %}{{ 'register.title'|trans }}{% endblock %}
 
 {% block meta %}
-    <meta name="description" content="Rejoins l'association GéoMonkey : adhésion annuelle, accès aux événements réservés, projets collectifs et à une bande de passionnés.">
+    <meta name="description" content="{{ 'register.meta'|trans }}">
 {% endblock %}
 
 {% block body %}
@@ -28,40 +28,39 @@
             {# ===== Colonne pitch : pourquoi rejoindre ===== #}
             <div class="col-lg-5 text-center text-lg-start">
                 <span class="badge home-hero-badge mb-3">
-                    <i class="bi bi-stars me-1"></i> Adhésion
+                    <i class="bi bi-stars me-1"></i> {{ 'register.badge'|trans }}
                 </span>
-                <h1 class="gm-join-title mb-3">Et si tu rejoignais<br>la bande ?</h1>
+                <h1 class="gm-join-title mb-3">{{ 'register.title_a'|trans }}<br>{{ 'register.title_b'|trans }}</h1>
                 <p class="gm-join-sub mb-4">
-                    Une assoc' de passionnés qui construit, bricole, fête et
-                    sort ensemble toute l'année. Il ne manque plus que toi.
+                    {{ 'register.sub'|trans }}
                 </p>
 
                 <ul class="list-unstyled gm-join-benefits">
                     <li>
                         <i class="bi bi-calendar-event"></i>
-                        <div><strong>Événements réservés</strong><br>
-                        <span class="small">Sorties, ateliers et chantiers membres uniquement</span></div>
+                        <div><strong>{{ 'register.b1t'|trans }}</strong><br>
+                        <span class="small">{{ 'register.b1s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-kanban"></i>
-                        <div><strong>Projets collectifs</strong><br>
-                        <span class="small">Participe aux aventures en cours, prends des responsabilités</span></div>
+                        <div><strong>{{ 'register.b2t'|trans }}</strong><br>
+                        <span class="small">{{ 'register.b2s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-images"></i>
-                        <div><strong>Contenus complets</strong><br>
-                        <span class="small">Galerie étendue, suivi d'avancement et coulisses de l'assoc'</span></div>
+                        <div><strong>{{ 'register.b3t'|trans }}</strong><br>
+                        <span class="small">{{ 'register.b3s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-people"></i>
-                        <div><strong>Une bande sympa</strong><br>
-                        <span class="small">Tous les âges, tous les niveaux, zéro obligation de compétence</span></div>
+                        <div><strong>{{ 'register.b4t'|trans }}</strong><br>
+                        <span class="small">{{ 'register.b4s'|trans }}</span></div>
                     </li>
                 </ul>
 
                 <div class="gm-join-price mt-4">
                     <span class="gm-join-price-value">{{ "%.2f"|format(membershipFee) }}&nbsp;€</span>
-                    <span class="gm-join-price-label">l'année d'adhésion,<br>aucun engagement caché</span>
+                    <span class="gm-join-price-label">{{ 'register.price_label'|trans|raw }}</span>
                 </div>
             </div>
 
@@ -69,10 +68,10 @@
             <div class="col-lg-6 col-md-9">
                 <div class="gm-join-card">
                     <h2 class="gm-join-card-title">
-                        <i class="bi bi-person-plus me-2"></i>Rejoindre GéoMonkey
+                        <i class="bi bi-person-plus me-2"></i>{{ 'register.card_title'|trans }}
                     </h2>
                     <p class="text-gm-muted small mb-4">
-                        Deux minutes de formulaire, et l'aventure commence.
+                        {{ 'register.card_sub'|trans }}
                     </p>
 
                     {% for message in app.flashes('warning') %}
@@ -88,7 +87,7 @@
                                 {{ form_label(form.firstName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 <div class="input-group">
                                     <span class="input-group-text bg-gm-light"><i class="bi bi-person text-gm-text"></i></span>
-                                    {{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Prénom'}}) }}
+                                    {{ form_widget(form.firstName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'register.ph_firstname'|trans}}) }}
                                 </div>
                                 <div class="text-gm-danger">{{ form_errors(form.firstName) }}</div>
                             </div>
@@ -97,7 +96,7 @@
                                 {{ form_label(form.lastName, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 <div class="input-group">
                                     <span class="input-group-text bg-gm-light"><i class="bi bi-person text-gm-text"></i></span>
-                                    {{ form_widget(form.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Nom'}}) }}
+                                    {{ form_widget(form.lastName, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'register.ph_lastname'|trans}}) }}
                                 </div>
                                 <div class="text-gm-danger">{{ form_errors(form.lastName) }}</div>
                             </div>
@@ -106,7 +105,7 @@
                                 {{ form_label(form.email, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 <div class="input-group">
                                     <span class="input-group-text bg-gm-light"><i class="bi bi-envelope text-gm-text"></i></span>
-                                    {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'votre@email.com'}}) }}
+                                    {{ form_widget(form.email, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'auth.ph_email'|trans}}) }}
                                 </div>
                                 <div class="text-gm-danger">{{ form_errors(form.email) }}</div>
                             </div>
@@ -115,9 +114,9 @@
                                 {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
                                 <div class="input-group">
                                     <span class="input-group-text bg-gm-light"><i class="bi bi-lock text-gm-text"></i></span>
-                                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'Mot de passe (min. 12 caractères)'}}) }}
+                                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'register.ph_password'|trans}}) }}
                                 </div>
-                                <div class="form-text">Doit contenir au moins 12 caractères avec majuscules, minuscules, chiffres et symboles</div>
+                                <div class="form-text">{{ 'register.pw_hint'|trans }}</div>
                                 <div class="text-gm-danger">{{ form_errors(form.plainPassword) }}</div>
                             </div>
 
@@ -151,7 +150,7 @@
 
                             <div class="col-12">
                                 <button type="submit" class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8">
-                                    <i class="bi bi-person-plus-fill me-2"></i> S'inscrire
+                                    <i class="bi bi-person-plus-fill me-2"></i> {{ 'register.submit'|trans }}
                                 </button>
                             </div>
                         </div>
@@ -159,7 +158,7 @@
 
                     <div class="mt-4 text-center">
                         <p class="text-gm-muted small mb-0">
-                            Déjà un compte ? <a href="{{ path('app_login') }}" class="text-gm-warning">Se connecter</a>
+                            {{ 'register.has_account'|trans }} <a href="{{ path('app_login') }}" class="text-gm-warning">{{ 'auth.submit'|trans }}</a>
                         </p>
                     </div>
                 </div>

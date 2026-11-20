@@ -1,7 +1,7 @@
 {# templates/front/membership/check_email.html.twig #}
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Vérifie ton adresse email - GéoMonkey{% endblock %}
+{% block title %}{{ 'register.check.page_title'|trans }} - GéoMonkey{% endblock %}
 
 {% block body %}
 {% include 'partials/_navbar.html.twig' %}
@@ -10,7 +10,7 @@
         <div class="col-md-8 col-lg-6">
             <div class="card shadow">
                 <div class="card-header bg-gm-green text-gm-white">
-                    <h2 class="card-title mb-0">✉️ Vérifie ton adresse email</h2>
+                    <h2 class="card-title mb-0">✉️ {{ 'register.check.header'|trans }}</h2>
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-4">
@@ -18,23 +18,22 @@
                     </div>
                     
                     <div class="alert alert-gm-info">
-                        <h4>Un email de vérification t'a été envoyé !</h4>
+                        <h4>{{ 'register.check.sent'|trans }}</h4>
                         <p class="mb-0">
-                            Nous avons envoyé un lien de vérification à ton adresse email. 
-                            Clique sur le lien dans l'email pour activer ton compte.
+                            {{ 'register.check.p'|trans }}
                         </p>
                     </div>
                     
                     <div class="alert alert-gm-warning">
                         <p class="mb-0">
-                            <strong>Note :</strong> Si tu ne vois pas l'email, vérifie tes spams ou attends quelques minutes.
+                            {{ 'register.check.warn'|trans|raw }}
                         </p>
                     </div>
                     
                     <div class="mt-4">
                         <p class="mb-0">
                             <a href="{{ path('app_login') }}" class="btn btn-outline-gm-green">
-                                <i class="bi bi-arrow-left me-2"></i> Retour à la connexion
+                                <i class="bi bi-arrow-left me-2"></i> {{ 'auth.back_login'|trans }}
                             </a>
                         </p>
                     </div>

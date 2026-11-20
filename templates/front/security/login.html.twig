@@ -1,10 +1,10 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Connexion - GéoMonkey{% endblock %}
+{% block title %}{{ 'auth.title'|trans }} - GéoMonkey{% endblock %}
 
 {% block meta %}
     <meta name="robots" content="noindex">
-    <meta name="description" content="Connecte-toi à ton espace membre GéoMonkey.">
+    <meta name="description" content="{{ 'auth.meta'|trans }}">
 {% endblock %}
 
 {% block body %}
@@ -26,7 +26,7 @@
         {# Lien de retour en haut #}
         <div class="mb-2">
             <a href="{{ path('app_home') }}" class="btn btn-outline-warning btn-sm">
-                <i class="bi bi-arrow-left"></i> Retour à l'accueil
+                <i class="bi bi-arrow-left"></i> {{ 'legal.back_home'|trans }}
             </a>
         </div>
 
@@ -34,7 +34,7 @@
         {% if app.session.get('_security.main.target_path') %}
         <div class="alert alert-gm-info d-flex align-items-center gap-2" role="alert">
             <i class="bi bi-shield-lock-fill"></i>
-            <div>Cet espace est réservé aux membres. Connecte-toi pour y accéder.</div>
+            <div>{{ 'auth.reserved'|trans }}</div>
         </div>
         {% endif %}
 
@@ -43,29 +43,27 @@
             {# ===== Colonne pitch ===== #}
             <div class="col-lg-5 text-center text-lg-start">
                 <span class="badge home-hero-badge mb-3">
-                    <i class="bi bi-box-arrow-in-right me-1"></i> Espace membre
+                    <i class="bi bi-box-arrow-in-right me-1"></i> {{ 'auth.badge'|trans }}
                 </span>
-                <h1 class="gm-join-title mb-3">Content de te<br>revoir !</h1>
+                <h1 class="gm-join-title mb-3">{{ 'auth.title_a'|trans }}<br>{{ 'auth.title_b'|trans }}</h1>
                 <p class="gm-join-sub mb-4">
-                    Derrière cette porte : les projets en cours, le suivi
-                    d'avancement, les événements réservés et toute la vie
-                    interne de l'assoc'.
+                    {{ 'auth.sub'|trans }}
                 </p>
                 <ul class="list-unstyled gm-join-benefits">
                     <li>
                         <i class="bi bi-kanban"></i>
-                        <div><strong>Suivi des projets</strong><br>
-                        <span class="small">Tableaux d'avancement et tâches en temps réel</span></div>
+                        <div><strong>{{ 'auth.b1t'|trans }}</strong><br>
+                        <span class="small">{{ 'auth.b1s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-calendar-event"></i>
-                        <div><strong>Événements membres</strong><br>
-                        <span class="small">Sorties et ateliers réservés aux adhérents actifs</span></div>
+                        <div><strong>{{ 'auth.b2t'|trans }}</strong><br>
+                        <span class="small">{{ 'auth.b2s'|trans }}</span></div>
                     </li>
                     <li>
                         <i class="bi bi-images"></i>
-                        <div><strong>Galerie complète</strong><br>
-                        <span class="small">Toutes les photos, y compris celles réservées aux membres</span></div>
+                        <div><strong>{{ 'auth.b3t'|trans }}</strong><br>
+                        <span class="small">{{ 'auth.b3s'|trans }}</span></div>
                     </li>
                 </ul>
             </div>
@@ -78,39 +76,39 @@
                              onerror="this.onerror=null;this.src='{{ asset('images/logo.png') }}';this.classList.add('rounded-circle');">
                     </span>
                     <h2 class="gm-join-card-title mb-1">GéoMonkey</h2>
-                    <p class="text-gm-muted small mb-4">Espace membre</p>
+                    <p class="text-gm-muted small mb-4">{{ 'auth.badge'|trans }}</p>
 
                     {% if app.user %}
                         <div class="alert alert-gm-info mb-4">
-                            Vous êtes déjà connecté en tant que <strong>{{ app.user.userIdentifier }}</strong>,
-                            <a href="{{ logout_path() }}" class="alert-link text-gm-green">Se déconnecter</a>
+                            {{ 'auth.already_logged'|trans({'%identifier%': app.user.userIdentifier})|raw }}
+                            <a href="{{ logout_path() }}" class="alert-link text-gm-green">{{ 'auth.logout'|trans }}</a>
                         </div>
                     {% endif %}
 
                     {% if error %}
                         <div class="alert alert-gm-danger mb-4">
-                            <strong>Erreur :</strong> {{ error.messageKey|trans(error.messageData, 'security') }}
+                            <strong>{{ 'auth.error_prefix'|trans }}</strong> {{ error.messageKey|trans(error.messageData, 'security') }}
                         </div>
                     {% endif %}
 
                     <form method="post" class="needs-validation text-start" novalidate>
                         {# Champ Email #}
                         <div class="mb-4">
-                            <label for="inputEmail" class="form-label fw-semibold">Email</label>
+                            <label for="inputEmail" class="form-label fw-semibold">{{ 'auth.field_email'|trans }}</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-gm-light text-gm-text border-0">
                                     <i class="bi bi-envelope"></i>
                                 </span>
                                 <input type="email" id="inputEmail" name="_username"
                                     class="form-control form-control-lg"
-                                    autocomplete="email" placeholder="votre@email.com"
+                                    autocomplete="email" placeholder="{{ 'auth.ph_email'|trans }}"
                                     value="{{ last_username }}" required autofocus>
                             </div>
                         </div>
 
                         {# Champ Mot de passe #}
                         <div class="mb-4">
-                            <label for="inputPassword" class="form-label fw-semibold">Mot de passe</label>
+                            <label for="inputPassword" class="form-label fw-semibold">{{ 'auth.field_password'|trans }}</label>
                             <div class="input-group">
                                 <span class="input-group-text bg-gm-light text-gm-text border-0">
                                     <i class="bi bi-lock"></i>
@@ -127,25 +125,25 @@
                         {# Option Se souvenir de moi #}
                         <div class="mb-4 form-check">
                             <input type="checkbox" id="rememberMe" name="_remember_me" class="form-check-input">
-                            <label for="rememberMe" class="form-check-label">Se souvenir de moi</label>
+                            <label for="rememberMe" class="form-check-label">{{ 'auth.remember_me'|trans }}</label>
                         </div>
 
                         {# Bouton de connexion #}
                         <button class="btn btn-warning btn-lg w-100 fw-bold py-3 border-radius-8" type="submit">
-                            <i class="bi bi-box-arrow-in-right me-2"></i> Se connecter
+                            <i class="bi bi-box-arrow-in-right me-2"></i> {{ 'auth.submit'|trans }}
                         </button>
                     </form>
 
                     {# Lien mot de passe oublié #}
                     <div class="mt-4 text-center">
                         <small class="text-gm-muted">
-                            <a href="{{ path('app_forgot_password') }}" class="text-gm-warning text-decoration-none">Mot de passe oublié ?</a>
+                            <a href="{{ path('app_forgot_password') }}" class="text-gm-warning text-decoration-none">{{ 'auth.forgot_link'|trans }}</a>
                         </small>
                     </div>
 
                     <hr class="my-3 border-gm-gray-700">
                     <p class="mb-0 small text-gm-muted">
-                        Pas encore membre ? <a href="{{ path('app_membership_register') }}" class="fw-bold text-gm-warning">Rejoins-nous</a>
+                        {{ 'auth.not_member'|trans }} <a href="{{ path('app_membership_register') }}" class="fw-bold text-gm-warning">{{ 'auth.join_us'|trans }}</a>
                     </p>
                 </div>
             </div>
