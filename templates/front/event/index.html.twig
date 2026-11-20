@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Événements — {{ parent() }}{% endblock %}
+{% block title %}{{ 'event.title'|trans }} — {{ parent() }}{% endblock %}
 
 {% block meta_description %}Découvrez les événements de l'association GéoMonkey : ateliers, constructions, festivals et rencontres.{% endblock %}
 
@@ -11,12 +11,11 @@
 <header class="pres-hero">
     <div class="container position-relative text-center">
         <span class="badge home-hero-badge mb-3">
-            <i class="bi bi-calendar-event me-1"></i> Agenda
+            <i class="bi bi-calendar-event me-1"></i> {{ 'event.hero.badge'|trans }}
         </span>
-        <h1 class="pres-hero-title">La vie de l'assoc', jour après jour</h1>
+        <h1 class="pres-hero-title">{{ 'event.hero.title'|trans }}</h1>
         <p class="home-hero-sub mx-auto mb-0">
-            Ateliers, constructions, sorties et festifs : retrouve tout
-            l'agenda GéoMonkey et réserve ta place pour le prochain rendez-vous.
+            {{ 'event.hero.sub'|trans }}
         </p>
     </div>
 </header>
@@ -36,7 +35,7 @@
                  {% if next_img %}style="background-image: url('{{ next_img }}')"{% endif %}>
             <div class="blog-card-overlay">
                 <span class="badge bg-gm-green text-gm-white mb-2">
-                    <i class="bi bi-stars me-1"></i> Prochain rendez-vous
+                    <i class="bi bi-stars me-1"></i> {{ 'event.next.badge'|trans }}
                 </span>
                 <h2 class="blog-card-title">
                     <a href="{{ path('app_event_show', {'slug': next.slug}) }}" class="gm-showcase-link">{{ next.title }}</a>
@@ -44,18 +43,18 @@
                 <p class="blog-card-meta mb-2">
                     <i class="bi bi-calendar"></i> {{ next.startDate|date('d/m/Y à H\\h i') }}
                     {% if next.location %} · <i class="bi bi-geo-alt"></i> {{ next.location }}{% endif %}
-                    {% if next.isMembersOnly %} · <i class="bi bi-people"></i> Réservé aux membres{% endif %}
+                    {% if next.isMembersOnly %} · <i class="bi bi-people"></i> {{ 'event.next.members'|trans }}{% endif %}
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <span class="gm-countdown badge bg-gm-surface border-gm-yellow text-gm-yellow fs-6"
                           data-controller="countdown"
                           data-countdown-start-value="{{ next.startDate|date(constant('DATE_ATOM')) }}"
-                          data-countdown-finished-value="C'est maintenant !">…</span>
+                          data-countdown-finished-value="{{ 'event.countdown.finished'|trans }}">…</span>
                     <a href="{{ path('app_event_ics', {'id': next.id}) }}" class="proj-card-cta">
-                        <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier
+                        <i class="bi bi-calendar-plus"></i> {{ 'event.next.calendar'|trans }}
                     </a>
                     <a href="{{ path('app_event_show', {'slug': next.slug}) }}" class="proj-card-cta">
-                        Voir l'événement <i class="bi bi-arrow-right"></i>
+                        {{ 'event.next.see'|trans }} <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
@@ -69,17 +68,16 @@
             <div class="gm-rotator-layer" data-rotator-target="layerB"></div>
             <div class="blog-card-overlay">
                 <span class="badge bg-gm-yellow text-gm-bg mb-2">
-                    <i class="bi bi-hourglass me-1"></i> Prochain événement en préparation
+                    <i class="bi bi-hourglass me-1"></i> {{ 'event.prep.badge'|trans }}
                 </span>
-                <h2 class="blog-card-title">Rien à l'agenda… pour l'instant</h2>
+                <h2 class="blog-card-title">{{ 'event.prep.title'|trans }}</h2>
                 <p class="blog-card-excerpt mb-2">
-                    L'équipe mijote la suite. En attendant, plonge dans nos
-                    souvenirs : chaque image raconte un moment de vie de l'assoc'.
+                    {{ 'event.prep.sub'|trans }}
                 </p>
                 <div class="d-flex flex-wrap align-items-center gap-3">
                     <span class="gm-rotator-dots" data-rotator-target="dots"></span>
                     <a href="{{ path('app_gallery_index') }}" class="proj-card-cta">
-                        Voir toute la galerie <i class="bi bi-arrow-right"></i>
+                        {{ 'event.prep.gallery'|trans }} <i class="bi bi-arrow-right"></i>
                     </a>
                 </div>
             </div>
@@ -93,13 +91,13 @@
        FILTRE (agit sur la liste mobile ; le calendrier desktop
        affiche lui l'intégralité)
        ============================================================ #}
-    <div class="btn-group mb-4 gm-filter-group" role="group" aria-label="Filtrer les événements">
+    <div class="btn-group mb-4 gm-filter-group" role="group" aria-label="{{ 'event.filter.aria'|trans }}">
         <a href="{{ path('app_event_index', {'filter': 'tous'}) }}"
-           class="btn btn-sm {{ filter == 'tous' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Tous</a>
+           class="btn btn-sm {{ filter == 'tous' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">{{ 'filter.all'|trans }}</a>
         <a href="{{ path('app_event_index', {'filter': 'a-venir'}) }}"
-           class="btn btn-sm {{ filter == 'a-venir' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">À venir</a>
+           class="btn btn-sm {{ filter == 'a-venir' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">{{ 'filter.upcoming'|trans }}</a>
         <a href="{{ path('app_event_index', {'filter': 'passes'}) }}"
-           class="btn btn-sm {{ filter == 'passes' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">Passés</a>
+           class="btn btn-sm {{ filter == 'passes' ? 'btn-warning' : 'btn-outline-gm-yellow' }}">{{ 'filter.past'|trans }}</a>
     </div>
 
     <div class="row g-4">
@@ -125,7 +123,7 @@
         <div class="col-12 d-lg-none">
             {% if events is empty %}
                 <div class="alert alert-gm-info">
-                    <i class="bi bi-info-circle me-2"></i> Aucun événement à afficher pour ce filtre. Revenez bientôt !
+                    <i class="bi bi-info-circle me-2"></i> {{ 'event.list.empty'|trans }}
                 </div>
             {% else %}
                 <div class="row g-4">
@@ -139,18 +137,18 @@
                                     <div class="blog-card-overlay">
                                         {% if event.isMembersOnly %}
                                             <span class="badge bg-gm-yellow text-gm-bg mb-2">
-                                                <i class="bi bi-people"></i> Réservé aux membres
+                                                <i class="bi bi-people"></i> {{ 'event.next.members'|trans }}
                                             </span>
                                         {% endif %}
                                         <span class="badge {{ event.endDate|date('U') >= 'now'|date('U') ? 'bg-gm-green text-gm-white' : 'bg-secondary text-white' }} mb-2">
-                                            {{ event.endDate|date('U') >= 'now'|date('U') ? 'À venir' : 'Passé' }}
+                                            {{ event.endDate|date('U') >= 'now'|date('U') ? 'event.status.upcoming'|trans : 'event.status.past'|trans }}
                                         </span>
                                         <h3 class="blog-card-title h5">{{ event.title }}</h3>
                                         <p class="blog-card-meta mb-2">
                                             <i class="bi bi-calendar"></i> {{ event.startDate|date('d/m/Y à H\\h i') }}{% if event.location %} · <i class="bi bi-geo-alt"></i> {{ event.location }}{% endif %}
                                         </p>
                                         <span class="proj-card-cta">
-                                            Voir l'événement <i class="bi bi-arrow-right"></i>
+                                            {{ 'event.next.see'|trans }} <i class="bi bi-arrow-right"></i>
                                         </span>
                                     </div>
                                 </article>

@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Projets — {{ parent() }}{% endblock %}
+{% block title %}{{ 'nav.projects'|trans }} — {{ parent() }}{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Découvrez les projets de l'association GéoMonkey : chantiers, créations et aventures collectives en cours ou achevés.">
@@ -13,14 +13,11 @@
 <header class="pres-hero">
     <div class="container position-relative text-center">
         <span class="badge home-hero-badge mb-3">
-            <i class="bi bi-kanban me-1"></i> Nos projets
+            <i class="bi bi-kanban me-1"></i> {{ 'project.hero.badge'|trans }}
         </span>
-        <h1 class="pres-hero-title">Des idées qui prennent vie</h1>
+        <h1 class="pres-hero-title">{{ 'project.hero.title'|trans }}</h1>
         <p class="home-hero-sub mx-auto mb-0">
-            Chaque projet GéoMonkey est une aventure collective : des événements
-            culturels imaginés, construits et vécus par des bénévoles de tous
-            les âges. Suis l'avancement de nos chantiers en cours et plonge
-            dans nos aventures déjà vécues.
+            {{ 'project.hero.sub'|trans }}
         </p>
     </div>
 </header>
@@ -35,9 +32,9 @@
     {% if projects is empty %}
         <div class="alert alert-gm-info">
             <i class="bi bi-info-circle me-2"></i>
-            Aucun projet à afficher pour le moment — mais ça ne va pas durer !
-            <a href="{{ path('app_membership_register') }}" class="alert-link">Rejoins l'association</a>
-            pour être au cœur de la prochaine aventure.
+            {{ 'project.empty_a'|trans }}
+            <a href="{{ path('app_membership_register') }}" class="alert-link">{{ 'project.empty_link'|trans }}</a>
+            {{ 'project.empty_b'|trans }}
         </div>
     {% endif %}
 
@@ -49,7 +46,7 @@
                     <article class="home-card position-relative gmFadeUp"
                              style="animation-delay: {{ (loop.index0 + delay_start) * 60 }}ms">
                         {% if project.hasImage %}
-                            {{ image_tag(project, 'medium', 'Illustration du projet ' ~ project.title, 'home-card-img') }}
+                            {{ image_tag(project, 'medium', 'project.card.illustration'|trans ~ ' ' ~ project.title, 'home-card-img') }}
                         {% else %}
                             <div class="home-card-img home-card-img-empty"><i class="bi bi-kanban"></i></div>
                         {% endif %}
@@ -68,7 +65,7 @@
                                 {{ project.description|striptags|slice(0, 130) }}{% if project.description|striptags|length > 130 %}…{% endif %}
                             </p>
                             <span class="proj-card-cta">
-                                Découvrir le projet <i class="bi bi-arrow-right"></i>
+                                {{ 'project.card.discover'|trans }} <i class="bi bi-arrow-right"></i>
                             </span>
                         </div>
                     </article>
@@ -82,8 +79,8 @@
     {% if ongoing is not empty %}
         <section class="mb-5">
             <div class="d-flex align-items-center gap-2 mb-4">
-                <span class="badge bg-gm-green text-gm-white fs-6"><i class="bi bi-arrow-repeat"></i> En cours</span>
-                <span class="text-muted small">{{ ongoing|length }} chantier{{ ongoing|length > 1 ? 's' }} en pleine effervescence</span>
+                <span class="badge bg-gm-green text-gm-white fs-6"><i class="bi bi-arrow-repeat"></i> {{ 'project.section.ongoing'|trans }}</span>
+                <span class="text-muted small">{{ 'project.section.ongoing_count'|trans({'%count%': ongoing|length}) }}</span>
             </div>
             <div class="row g-4">
                 {{ proj.project_cards(ongoing) }}
@@ -94,8 +91,8 @@
     {% if planned is not empty %}
         <section class="mb-5">
             <div class="d-flex align-items-center gap-2 mb-4">
-                <span class="badge bg-gm-warning text-gm-bg fs-6"><i class="bi bi-rocket-takeoff"></i> En préparation</span>
-                <span class="text-muted small">Les futures aventures en préparation</span>
+                <span class="badge bg-gm-warning text-gm-bg fs-6"><i class="bi bi-rocket-takeoff"></i> {{ 'project.section.planned_badge'|trans }}</span>
+                <span class="text-muted small">{{ 'project.section.planned_sub'|trans }}</span>
             </div>
             <div class="row g-4">
                 {{ proj.project_cards(planned, ongoing|length) }}
@@ -106,8 +103,8 @@
     {% if done is not empty %}
         <section class="mb-2">
             <div class="d-flex align-items-center gap-2 mb-4">
-                <span class="badge bg-secondary text-white fs-6"><i class="bi bi-trophy"></i> Terminés</span>
-                <span class="text-muted small">Nos aventures déjà vécues</span>
+                <span class="badge bg-secondary text-white fs-6"><i class="bi bi-trophy"></i> {{ 'project.section.done_badge'|trans }}</span>
+                <span class="text-muted small">{{ 'project.section.done_sub'|trans }}</span>
             </div>
             <div class="row g-4">
                 {{ proj.project_cards(done, ongoing|length + planned|length) }}

@@ -97,4 +97,64 @@ return [
 
     // Libellés de formulaires communs
     'form.email' => 'Adresse email',
+
+    // ===== Événements =====
+    'event.title' => 'Événements',
+    'event.hero.badge' => 'Agenda',
+    'event.hero.title' => 'La vie de l\'assoc\', jour après jour',
+    'event.hero.sub' => 'Ateliers, constructions, sorties et festifs : retrouve tout l\'agenda GéoMonkey et réserve ta place pour le prochain rendez-vous.',
+    'event.next.badge' => 'Prochain rendez-vous',
+    'event.next.members' => 'Réservé aux membres',
+    'event.countdown.finished' => 'C\'est maintenant !',
+    'event.next.calendar' => 'Ajouter à mon calendrier',
+    'event.next.see' => 'Voir l\'événement',
+    'event.prep.badge' => 'Prochain événement en préparation',
+    'event.prep.title' => 'Rien à l\'agenda… pour l\'instant',
+    'event.prep.sub' => 'L\'équipe mijote la suite. En attendant, plonge dans nos souvenirs : chaque image raconte un moment de vie de l\'assoc\'.',
+    'event.prep.gallery' => 'Voir toute la galerie',
+    'event.filter.aria' => 'Filtrer les événements',
+    'event.list.empty' => 'Aucun événement à afficher pour ce filtre. Revenez bientôt !',
+    'event.status.upcoming' => 'À venir',
+    'event.status.past' => 'Passé',
+
+    // Filtres communs
+    'filter.all' => 'Tous',
+    'filter.upcoming' => 'À venir',
+    'filter.past' => 'Passés',
+
+    // ===== Projets =====
+    'project.hero.badge' => 'Nos projets',
+    'project.hero.title' => 'Des idées qui prennent vie',
+    'project.hero.sub' => 'Chaque projet GéoMonkey est une aventure collective : des événements culturels imaginés, construits et vécus par des bénévoles de tous les âges. Suis l\'avancement de nos chantiers en cours et plonge dans nos aventures déjà vécues.',
+    'project.empty_a' => 'Aucun projet à afficher pour le moment — mais ça ne va pas durer !',
+    'project.empty_link' => 'Rejoins l\'association',
+    'project.empty_b' => 'pour être au cœur de la prochaine aventure.',
+    'project.card.illustration' => 'Illustration du projet',
+    'project.card.discover' => 'Découvrir le projet',
+    'project.section.ongoing' => 'En cours',
+    'project.section.ongoing_count' => '%count% chantier(s) en pleine effervescence',
+    'project.section.planned_badge' => 'En préparation',
+    'project.section.planned_sub' => 'Les futures aventures en préparation',
+    'project.section.done_badge' => 'Terminés',
+    'project.section.done_sub' => 'Nos aventures déjà vécues',
+
+    // ===== Blog =====
+    'blog.hero.title' => 'La vie de l\'assoc\', en direct',
+    'blog.hero.sub' => 'Coulisses des chantiers, retours des événements, annonces et petites histoires : chaque article est une invitation à plonger dans l\'univers GéoMonkey. Bonne lecture !',
+    'blog.tagged' => 'Articles tagués',
+    'blog.tagged_all' => 'Tout voir',
+
+    // ===== Galerie =====
+    'gallery.hero.title' => 'Le patchwork des souvenirs',
+    'gallery.hero.sub' => 'Des morceaux de vie d\'asso, grands et petits, cousus les uns aux autres. Clique sur une image pour l\'agrandir — et laisse-toi porter.',
+    'gallery.count' => '%count% souvenirs',
+    'gallery.empty' => 'Aucune image à afficher pour le moment. Revenez bientôt !',
+    'gallery.lock_title' => 'Image réservée aux membres connectés',
+    'gallery.edit_title' => 'Éditer cette image',
+    'gallery.tip' => 'Astuce : clique sur une image pour l\'ouvrir en grand — flèches ← → pour naviguer, Échap pour fermer.',
+    'gallery.lightbox.aria' => 'Visionneuse d\'images',
+    'gallery.lightbox.close' => 'Fermer (Échap)',
+    'gallery.lightbox.prev' => 'Image précédente',
+    'gallery.lightbox.next' => 'Image suivante',
+
 ];

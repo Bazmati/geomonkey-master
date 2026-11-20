@@ -97,4 +97,64 @@ return [
 
     // Common form labels
     'form.email' => 'Email address',
+
+    // ===== Events =====
+    'event.title' => 'Events',
+    'event.hero.badge' => 'Agenda',
+    'event.hero.title' => 'Asso life, day after day',
+    'event.hero.sub' => 'Workshops, builds, outings and celebrations: find the whole GéoMonkey agenda and save your spot for the next gathering.',
+    'event.next.badge' => 'Next gathering',
+    'event.next.members' => 'Members only',
+    'event.countdown.finished' => 'It\'s now!',
+    'event.next.calendar' => 'Add to my calendar',
+    'event.next.see' => 'See the event',
+    'event.prep.badge' => 'Next event in the making',
+    'event.prep.title' => 'Nothing on the agenda… for now',
+    'event.prep.sub' => 'The team is cooking up what\'s next. Meanwhile, dive into our memories: every picture tells a moment of the asso\'s life.',
+    'event.prep.gallery' => 'See the whole gallery',
+    'event.filter.aria' => 'Filter events',
+    'event.list.empty' => 'No events to show for this filter. Come back soon!',
+    'event.status.upcoming' => 'Upcoming',
+    'event.status.past' => 'Past',
+
+    // Common filters
+    'filter.all' => 'All',
+    'filter.upcoming' => 'Upcoming',
+    'filter.past' => 'Past',
+
+    // ===== Projects =====
+    'project.hero.badge' => 'Our projects',
+    'project.hero.title' => 'Ideas coming to life',
+    'project.hero.sub' => 'Every GéoMonkey project is a collective adventure: cultural events imagined, built and lived by volunteers of all ages. Follow the progress of our current builds and dive into adventures already lived.',
+    'project.empty_a' => 'No projects to show for now — but that won\'t last!',
+    'project.empty_link' => 'Join the association',
+    'project.empty_b' => 'to be at the heart of the next adventure.',
+    'project.card.illustration' => 'Project illustration',
+    'project.card.discover' => 'Discover the project',
+    'project.section.ongoing' => 'Ongoing',
+    'project.section.ongoing_count' => '%count% project(s) in full swing',
+    'project.section.planned_badge' => 'In preparation',
+    'project.section.planned_sub' => 'Future adventures in the making',
+    'project.section.done_badge' => 'Completed',
+    'project.section.done_sub' => 'Adventures we have already lived',
+
+    // ===== Blog =====
+    'blog.hero.title' => 'Asso life, live',
+    'blog.hero.sub' => 'Behind the scenes of our builds, event comebacks, announcements and little stories: every article is an invitation to dive into the GéoMonkey universe. Enjoy the read!',
+    'blog.tagged' => 'Posts tagged',
+    'blog.tagged_all' => 'See all',
+
+    // ===== Gallery =====
+    'gallery.hero.title' => 'A patchwork of memories',
+    'gallery.hero.sub' => 'Pieces of asso life, big and small, stitched together. Click a picture to enlarge it — and let yourself drift.',
+    'gallery.count' => '%count% memories',
+    'gallery.empty' => 'No images to show yet. Come back soon!',
+    'gallery.lock_title' => 'Image for signed-in members only',
+    'gallery.edit_title' => 'Edit this image',
+    'gallery.tip' => 'Tip: click a picture to open it full size — use ← → arrows to browse, Esc to close.',
+    'gallery.lightbox.aria' => 'Image viewer',
+    'gallery.lightbox.close' => 'Close (Esc)',
+    'gallery.lightbox.prev' => 'Previous image',
+    'gallery.lightbox.next' => 'Next image',
+
 ];

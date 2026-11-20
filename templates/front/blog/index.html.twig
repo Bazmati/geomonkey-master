@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Actualités — {{ parent() }}{% endblock %}
+{% block title %}{{ 'nav.blog'|trans }} — {{ parent() }}{% endblock %}
 
 {% block meta %}
     <meta name="description" content="Actualités et articles de l'association GéoMonkey : projets, constructions, festivals et vie de l'association.">
@@ -13,13 +13,11 @@
 <header class="pres-hero">
     <div class="container position-relative text-center">
         <span class="badge home-hero-badge mb-3">
-            <i class="bi bi-newspaper me-1"></i> Actualités
+            <i class="bi bi-newspaper me-1"></i> {{ 'nav.blog'|trans }}
         </span>
-        <h1 class="pres-hero-title">La vie de l'assoc', en direct</h1>
+        <h1 class="pres-hero-title">{{ 'blog.hero.title'|trans }}</h1>
         <p class="home-hero-sub mx-auto mb-0">
-            Coulisses des chantiers, retours des événements, annonces et
-            petites histoires : chaque article est une invitation à plonger
-            dans l'univers GéoMonkey. Bonne lecture !
+            {{ 'blog.hero.sub'|trans }}
         </p>
     </div>
 </header>
@@ -32,8 +30,8 @@
         <div class="col-lg-8">
             {% if currentTag is defined and currentTag %}
                 <div class="alert alert-dark d-flex align-items-center justify-content-between">
-                    <span><i class="bi bi-tag me-1 text-gm-yellow"></i> Articles tagués <strong class="text-gm-yellow">#{{ currentTag.name }}</strong></span>
-                    <a href="{{ path('app_blog_index') }}" class="btn btn-sm btn-outline-light">Tout voir</a>
+                    <span><i class="bi bi-tag me-1 text-gm-yellow"></i> {{ 'blog.tagged'|trans }} <strong class="text-gm-yellow">#{{ currentTag.name }}</strong></span>
+                    <a href="{{ path('app_blog_index') }}" class="btn btn-sm btn-outline-light">{{ 'blog.tagged_all'|trans }}</a>
                 </div>
             {% endif %}
 

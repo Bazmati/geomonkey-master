@@ -1,37 +1,38 @@
-GEO MONKEY — i18n LOT 1a : PAGE D'ACCUEIL BILINGUE
-==================================================
+GEO MONKEY — i18n LOT 1b : PAGES DE LISTING BILINGUES
+=====================================================
 
-PREALABLE : le Lot 0 doit etre installe (translation.yaml,
-LocaleSubscriber, LocaleController, catalogs) et le bouton FR/EN
-operationnel.
+PREALABLE : Lots 0 et 1a installes.
 
 CONTENU (a extraire a la racine du projet) :
-- templates/front/home/index.html.twig (REMPLACE : tous les textes
-  figes passent en |trans, structures identiques)
-- translations/messages.fr.php (REMPLACE : Lot 0 + cles home.*)
-- translations/messages.en.php (REMPLACE : idem en anglais)
-- tests/Controller/Front/HomeTranslationTest.php (NOUVEAU : 2 tests)
+- templates/front/event/index.html.twig   (REMPLACE : hero, carte evenement
+  vedette, filtres, cartes mobiles en |trans)
+- templates/front/project/index.html.twig (REMPLACE : hero, sections
+  en cours/preparation/termines, cartes en |trans)
+- templates/front/blog/index.html.twig    (REMPLACE : hero + filtre par tag)
+- templates/front/gallery/index.html.twig (REMPLACE : hero, compteur, tip,
+  lightbox aria/titles en |trans)
+- translations/messages.fr.php (REMPLACE : Lots 0+1a + ~50 cles
+  event.*/project.*/blog.*/gallery.*/filter.*)
+- translations/messages.en.php (REMPLACE : idem EN)
+- tests/Controller/Front/ListingTranslationTest.php (NOUVEAU : 2 tests)
 - LISEZMOI.txt (ne pas copier)
 
-SCOPE ASSUME :
-- Tous les textes figures de la home sont traduits (hero, piliers,
-  stats, sections evenements/projets/actus/galerie, CTA, newsletter).
-- Le CONTENU de la base reste en francais : titres d'evenements,
-  statuts de projets (project.status.label/publicTeaser), noms de
-  categories, extraits d'articles, alt d'images, nawet author names.
-- SEO (title, meta description) figure en francais volontairement.
-- Les dates gardent le format d/m/Y (mois courts EN dans le chip
-  date : detail cosmetique acceptable en v1).
+DETAILS :
+- Le compteur du projet en cours utilise un parametre : '...|trans({'%count%': n})
+  FR '%count% chantier(s)...', EN '%count% project(s)...'.
+- Le data-attribute du countdown ("C'est maintenant !") est traduit.
+- Non traduits (contenu de la base ou sous-templates du prochain lot) :
+  titres/lieux d'evenements, descriptions de projets,
+  project.status.label (enum PHP), _sidebar et _list des evenements/blog,
+  noms de tags et categories.
 
-TESTS : php bin/phpunit --filter HomeTranslationTest
-(2 tests : home FR par defaut sans cle brute qui fuit, home EN
-apres bascule)
+TESTS : php bin/phpunit --filter ListingTranslationTest
 
 RIUEL : local -> tests verts -> commit -> push ->
 pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && \
   php bin/console cache:clear --env=prod && \
   chown -R www-data:www-data var && systemctl reload php8.4-fpm'
 
-VERIF PROD : www.geomonkey.fr bascule FR/EN -> toute la home change
-de langue (hero, sections, CTA), les contenus de la base (evenements,
-articles...) restent en francais : comportement voulu.
+VERIF PROD : bascule FR/EN puis visite /evenements, /projets, /galerie,
+/blog : les heroes et boutons changent de langue, les contenus (titres,
+descriptions) restent en francais : comportement voulu.
