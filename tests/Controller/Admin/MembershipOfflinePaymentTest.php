@@ -53,6 +53,39 @@ final class MembershipOfflinePaymentTest extends WebTestCase
         return [$president, $member];
     }
 
+    /**
+     * Crée un utilisateur de bureau avec une adhésion active
+     * (le EntityVoter l'exige pour toute fonction de bureau).
+     */
+    private function createOfficeUser(string $email, OfficeFunction $function): User
+    {
+        $container = static::getContainer();
+        $em = $container->get('doctrine')->getManager();
+        /** @var UserPasswordHasherInterface $hasher */
+        $hasher = $container->get('security.user_password_hasher');
+
+        $user = (new User())->setEmail($email);
+        $user->setFirstName('Bureau');
+        $user->setLastName('Test');
+        $user->setPassword($hasher->hashPassword($user, 'password'));
+        $user->setRoles(['ROLE_ADMIN']);
+        $user->setOfficeFunction($function);
+
+        $membership = new Membership();
+        $membership->setIsActive(true);
+        $membership->setAmount(1500);
+        $membership->setStartedAt(new \DateTimeImmutable());
+        $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P1Y')));
+        $membership->setUser($user);
+        $membership->setPaymentStatus('paid');
+        $em->persist($membership);
+
+        $em->persist($user);
+        $em->flush();
+
+        return $user;
+    }
+
     private function csrfToken(Crawler $crawler): ?string
     {
         $input = $crawler->filter('input[name="_token"]');
@@ -137,5 +170,32 @@ final class MembershipOfflinePaymentTest extends WebTestCase
 
         self::assertSame(OfficeFunction::None, $memberReloaded->getOfficeFunction());
         self::assertNull($memberReloaded->getActiveMembership());
+    }
+
+    public function testTreasurerCanAccessOfflinePage(): void
+    {
+        $client = static::createClient();
+        [$president, $member] = $this->createPresidentAndMember();
+        $treasurer = $this->createOfficeUser('tresorier-offline@asso.fr', OfficeFunction::Treasurer);
+
+        $client->loginUser($treasurer);
+        $crawler = $client->request('GET', '/admin/membership/hors-ligne');
+
+        // Le trésorier encaisse : accès direct à la page
+        self::assertResponseIsSuccessful();
+        self::assertSelectorTextContains('h1', 'Encaisser une cotisation hors-ligne');
+    }
+
+    public function testSecretaryIsForbiddenFromOfflinePage(): void
+    {
+        $client = static::createClient();
+        [$president, $member] = $this->createPresidentAndMember();
+        $secretary = $this->createOfficeUser('secretaire-offline@asso.fr', OfficeFunction::Secretary);
+
+        $client->loginUser($secretary);
+        $client->request('GET', '/admin/membership/hors-ligne');
+
+        // Le secrétaire passe l'ENTITY_EDIT de la classe mais pas l'ENTITY_CASH
+        self::assertResponseStatusCodeSame(403);
     }
 }

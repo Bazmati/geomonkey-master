@@ -17,7 +17,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-#[IsGranted('ENTITY_EDIT')] // Bureau (président + secrétaire)
+// NB : pas de #[IsGranted] au niveau classe : l'action offline() est ouverte
+// au trésorier (ENTITY_CASH) alors que le reste exige ENTITY_EDIT, qui ne
+// l'inclut PAS (canEdit : président, VP, secrétaire). Un garde de classe
+// s'applique à toutes les actions avant les attributs de méthode : il
+// bloquerait le trésorier même avec un ENTITY_CASH en méthode. Chaque action
+// porte donc son propre attribut ci-dessous.
 #[Route('/admin/membership', name: 'app_admin_membership_')]
 class MembershipController extends AbstractController
 {
@@ -34,6 +39,7 @@ class MembershipController extends AbstractController
     ) {}
 
     #[Route('/requests', name: 'requests')]
+    #[IsGranted('ENTITY_EDIT')]
     public function requests(): Response
     {
         $pendingUsers = $this->userRepo->findPendingMembershipRequests();
@@ -96,6 +102,10 @@ class MembershipController extends AbstractController
     }
 
     #[Route('/list', name: 'list')]
+    // Liste des adhésions : bureau étendu (TREASURY) pour que le trésorier
+    // puisse consulter les cotisations ET atterrir ici après un encaissement
+    // hors-ligne (le redirect de offline() pointe sur cette page).
+    #[IsGranted('ENTITY_TREASURY')]
     public function list(): Response
     {
         $memberships = $this->membershipRepository->findAllWithUsers();
@@ -132,6 +142,9 @@ class MembershipController extends AbstractController
      * de schéma nécessaire, la colonne existe déjà).
      */
     #[Route('/hors-ligne', name: 'offline', methods: ['GET', 'POST'])]
+    // Encaissement hors-ligne : trésorier et président uniquement.
+    // Surcharge l'ENTITY_EDIT de la classe (qui n'inclut PAS le trésorier).
+    #[IsGranted('ENTITY_CASH')]
     public function offline(Request $request): Response
     {
         // Montant par défaut : le tarif courant si défini

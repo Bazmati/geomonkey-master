@@ -24,12 +24,13 @@ class EntityVoter extends Voter
     public const SETTINGS = 'ENTITY_SETTINGS';    // onglet Paramètres : président uniquement
     public const TREASURY = 'ENTITY_TREASURY';    // données financières (dons, future compta) : bureau étendu, trésorier inclus
     public const MESSAGES = 'ENTITY_MESSAGES';    // boîte mail de l'asso (onglet Messages) : bureau étendu
+    public const CASH = 'ENTITY_CASH';            // encaissement hors-ligne d'une cotisation : trésorier et président uniquement
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         return in_array(
             $attribute,
-            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS, self::TREASURY, self::MESSAGES],
+            [self::VIEW, self::CREATE, self::EDIT, self::DELETE, self::PUBLISH, self::SETTINGS, self::TREASURY, self::MESSAGES, self::CASH],
             true
         );
     }
@@ -78,6 +79,7 @@ class EntityVoter extends Voter
             self::SETTINGS => $this->canManageSettings($function),
             self::TREASURY => $isBureau, // bureau étendu : président, VP, trésorier, secrétaire
             self::MESSAGES => $isBureau, // boîte mail asso : idem bureau étendu
+            self::CASH     => $this->canCash($function),
             default        => false,
         };
     }
@@ -89,6 +91,20 @@ class EntityVoter extends Voter
             OfficeFunction::President,
             OfficeFunction::VicePresident,
             OfficeFunction::Secretary,
+        ], true);
+    }
+
+    /**
+     * Encaissement d'une cotisation hors-ligne (espèces, chèque, virement) :
+     * c'est l'acte du trésorier. Le président (ou un break-glass SUPER_ADMIN)
+     * garde la main pour ne jamais être bloqué, le VP et le secrétaire n'y ont
+     * pas accès (pas d'argent qui passe par eux).
+     */
+    private function canCash(OfficeFunction $function): bool
+    {
+        return in_array($function, [
+            OfficeFunction::Treasurer,
+            OfficeFunction::President,
         ], true);
     }
 
