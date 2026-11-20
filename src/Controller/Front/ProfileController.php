@@ -10,6 +10,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Page « Mon profil » (front) : consultation et édition des informations
@@ -24,6 +25,10 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
  */
 class ProfileController extends AbstractController
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     #[Route(path: '/profil', name: 'app_profile')]
     #[IsGranted('ROLE_USER')]
     public function show(): Response
@@ -55,11 +60,14 @@ class ProfileController extends AbstractController
 
             $em->flush();
 
-            $this->addFlash('success', 'Ton profil a bien été mis à jour.');
+            $this->addFlash('success', $this->translator->trans('flash.profile.updated'));
 
             return $this->redirectToRoute('app_profile');
         }
 
+        // NB : passer $form (et non $form->createView()) à render() permet à
+        // Symfony de répondre automatiquement 422 quand le formulaire soumis
+        // est invalide (comportement attendu par ProfileControllerTest).
         return $this->render('front/profile/edit.html.twig', [
             'form' => $form,
         ]);

@@ -10,8 +10,8 @@ use Symfony\Component\Routing\RouterInterface;
 /**
  * i18n Lot 2a : pages formulaires (connexion, inscription, don).
  * Vérifie les textes figés du « hero » et les libellés statiques.
- * Les libellés des champs Symfony (FormType) et le contenu des
- * flashs restent en français pour l'instant (frontière acceptée).
+ * Depuis le Lot 2b, les libellés des champs Symfony (FormType) et les
+ * messages de validation sont traduits : voir FormTypeTranslationTest.
  *
  * NB : /inscription redirige vers l'accueil si aucun tarif de
  * cotisation n'existe en base -> on sème un MembershipFee en setUp.

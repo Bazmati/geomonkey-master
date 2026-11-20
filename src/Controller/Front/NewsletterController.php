@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Newsletter : inscription depuis l'accueil + désinscription par lien tokenisé (RGPD).
@@ -20,6 +21,7 @@ final class NewsletterController extends AbstractController
         private NewsletterSubscriberRepository $subscriberRepository,
         private EntityManagerInterface $em,
         private MailService $mailService,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('/newsletter/inscription', name: 'app_newsletter_subscribe', methods: ['POST'])]
@@ -28,7 +30,7 @@ final class NewsletterController extends AbstractController
         $back = $this->generateUrl('app_home', ['_fragment' => 'newsletter']);
 
         if (!$this->isCsrfTokenValid('newsletter_subscribe', (string) $request->request->get('_token'))) {
-            $this->addFlash('error', 'Session expirée : recharge la page puis réessaie.');
+            $this->addFlash('error', $this->translator->trans('flash.newsletter.csrf'));
 
             return $this->redirect($back);
         }
@@ -36,7 +38,7 @@ final class NewsletterController extends AbstractController
         $email = trim((string) $request->request->get('email'));
 
         if ('' === $email || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $this->addFlash('error', 'Adresse email invalide : vérifie ta saisie.');
+            $this->addFlash('error', $this->translator->trans('flash.newsletter.invalid_email'));
 
             return $this->redirect($back);
         }
@@ -44,7 +46,7 @@ final class NewsletterController extends AbstractController
         $subscriber = $this->subscriberRepository->findOneBy(['email' => $email]);
 
         if (null !== $subscriber && $subscriber->isActive()) {
-            $this->addFlash('info', 'Tu es déjà inscrit·e à la newsletter, merci !');
+            $this->addFlash('info', $this->translator->trans('flash.newsletter.already'));
 
             return $this->redirect($back);
         }
@@ -74,7 +76,7 @@ final class NewsletterController extends AbstractController
             // L'inscription reste valide même si le SMTP est indisponible
         }
 
-        $this->addFlash('success', 'Inscription confirmée ! 🐒 Vérifie ta boîte mail pour le message de bienvenue.');
+        $this->addFlash('success', $this->translator->trans('flash.newsletter.subscribed'));
 
         return $this->redirect($back);
     }

@@ -16,6 +16,7 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfToken;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/inscription')]
 class MembershipController extends AbstractController
@@ -23,6 +24,7 @@ class MembershipController extends AbstractController
     public function __construct(
         private MembershipFeeService $feeService,
         private MailService $mailService,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_membership_register', methods: ['GET', 'POST'])]
@@ -34,6 +36,7 @@ class MembershipController extends AbstractController
         try {
             $membershipFee = $this->feeService->getCurrentAmountInEuros();
         } catch (\RuntimeException $e) {
+            // Message du service (frontière acceptée : le service reste FR)
             $this->addFlash('error', $e->getMessage());
             return $this->redirectToRoute('app_home');
         }
@@ -45,7 +48,7 @@ class MembershipController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer le mot de passe en clair depuis le formulaire (non mappé)
             $plainPassword = $form->get('plainPassword')->getData();
-            
+
             // Hash du mot de passe
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
@@ -55,7 +58,7 @@ class MembershipController extends AbstractController
 
             // Stocker les consentements RGPD
             $user->setTermsAcceptedAt(new \DateTimeImmutable());
-            
+
             // Stocker le consentement pour les photos (si coché)
             $imageConsent = $form->get('imageConsent')->getData();
             $user->setImageConsent($imageConsent);
@@ -65,7 +68,7 @@ class MembershipController extends AbstractController
 
             // Générer un token de vérification d'email pour tous les utilisateurs
             $verificationToken = $user->generateEmailVerificationToken();
-            
+
             // Si l'utilisateur a demandé "membre_actif", validation bureau nécessaire
             // Sinon (null), le compte sera actif après vérification de l'email
             // Note: isRegistrationConfirmed reste false jusqu'à vérification de l'email
@@ -83,7 +86,7 @@ class MembershipController extends AbstractController
                     'token' => $verificationToken,
                     'email' => urlencode($user->getEmail()),
                 ], UrlGeneratorInterface::ABSOLUTE_URL);
-                
+
                 $this->mailService->sendEmailVerification($user, $verificationUrl);
                 $this->mailService->sendRegistrationConfirmation($user);
 
@@ -92,7 +95,7 @@ class MembershipController extends AbstractController
                 }
             } catch (\Throwable $e) {
                 // Log pour monitoring, mais l'utilisateur continue son parcours
-                $this->addFlash('warning', 'Ton inscription est bien enregistrée, mais l\'envoi des emails a échoué.');
+                $this->addFlash('warning', $this->translator->trans('flash.register.emails_failed'));
             }
 
             // Redirection vers page de vérification d'email
@@ -130,7 +133,7 @@ class MembershipController extends AbstractController
     #[Route('/cancel', name: 'app_membership_cancel')]
     public function cancel(): Response
     {
-        // Page de retour après annulation du paiement
+        // Retour après annulation du paiement
         return $this->render('front/membership/cancel.html.twig');
     }
 
@@ -149,50 +152,50 @@ class MembershipController extends AbstractController
         UserRepository $userRepository
     ): Response {
         $user = $userRepository->findOneBy(['email' => urldecode($email)]);
-        
+
         if (!$user) {
-            $this->addFlash('error', 'Aucun utilisateur trouvé avec cette adresse email.');
+            $this->addFlash('error', $this->translator->trans('flash.verify.no_user'));
             return $this->redirectToRoute('app_login');
         }
-        
+
         if (!$user->isEmailVerificationTokenValid($token)) {
-            $this->addFlash('error', 'Le lien de vérification est invalide ou a expiré. Un nouveau lien t\'a été envoyé.');
-            
+            $this->addFlash('error', $this->translator->trans('flash.verify.invalid_token'));
+
             // Générer un nouveau token et renvoyer l'email
             $newToken = $user->generateEmailVerificationToken();
             $em->persist($user);
             $em->flush();
-            
+
             try {
                 $verificationUrl = $this->generateUrl('app_verify_email', [
                     'token' => $newToken,
                     'email' => urlencode($user->getEmail()),
                 ], UrlGeneratorInterface::ABSOLUTE_URL);
                 $this->mailService->sendEmailVerification($user, $verificationUrl);
-                $this->addFlash('info', 'Un nouveau lien de vérification t\'a été envoyé.');
+                $this->addFlash('info', $this->translator->trans('flash.verify.new_link_sent'));
             } catch (\Throwable $e) {
-                $this->addFlash('warning', 'Un nouveau lien a été généré mais l\'envoi a échoué.');
+                $this->addFlash('warning', $this->translator->trans('flash.verify.new_link_failed'));
             }
-            
+
             return $this->redirectToRoute('app_check_email');
         }
-        
+
         // Marquer l'email comme vérifié
         $user->setIsRegistrationConfirmed(true);
         $user->setRegistrationValidatedAt(new \DateTimeImmutable());
         $user->setEmailVerificationToken(null);
         $user->setEmailVerificationTokenExpiresAt(null);
-        
+
         // Si l'utilisateur n'a pas besoin de validation bureau, activer immédiatement
         if (!$user->needsBureauValidation()) {
             $user->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
         }
-        
+
         $em->persist($user);
         $em->flush();
-        
-        $this->addFlash('success', 'Ton adresse email a été vérifiée avec succès !');
-        
+
+        $this->addFlash('success', $this->translator->trans('flash.verify.success'));
+
         // Redirection selon le statut
         if ($user->needsBureauValidation()) {
             return $this->redirectToRoute('app_membership_wait_validation');
@@ -212,41 +215,41 @@ class MembershipController extends AbstractController
             // Protection CSRF : le formulaire embarque un jeton _csrf_token
             $submittedToken = $request->request->get('_csrf_token', '');
             if (!$csrf->isTokenValid(new CsrfToken('forgot_password', $submittedToken))) {
-                $this->addFlash('error', 'Session expirée ou jeton invalide, veuillez réessayer.');
+                $this->addFlash('error', $this->translator->trans('flash.forgot.csrf'));
                 return $this->redirectToRoute('app_forgot_password');
             }
 
             $email = $request->request->get('email');
-            
+
             $user = $userRepository->findOneBy(['email' => $email]);
-            
+
             if ($user) {
                 // Générer un token de reset
                 $resetToken = $user->generatePasswordResetToken();
                 $em->persist($user);
                 $em->flush();
-                
+
                 // Envoyer l'email de reset
                 $resetUrl = $this->generateUrl('app_reset_password', [
                     'token' => $resetToken,
                     'email' => urlencode($user->getEmail()),
                 ], UrlGeneratorInterface::ABSOLUTE_URL);
-                
+
                 try {
                     $this->mailService->sendPasswordReset($user, $resetUrl);
                 } catch (\Throwable $e) {
-                    $this->addFlash('warning', 'Un problème est survenu lors de l\'envoi de l\'email.');
+                    $this->addFlash('warning', $this->translator->trans('flash.forgot.mail_failed'));
                 }
-                
-                $this->addFlash('success', 'Si ton adresse email est enregistrée, un lien de réinitialisation t\'a été envoyé.');
+
+                $this->addFlash('success', $this->translator->trans('flash.forgot.success'));
             } else {
                 // Ne pas révéler que l'email n'existe pas (pour la sécurité)
-                $this->addFlash('success', 'Si ton adresse email est enregistrée, un lien de réinitialisation t\'a été envoyé.');
+                $this->addFlash('success', $this->translator->trans('flash.forgot.success'));
             }
-            
+
             return $this->redirectToRoute('app_login');
         }
-        
+
         return $this->render('front/security/forgot_password.html.twig');
     }
 
@@ -260,48 +263,48 @@ class MembershipController extends AbstractController
         UserRepository $userRepository
     ): Response {
         $user = $userRepository->findOneBy(['email' => urldecode($email)]);
-        
+
         if (!$user || !$user->isPasswordResetTokenValid($token)) {
-            $this->addFlash('error', 'Le lien de réinitialisation est invalide ou a expiré.');
+            $this->addFlash('error', $this->translator->trans('flash.reset.invalid'));
             return $this->redirectToRoute('app_forgot_password');
         }
-        
+
         if ($request->isMethod('POST')) {
             $plainPassword = $request->request->get('plainPassword');
             $confirmPassword = $request->request->get('confirmPassword');
-            
+
             if ($plainPassword !== $confirmPassword) {
-                $this->addFlash('error', 'Les mots de passe ne correspondent pas.');
+                $this->addFlash('error', $this->translator->trans('flash.reset.mismatch'));
                 return $this->render('front/security/reset_password.html.twig', [
                     'email' => $email,
                     'token' => $token,
                 ]);
             }
-            
+
             // Valider le mot de passe (au moins 12 caractères)
             if (strlen($plainPassword) < 12) {
-                $this->addFlash('error', 'Le mot de passe doit faire au moins 12 caractères.');
+                $this->addFlash('error', $this->translator->trans('flash.reset.too_short'));
                 return $this->render('front/security/reset_password.html.twig', [
                     'email' => $email,
                     'token' => $token,
                 ]);
             }
-            
+
             // Hasher le mot de passe et le mettre à jour
             $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
             $user->setPassword($hashedPassword);
-            
+
             // Invalider le token
             $user->setPasswordResetToken(null);
             $user->setPasswordResetTokenExpiresAt(null);
-            
+
             $em->persist($user);
             $em->flush();
-            
-            $this->addFlash('success', 'Ton mot de passe a été réinitialisé avec succès ! Tu peux maintenant te connecter.');
+
+            $this->addFlash('success', $this->translator->trans('flash.reset.success'));
             return $this->redirectToRoute('app_login');
         }
-        
+
         return $this->render('front/security/reset_password.html.twig', [
             'email' => $email,
             'token' => $token,

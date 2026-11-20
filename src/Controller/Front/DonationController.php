@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 /**
  * Page publique de don libre
@@ -23,6 +24,7 @@ class DonationController extends AbstractController
 {
     public function __construct(
         private StripeService $stripeService,
+        private TranslatorInterface $translator,
     ) {}
 
     #[Route('', name: 'app_donation', methods: ['GET', 'POST'])]
@@ -54,7 +56,7 @@ class DonationController extends AbstractController
             } catch (\Throwable $e) {
                 // Stripe indisponible : le don reste "pending" et sera nettoyé,
                 // mais l'utilisateur n'a pas d'erreur blanche
-                $this->addFlash('error', 'Le paiement est momentanément indisponible. Merci de réessayer dans quelques instants.');
+                $this->addFlash('error', $this->translator->trans('flash.donation.unavailable'));
             }
         }
 

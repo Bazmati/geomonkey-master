@@ -21,6 +21,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Csrf\CsrfTokenManagerInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 #[Route('/evenements', name: 'app_event_')]
 class EventController extends AbstractController
@@ -33,6 +34,7 @@ class EventController extends AbstractController
         private readonly EventParticipantRepository $participantRepository,
         private readonly EntityManagerInterface $entityManager,
         private readonly EventIcsGenerator $icsGenerator,
+        private readonly TranslatorInterface $translator,
     ) {
     }
 
@@ -65,7 +67,7 @@ class EventController extends AbstractController
         if ($categorySlug !== '') {
             $currentCategory = $categoryRepo->findOneBy(['slug' => $categorySlug]);
             if ($currentCategory === null) {
-                throw $this->createNotFoundException("Catégorie d'événement inconnue.");
+                throw $this->createNotFoundException($this->translator->trans('event.error.category_unknown'));
             }
             $events = array_values(array_filter(
                 $events,
@@ -76,7 +78,7 @@ class EventController extends AbstractController
         if ($tagSlug !== '') {
             $currentTag = $tagRepo->findOneBy(['slug' => $tagSlug]);
             if ($currentTag === null) {
-                throw $this->createNotFoundException("Tag d'événement inconnu.");
+                throw $this->createNotFoundException($this->translator->trans('event.error.tag_unknown'));
             }
             $events = array_values(array_filter(
                 $events,
@@ -136,7 +138,7 @@ class EventController extends AbstractController
         if (ctype_digit($slug)) {
             $byId = $repo->findOneVisibleBy((int) $slug, $isActiveMember);
             if ($byId === null) {
-                throw $this->createNotFoundException('Événement introuvable.');
+                throw $this->createNotFoundException($this->translator->trans('event.error.not_found'));
             }
 
             return $this->redirectToRoute(
@@ -148,7 +150,7 @@ class EventController extends AbstractController
 
         $event = $repo->findOneVisibleBySlug($slug, $isActiveMember);
         if ($event === null) {
-            throw $this->createNotFoundException('Événement introuvable.');
+            throw $this->createNotFoundException($this->translator->trans('event.error.not_found'));
         }
 
         $participantCount = $this->participantRepository->countParticipants($event);
@@ -172,27 +174,27 @@ class EventController extends AbstractController
         /** @var User|null $user */
         $user = $this->getUser();
         if (null === $user) {
-            $this->addFlash('warning', 'Connectez-vous pour participer à un événement.');
+            $this->addFlash('warning', $this->translator->trans('flash.event.login_required'));
 
             return $this->redirectToRoute('app_login');
         }
 
         if (!$this->isCsrfTokenValid('register' . $event->getId(), $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
+            $this->addFlash('danger', $this->translator->trans('flash.event.csrf'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Événement réservé aux membres : adhésion active obligatoire
         if ($event->isMembersOnly() && !$this->isViewerActiveMember()) {
-            $this->addFlash('warning', 'Cet événement est réservé aux membres actifs de l\'association.');
+            $this->addFlash('warning', $this->translator->trans('flash.event.members_only'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Événement déjà commencé
         if ($event->getStartDate() !== null && $event->getStartDate()->getTimestamp() < time()) {
-            $this->addFlash('warning', 'Cet événement a déjà commencé, les inscriptions sont fermées.');
+            $this->addFlash('warning', $this->translator->trans('flash.event.started'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
@@ -200,14 +202,14 @@ class EventController extends AbstractController
         // Capacité atteinte
         if (null !== $event->getCapacity()
             && $this->participantRepository->countParticipants($event) >= $event->getCapacity()) {
-            $this->addFlash('warning', 'Toutes les places sont prises, l\'événement est complet.');
+            $this->addFlash('warning', $this->translator->trans('flash.event.full'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         // Déjà inscrit
         if ($this->participantRepository->userParticipatesInEvent($user, $event)) {
-            $this->addFlash('info', 'Vous êtes déjà inscrit à cet événement.');
+            $this->addFlash('info', $this->translator->trans('flash.event.already_registered'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
@@ -220,7 +222,7 @@ class EventController extends AbstractController
         $this->entityManager->persist($participant);
         $this->entityManager->flush();
 
-        $this->addFlash('success', 'Inscription confirmée, à bientôt !');
+        $this->addFlash('success', $this->translator->trans('flash.event.registered'));
 
         return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
     }
@@ -237,14 +239,14 @@ class EventController extends AbstractController
         }
 
         if (!$this->isCsrfTokenValid('unregister' . $event->getId(), $request->request->get('_token'))) {
-            $this->addFlash('danger', 'Jeton de sécurité invalide, réessayez.');
+            $this->addFlash('danger', $this->translator->trans('flash.event.csrf'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
 
         $participant = $this->participantRepository->findOneBy(['event' => $event, 'user' => $user]);
         if (null === $participant) {
-            $this->addFlash('info', 'Vous n\'êtes pas inscrit à cet événement.');
+            $this->addFlash('info', $this->translator->trans('flash.event.not_registered'));
 
             return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
         }
@@ -252,7 +254,7 @@ class EventController extends AbstractController
         $this->entityManager->remove($participant);
         $this->entityManager->flush();
 
-        $this->addFlash('success', 'Votre inscription a été annulée.');
+        $this->addFlash('success', $this->translator->trans('flash.event.unregistered'));
 
         return $this->redirectToRoute('app_event_show', ['slug' => $event->getSlug() ?: (string) $event->getId()]);
     }
@@ -280,7 +282,7 @@ class EventController extends AbstractController
             ->findOneVisibleBy($id, $isActiveMember);
 
         if (null === $event) {
-            throw $this->createNotFoundException('Événement introuvable.');
+            throw $this->createNotFoundException($this->translator->trans('event.error.not_found'));
         }
 
         return $event;

@@ -12,73 +12,84 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Zemasterkrom\CloudflareTurnstileBundle\Form\Type\CloudflareTurnstileType;
 
+/**
+ * i18n Lot 2b : libellés et messages de validation traduits via le
+ * catalogue (domaine messages) à la construction du formulaire.
+ */
 class RegistrationFormType extends AbstractType
 {
+    public function __construct(
+        private readonly TranslatorInterface $translator,
+    ) {}
+
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
+        $t = fn (string $key): string => $this->translator->trans($key);
+
         $builder
             ->add('email', EmailType::class, [
-                'label' => 'Adresse email',
+                'label' => $t('form.email'),
                 'attr' => ['class' => 'form-control', 'placeholder' => 'votre@email.com'],
                 'constraints' => [
-                    new Assert\NotBlank(message: 'L\'email est obligatoire'),
-                    new Assert\Email(message: 'Veuillez fournir une adresse email valide'),
+                    new Assert\NotBlank(message: $t('form.email.blank')),
+                    new Assert\Email(message: $t('form.email.invalid')),
                 ],
             ])
             ->add('firstName', TextType::class, [
-                'label' => 'Prénom',
-                'attr' => ['class' => 'form-control', 'placeholder' => 'Jean'],
+                'label' => $t('form.first_name.label'),
+                'attr' => ['class' => 'form-control', 'placeholder' => $t('form.first_name.placeholder')],
                 'constraints' => [
-                    new Assert\NotBlank(message: 'Le prénom est obligatoire'),
+                    new Assert\NotBlank(message: $t('form.first_name.blank')),
                     new Assert\Length(max: 50),
                 ],
             ])
             ->add('lastName', TextType::class, [
-                'label' => 'Nom',
-                'attr' => ['class' => 'form-control', 'placeholder' => 'Dupont'],
+                'label' => $t('form.last_name.label'),
+                'attr' => ['class' => 'form-control', 'placeholder' => $t('form.last_name.placeholder')],
                 'constraints' => [
-                    new Assert\NotBlank(message: 'Le nom est obligatoire'),
+                    new Assert\NotBlank(message: $t('form.last_name.blank')),
                     new Assert\Length(max: 50),
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                'label' => 'Mot de passe',
+                'label' => $t('form.password.label'),
                 'mapped' => false,
                 'attr' => ['class' => 'form-control', 'autocomplete' => 'new-password'],
                 'constraints' => [
-                    new Assert\NotBlank(message: 'Le mot de passe est obligatoire'),
-                    new Assert\PasswordStrength(minScore: 4, message: 'Le mot de passe doit être plus robuste (au moins 12 caractères avec majuscules, minuscules, chiffres et symboles)'),
-                    new Assert\Length(min: 12, minMessage: 'Le mot de passe doit faire au moins {{ limit }} caractères'),
+                    new Assert\NotBlank(message: $t('form.password.blank')),
+                    new Assert\PasswordStrength(minScore: 4, message: $t('form.password.strong')),
+                    new Assert\Length(min: 12, minMessage: $t('form.password.min')),
                 ],
             ])
             ->add('requestedFunction', ChoiceType::class, [
-                'label' => 'Statut souhaité',
+                'label' => $t('form.requested_function.label'),
                 'choices' => [
                     'membre_actif' => 'membre_actif',
                 ],
                 'required' => false,
                 'expanded' => true,        // ← rend des radios au lieu d'un select
                 'placeholder' => false,     // pas d'option vide supplémentaire
-                'choice_label' => function ($value) {
+                'choice_label' => function ($value) use ($t) {
                     return match ($value) {
-                        'membre_actif' => 'Membre actif (accès complet, adhésion payante)',
-                        default => 'Simple visiteur (gratuit, accès public)',
+                        'membre_actif' => $t('form.requested_function.active_member'),
+                        default => $t('form.requested_function.visitor'),
                     };
                 },
             ])
             ->add('agreeTerms', CheckboxType::class, [
-                'label' => 'J\'accepte les <a href="/legal/cgu" target="_blank">Conditions Générales d\'Adhésion</a> et la <a href="/legal/confidentialite" target="_blank">Politique de Confidentialité</a>',
+                'label' => $t('form.agree_terms.label'),
                 'label_html' => true,
                 'mapped' => false,
                 'constraints' => [
-                    new Assert\IsTrue(message: 'Vous devez accepter les conditions pour vous inscrire'),
+                    new Assert\IsTrue(message: $t('form.agree_terms.error')),
                 ],
                 'attr' => ['class' => 'form-check-input'],
             ])
             ->add('imageConsent', CheckboxType::class, [
-                'label' => 'J\'accepte que mes photos prises lors des événements soient publiées sur le site (facultatif, retirable à tout moment en nous contactant)',
+                'label' => $t('form.image_consent.register.label'),
                 'label_html' => true,
                 'required' => false,
                 'attr' => ['class' => 'form-check-input'],

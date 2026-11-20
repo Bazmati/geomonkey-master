@@ -1,0 +1,24 @@
+# Fix tests Lot 2b (i18n)
+
+Deux corrections après le premier passage de `php bin/phpunit` :
+
+## 1. tests/Controller/Front/EventControllerTest.php (11 erreurs)
+Le test unitaire instancie EventController à la main (classes anonymes).
+Le contrôleur attend désormais 6 arguments (TranslatorInterface ajouté en Lot 2b
+pour les flashs) -> le test mock TranslatorInterface et passe le 6e argument
+aux deux classes anonymes.
+
+## 2. src/Controller/Front/ProfileController.php (1 échec)
+Régression dans mon Livrable 2b : j'avais mis `'form' => $form->createView()`
+alors que l'original passait `'form' => $form`. Passer le FormInterface
+(et non la vue) à render() fait répondre Symfony automatiquement en 422
+quand le formulaire soumis est invalide (ProfileControllerTest::testEditRejectsEmptyFirstName).
+
+Corrigé en restaurant `'form' => $form` + commentaire pour éviter que ça revienne.
+
+## Déploiement
+Extraire à la racine du projet (2 fichiers écrasés), puis :
+- php bin/phpunit
+- git add/commit/push
+- CT 202 : git pull + cache:clear --env=prod + reload php8.4-fpm (inchangé,
+  les 2 fichiers Lot 2b déjà déployés restent valides côté prod)

@@ -1,43 +1,52 @@
-# i18n Lot 3 : partials + pages de contenu restantes (front uniquement)
+# i18n Lot 2b : libellés FormType, validation et flashs contrôleurs (front)
 
-## Périmètre (12 templates)
-- templates/front/event/_sidebar.html.twig    (filtres, catégories, tags, prochains rendez-vous, souvenirs)
-- templates/front/event/show.html.twig       (badges, inscription, countdown, infos pratiques, .ics)
-- templates/front/blog/_list.html.twig       (carte à la une, vide, lecture, badge Bureau)
-- templates/front/blog/_sidebar.html.twig
-- templates/front/blog/_share_buttons.html.twig (partages + copier le lien)
-- templates/front/blog/category.html.twig
-- templates/front/blog/show.html.twig        (lecture, remerciement, partage, à lire aussi)
-- templates/front/presentation/index.html.twig
-- templates/front/presentation/show.html.twig
-- templates/front/profile/show.html.twig
-- templates/front/profile/edit.html.twig
-- templates/front/newsletter/unsubscribe.html.twig
+## Périmètre
 
-Non couverts (volontairement) :
-- gallery_image/_picture.html.twig (shim déprécié, aucun texte)
-- tag.html.twig (fragment breadcrumb) — le helper breadcrumb() PHP reste FR pour l'instant
+### FormTypes (labels + messages de validation traduits via TranslatorInterface)
+- src/Form/DonationType.php
+- src/Form/ProfileType.php
+- src/Form/RegistrationFormType.php
+
+Principe : les FormTypes sont des services Symfony (autoconfigure/autowire),
+le TranslatorInterface est injecté en constructeur et les libellés/messages
+sont traduits à la construction du formulaire (domaine `messages`).
+Les placeholders de validation ({{ limit }}, {{ min }}, {{ max }}) sont
+conservés par trans() puis remplacés par le validator.
+
+### Contrôleurs front (flashs + messages 404 traduits)
+- src/Controller/Front/DonationController.php   (erreur paiement Stripe)
+- src/Controller/Front/MembershipController.php (emails, vérification email, mot de passe oublié/réinitialisé)
+- src/Controller/Front/ProfileController.php    (profil mis à jour)
+- src/Controller/Front/EventController.php      (inscription/désinscription événement, CSRF, 404)
+- src/Controller/Front/NewsletterController.php (inscription newsletter)
+
+Frontières volontairement laissées FR :
+- MembershipFeeService->getCurrentAmountInEuros() : le message d'erreur du service
+  (flash sur /inscription quand aucun tarif n'existe) reste FR.
+- MembershipFeeType : formulaire back-office, hors périmètre.
+- Emails transactionnels (déjà traités à part, non concernés ici).
 
 ## Catalogues
-- translations/messages.fr.php + messages.en.php : **360 clés** chacune
-  (278 du lot 2a + 82 nouvelles du lot 3), symétriques, sans doublon.
-- Remplacez vos fichiers du lot 2a par ceux-ci (fusion déjà faite).
-- Nouvelles familles : event.sidebar.*, event.show.*, event.status.past_event,
-  blog.* (list, sidebar, share, category, show, read_suffix), presentation.*,
-  profile.*, badge.visitor, newsletter.*.
-- Quelques messages contiennent du HTML (lien "rejoins l'assoc'", <strong>%email%</strong>)
-  rendus avec |raw dans les templates.
+- translations/messages.fr.php + messages.en.php : **420 clés** chacune
+  (360 du lot 3 + 60 nouvelles : form.*, event.error.*, flash.*).
+- Remplacez vos fichiers du lot 3 par ceux-ci (fusion déjà faite).
 
-## Test
-- tests/Controller/Front/ContentTranslationTest.php (2 tests) :
-  sidebar événements + hero Présentation, en FR par défaut puis EN après /locale/en.
-  Aucune fixture requise (assertions sur textes toujours rendus).
+## Tests
+- tests/Controller/Front/FormTypeTranslationTest.php (nouveau, 4 tests) :
+  labels FR/EN du formulaire de don + messages de validation en POST,
+  labels FR/EN du formulaire d'inscription (seed MembershipFee en base).
+- tests/Controller/Front/FormTranslationTest.php : commentaire mis à jour
+  (seul changement, l'ancienne frontière "libellés FormType" est levée).
 
 ## Déploiement (rituel habituel)
-1. Extraire ce zip à la racine du projet (il écrase les 12 templates, les 2 catalogues, ajoute le test).
-2. php bin/phpunit
+1. Extraire ce zip à la racine du projet. Il écrase :
+   3 FormTypes, 5 contrôleurs, les 2 catalogues, 2 fichiers de test.
+2. `php bin/phpunit tests/Controller/Front/`
+   (si un FormType n'est pas reconnu comme service, vérifier que
+   services.yaml autoconfigure bien App\\ — c'est la config standard du repo)
 3. git add/commit/push
 4. Serveur (CT 202) :
    pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && php bin/console cache:clear --env=prod && systemctl reload php8.4-fpm'
-5. Vérifier sur geomonkey.fr : /evenements (sidebar), /presentation, /blog (catégorie),
-    et une fiche événement/article pour les badges et boutons i18n.
+5. Vérifier sur geomonkey.fr en EN : /don (libellés + soumission vide),
+   /inscription (labels, radios, CGA cliquables), inscription/désinscription
+   à un événement (flash), inscription newsletter depuis l'accueil (flash).
