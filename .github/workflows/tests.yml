@@ -44,6 +44,11 @@ jobs:
       WHATSAPP_GROUP_LINK: https://example.invalid
       MAIL_FROM_ADDRESS: noreply@local.fr
       MAILBOX_ENCRYPTION: ssl
+      # Vars de config non optionnelles (messenger.yaml, base_uri/asset) :
+      # transport synchrone (pas de table messenger_messages nécessaire pour
+      # les tests) et URI de base factice pour les URLs absolues.
+      MESSENGER_TRANSPORT_DSN: sync://
+      DEFAULT_URI: http://localhost
       # MAILBOX_HOST/PORT/USER/PASSWORD sont forcés vides par phpunit.dist.xml
 
     steps:
