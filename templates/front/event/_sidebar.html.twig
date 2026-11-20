@@ -4,7 +4,7 @@
 
 <aside class="blog-sidebar">
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> Prochains rendez-vous</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> {{ 'event.sidebar.next'|trans }}</h2>
         {% if upcoming|length > 1 %}
             {% for event in upcoming|slice(1, 5) %}
                 <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="blog-latest-item">
@@ -22,32 +22,32 @@
             {% endfor %}
         {% else %}
             <p class="text-muted small mb-0">
-                <i class="bi bi-hourglass-split me-1"></i> Aucun événement programmé pour le moment.
+                <i class="bi bi-hourglass-split me-1"></i> {{ 'event.sidebar.empty'|trans }}
             </p>
         {% endif %}
     </div>
 
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-funnel text-gm-yellow me-1"></i> Filtrer</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-funnel text-gm-yellow me-1"></i> {{ 'filter.title'|trans }}</h2>
         <ul class="list-unstyled mb-0">
             <li>
                 <a href="{{ path('app_event_index', {'filter': 'tous'}) }}"
                    class="blog-cat-link {{ filter == 'tous' ? 'active' }}">
-                    <span><i class="bi bi-asterisk me-1"></i> Tous</span>
+                    <span><i class="bi bi-asterisk me-1"></i> {{ 'filter.all'|trans }}</span>
                     <span class="blog-cat-count">{{ events|length }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ path('app_event_index', {'filter': 'a-venir'}) }}"
                    class="blog-cat-link {{ filter == 'a-venir' ? 'active' }}">
-                    <span><i class="bi bi-calendar-plus me-1"></i> À venir</span>
+                    <span><i class="bi bi-calendar-plus me-1"></i> {{ 'filter.upcoming'|trans }}</span>
                     <span class="blog-cat-count">{{ upcoming|length }}</span>
                 </a>
             </li>
             <li>
                 <a href="{{ path('app_event_index', {'filter': 'passes'}) }}"
                    class="blog-cat-link {{ filter == 'passes' ? 'active' }}">
-                    <span><i class="bi bi-clock-fill me-1"></i> Passés</span>
+                    <span><i class="bi bi-clock-fill me-1"></i> {{ 'filter.past'|trans }}</span>
                     <span class="blog-cat-count">{{ past|length }}</span>
                 </a>
             </li>
@@ -56,7 +56,7 @@
 
     {% if event_categories is defined and event_categories|length > 0 %}
         <div class="blog-sidebar-block">
-            <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> Catégories</h2>
+            <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> {{ 'filter.categories'|trans }}</h2>
             <ul class="list-unstyled mb-0">
                 {% for category in event_categories %}
                     <li>
@@ -73,7 +73,7 @@
 
     {% if event_tags is defined and event_tags|length > 0 %}
         <div class="blog-sidebar-block">
-            <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> Tags</h2>
+            <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> {{ 'filter.tags'|trans }}</h2>
             <p class="mb-0">
                 {% for tag in event_tags %}
                     <a href="{{ path('app_event_index', {'tag': tag.slug}) }}"
@@ -84,7 +84,7 @@
     {% endif %}
 
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-camera text-gm-green me-1"></i> Derniers souvenirs</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-camera text-gm-green me-1"></i> {{ 'event.sidebar.memories'|trans }}</h2>
         {% for event in past|slice(0, 3) %}
             <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="blog-latest-item">
                 <div class="event-date-badge event-date-badge-past">
@@ -98,7 +98,7 @@
             </a>
         {% else %}
             <p class="text-muted small mb-0">
-                <i class="bi bi-emoji-smile me-1"></i> Les premiers souvenirs arrivent bientôt !
+                <i class="bi bi-emoji-smile me-1"></i> {{ 'event.sidebar.memories_empty'|trans }}
             </p>
         {% endfor %}
     </div>

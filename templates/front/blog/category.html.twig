@@ -1,8 +1,8 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Articles — {{ category.name }} — {{ parent() }}{% endblock %}
+{% block title %}{{ 'blog.category.title'|trans }} — {{ category.name }} — {{ parent() }}{% endblock %}
 {% block meta %}
-    <meta name="description" content="Tous les articles de l'association GéoMonkey classés dans la catégorie « {{ category.name }} ».">
+    <meta name="description" content="{{ 'blog.category.meta'|trans({'%category%': category.name}) }}">
 {% endblock %}
 
 {% block body %}
@@ -12,11 +12,11 @@
 <header class="pres-hero">
     <div class="container position-relative text-center">
         <span class="badge home-hero-badge mb-3">
-            <i class="bi bi-folder2-open me-1"></i> Catégorie
+            <i class="bi bi-folder2-open me-1"></i> {{ 'blog.category.badge'|trans }}
         </span>
         <h1 class="pres-hero-title">{{ category.name }}</h1>
         <p class="home-hero-sub mx-auto mb-0">
-            Tous les articles classés dans « {{ category.name }} ».
+            {{ 'blog.category.sub'|trans({'%category%': category.name}) }}
         </p>
     </div>
 </header>

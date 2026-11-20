@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Modifier mon profil — GéoMonkey{% endblock %}
+{% block title %}{{ 'profile.edit_title'|trans }} — GéoMonkey{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
@@ -11,7 +11,7 @@
                 <div class="col-lg-6">
 
                     <h1 class="text-warning fw-bold mb-4">
-                        <i class="bi bi-pencil me-2"></i>Modifier mon profil
+                        <i class="bi bi-pencil me-2"></i>{{ 'profile.edit_title'|trans }}
                     </h1>
 
                     <div class="card bg-gm-surface border-warning">
@@ -39,11 +39,9 @@
 
                             <div class="d-flex flex-wrap gap-2">
                                 <button type="submit" class="btn btn-gm-yellow fw-semibold">
-                                    <i class="bi bi-check-lg me-1"></i>Enregistrer
+                                    <i class="bi bi-check-lg me-1"></i>{{ 'profile.save'|trans }}
                                 </button>
-                                <a href="{{ path('app_profile') }}" class="btn btn-outline-gm-yellow">
-                                    Annuler
-                                </a>
+                                <a href="{{ path('app_profile') }}" class="btn btn-outline-gm-yellow"> {{ 'profile.cancel'|trans }} </a>
                             </div>
 
                             {{ form_end(form) }}
@@ -52,9 +50,7 @@
 
                     <p class="small text-gm-muted mt-3 mb-0">
                         <i class="bi bi-shield-check me-1"></i>
-                        Protégé contre la falsification de requête (CSRF). Ton email et ton mot de passe
-                        ne se modifient pas ici : contacte le bureau pour l'email, utilise
-                        « Mot de passe oublié » pour le mot de passe.
+                        {{ 'profile.csrf_note'|trans }}
                     </p>
 
                 </div>

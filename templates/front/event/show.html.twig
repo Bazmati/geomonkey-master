@@ -28,12 +28,12 @@
     <div class="container position-relative">
         <p class="mb-2">
             {% if event.isMembersOnly %}
-                <span class="badge bg-gm-yellow text-gm-bg"><i class="bi bi-people me-1"></i> Réservé aux membres</span>
+                <span class="badge bg-gm-yellow text-gm-bg"><i class="bi bi-people me-1"></i> {{ 'event.next.members'|trans }}</span>
             {% endif %}
             {% if isPast %}
-                <span class="badge bg-secondary text-white"><i class="bi bi-clock-history me-1"></i> Événement passé</span>
+                <span class="badge bg-secondary text-white"><i class="bi bi-clock-history me-1"></i> {{ 'event.status.past_event'|trans }}</span>
             {% else %}
-                <span class="badge bg-gm-green text-gm-white"><i class="bi bi-stars me-1"></i> À venir</span>
+                <span class="badge bg-gm-green text-gm-white"><i class="bi bi-stars me-1"></i> {{ 'event.status.upcoming'|trans }}</span>
             {% endif %}
         </p>
         <h1 class="pres-show-hero-title">{{ event.title }}</h1>
@@ -84,7 +84,7 @@
             {% set related_projects = event.projects|filter(p => p.isPublished) %}
             {% if related_projects|length > 0 %}
                 <section class="mt-5">
-                    <h2 class="h4 mb-3"><i class="bi bi-kanban text-gm-green"></i> Projets liés</h2>
+                    <h2 class="h4 mb-3"><i class="bi bi-kanban text-gm-green"></i> {{ 'event.show.related_projects'|trans }}</h2>
                     {% for project in related_projects %}
                         <a href="{{ path('app_project_show', {'slug': project.slug}) }}" class="proj-related mb-2">
                             <i class="bi bi-kanban fs-5 text-gm-green"></i>
@@ -98,7 +98,7 @@
             {% set related_posts = event.blogPosts|filter(p => p.isPublished) %}
             {% if related_posts|length > 0 %}
                 <section class="mt-5">
-                    <h2 class="h4 mb-3"><i class="bi bi-newspaper text-gm-yellow"></i> Articles liés</h2>
+                    <h2 class="h4 mb-3"><i class="bi bi-newspaper text-gm-yellow"></i> {{ 'event.show.related_posts'|trans }}</h2>
                     {% for post in related_posts %}
                         <a href="{{ path('app_blog_show', {'slug': post.slug}) }}" class="proj-related mb-2">
                             <i class="bi bi-newspaper fs-5 text-gm-yellow"></i>
@@ -116,72 +116,72 @@
                 {% if not isPast %}
                     <div class="bg-gm-surface border-gm-green rounded p-3 mb-3 text-center">
                         {% if event.startDate|date('U') >= 'now'|date('U') %}
-                            <p class="small text-muted mb-1"><i class="bi bi-hourglass-split me-1"></i> Ça commence dans</p>
+                            <p class="small text-muted mb-1"><i class="bi bi-hourglass-split me-1"></i> {{ 'event.show.starts_in'|trans }}</p>
                             <span class="gm-countdown badge bg-gm-surface border-gm-yellow text-gm-yellow fs-6 w-100 py-2"
                                   data-controller="countdown"
                                   data-countdown-start-value="{{ event.startDate|date(constant('DATE_ATOM')) }}"
-                                  data-countdown-finished-value="C'est parti !">…</span>
+                                  data-countdown-finished-value="{{ 'event.show.parti'|trans }}">…</span>
                         {% else %}
-                            <p class="mb-0 small text-muted"><i class="bi bi-lightning-charge me-1 text-gm-yellow"></i> L'événement est en cours !</p>
+                            <p class="mb-0 small text-muted"><i class="bi bi-lightning-charge me-1 text-gm-yellow"></i> {{ 'event.show.ongoing'|trans }}</p>
                         {% endif %}
                     </div>
                 {% endif %}
 
                 <div class="bg-gm-surface border-gm-yellow rounded p-3">
-                    <h2 class="h6 mb-3"><i class="bi bi-person-check"></i> Inscription</h2>
+                    <h2 class="h6 mb-3"><i class="bi bi-person-check"></i> {{ 'event.show.registration'|trans }}</h2>
 
                     {% if event.capacity %}
                         <div class="d-flex justify-content-between small mb-1">
-                            <span class="text-muted">Places</span>
+                            <span class="text-muted">{{ 'event.show.seats'|trans }}</span>
                             <strong>{{ participantCount }} / {{ event.capacity }}</strong>
                         </div>
                         {% set gauge = (participantCount / event.capacity * 100)|round %}
-                        <div class="progress mb-3" role="progressbar" aria-label="Places occupées"
+                        <div class="progress mb-3" role="progressbar" aria-label="{{ 'event.show.seats_aria'|trans }}"
                              aria-valuenow="{{ gauge }}" aria-valuemin="0" aria-valuemax="100">
                             <div class="progress-bar {{ gauge >= 100 ? 'bg-danger' : 'bg-gm-green' }}"
                                  style="width: {{ gauge }}%"></div>
                         </div>
                     {% elseif participantCount > 0 %}
                         <p class="text-muted small mb-3">
-                            {{ participantCount }} inscrit{{ participantCount > 1 ? 's' : '' }}
+                            {{ 'event.show.registered_count'|trans({'%count%': participantCount}) }}
                         </p>
                     {% endif %}
 
                     {% if isPast %}
-                        <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> Inscriptions closes : cet événement est terminé.</p>
+                        <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> {{ 'event.show.closed'|trans }}</p>
                     {% elseif isRegistered %}
-                        <span class="badge bg-gm-green text-white mb-2"><i class="bi bi-check-circle"></i> Vous êtes inscrit</span>
+                        <span class="badge bg-gm-green text-white mb-2"><i class="bi bi-check-circle"></i> {{ 'event.show.registered'|trans }}</span>
                         <form method="post" action="{{ path('app_event_unregister', {id: event.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('unregister' ~ event.id) }}">
                             <button type="submit" class="btn btn-outline-gm-green btn-sm w-100">
-                                <i class="bi bi-x-circle"></i> Annuler mon inscription
+                                <i class="bi bi-x-circle"></i> {{ 'event.show.unregister'|trans }}
                             </button>
                         </form>
                     {% elseif not app.user %}
                         <a href="{{ path('app_login') }}" class="btn btn-gm-green w-100">
-                            <i class="bi bi-box-arrow-in-right"></i> Se connecter pour participer
+                            <i class="bi bi-box-arrow-in-right"></i> {{ 'event.show.login_to_join'|trans }}
                         </a>
                     {% elseif event.isMembersOnly and not is_active_member %}
                         <button type="button" class="btn btn-gm-green w-100" disabled>
-                            <i class="bi bi-person-plus"></i> Je participe
+                            <i class="bi bi-person-plus"></i> {{ 'event.show.join'|trans }}
                         </button>
-                        <p class="text-muted small mt-2 mb-0">Réservé aux membres actifs — <a href="{{ path('app_membership_register') }}">rejoins l'assoc'</a> pour participer !</p>
+                        <p class="text-muted small mt-2 mb-0">{{ 'event.show.members_note'|trans({'%url%': path('app_membership_register')})|raw }}</p>
                     {% elseif isFull %}
                         <button type="button" class="btn btn-gm-green w-100" disabled>
-                            <i class="bi bi-person-x"></i> Complet
+                            <i class="bi bi-person-x"></i> {{ 'event.show.full'|trans }}
                         </button>
                     {% else %}
                         <form method="post" action="{{ path('app_event_register', {id: event.id}) }}">
                             <input type="hidden" name="_token" value="{{ csrf_token('register' ~ event.id) }}">
                             <button type="submit" class="btn btn-gm-green w-100">
-                                <i class="bi bi-person-plus"></i> Je participe
+                                <i class="bi bi-person-plus"></i> {{ 'event.show.join'|trans }}
                             </button>
                         </form>
                     {% endif %}
                 </div>
 
                 <div class="bg-gm-surface border-gm-yellow rounded p-3 mt-3">
-                    <h2 class="h6 mb-3"><i class="bi bi-pin-map"></i> Infos pratiques</h2>
+                    <h2 class="h6 mb-3"><i class="bi bi-pin-map"></i> {{ 'event.show.practical'|trans }}</h2>
                     <p class="small mb-2">
                         <i class="bi bi-calendar text-gm-green me-1"></i>
                         {{ event.startDate|date('d/m/Y à H\\h i') }}<br>
@@ -196,7 +196,7 @@
                         </p>
                     {% endif %}
                     <a href="{{ path('app_event_ics', {id: event.id}) }}" class="btn btn-outline-gm-green btn-sm w-100 mt-2">
-                        <i class="bi bi-calendar-plus"></i> Ajouter à mon calendrier (.ics)
+                        <i class="bi bi-calendar-plus"></i> {{ 'event.next.calendar'|trans }} (.ics)
                     </a>
                 </div>
             </div>

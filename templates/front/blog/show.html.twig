@@ -32,13 +32,13 @@
                    class="badge bg-gm-green text-gm-white text-decoration-none">{{ post.category.name }}</a>
             {% endif %}
             <span class="badge bg-gm-surface border-gm-yellow text-gm-text">
-                <i class="bi bi-clock me-1"></i> {{ read_time }} min de lecture
+                <i class="bi bi-clock me-1"></i> {{ read_time }} {{ 'blog.read_suffix'|trans }}
             </span>
         </p>
         <h1 class="pres-show-hero-title">{{ post.title }}</h1>
         <p class="pres-show-hero-excerpt mb-0">
             <i class="bi bi-person-circle me-1"></i>
-            {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
+            {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau'|trans }}
             — {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
         </p>
     </div>
@@ -64,9 +64,9 @@
 
                 <p class="text-muted small mt-4 mb-0">
                     {% if post.updatedAt and post.updatedAt > post.createdAt %}
-                        <i class="bi bi-pencil me-1"></i> Article mis à jour le {{ post.updatedAt|date('d/m/Y') }}
+                        <i class="bi bi-pencil me-1"></i> {{ 'blog.show.updated'|trans({'%date%': post.updatedAt|date('d/m/Y')}) }}
                     {% else %}
-                        <i class="bi bi-check2-circle me-1"></i> Merci d'avoir lu jusqu'ici !
+                        <i class="bi bi-check2-circle me-1"></i> {{ 'blog.show.thanks'|trans }}
                     {% endif %}
                 </p>
             </article>
@@ -74,7 +74,7 @@
             {# Événements liés #}
             {% if post.events|length > 0 %}
                 <section class="mt-5">
-                    <h2 class="h4 mb-3"><i class="bi bi-calendar-event text-gm-green"></i> Événements liés</h2>
+                    <h2 class="h4 mb-3"><i class="bi bi-calendar-event text-gm-green"></i> {{ 'blog.show.related_events'|trans }}</h2>
                     {% for event in post.events %}
                         <a href="{{ path('app_event_show', {'slug': event.slug}) }}" class="proj-related mb-2">
                             <i class="bi bi-calendar-event fs-5 text-gm-green"></i>
@@ -105,14 +105,14 @@
 
             {# Fin d'article : partage + adhésion #}
             <div class="blog-end text-center mt-5 p-4">
-                <p class="h5 mb-1"><i class="bi bi-heart text-gm-yellow"></i> Tu as aimé cet article ?</p>
-                <p class="text-muted small mb-0">Partage-le autour de toi, ou viens vivre la suite avec nous.</p>
+                <p class="h5 mb-1"><i class="bi bi-heart text-gm-yellow"></i> {{ 'blog.show.enjoyed'|trans }}</p>
+                <p class="text-muted small mb-0">{{ 'blog.show.share_cta'|trans }}</p>
                 <div class="mt-3 d-flex flex-wrap justify-content-center gap-2">
                     <a href="{{ path('app_membership_register') }}" class="btn btn-gm-green">
-                        <i class="bi bi-people me-1"></i> Rejoindre l'association
+                        <i class="bi bi-people me-1"></i> {{ 'blog.show.join'|trans }}
                     </a>
                     <a href="{{ path('app_project_index') }}" class="btn btn-outline-gm-green">
-                        <i class="bi bi-kanban me-1"></i> Voir nos projets
+                        <i class="bi bi-kanban me-1"></i> {{ 'blog.show.view_projects'|trans }}
                     </a>
                 </div>
             </div>
@@ -123,7 +123,7 @@
             {# À lire aussi #}
             {% if related|length > 0 %}
                 <section class="mt-5">
-                    <h2 class="h4 mb-3"><i class="bi bi-bookmarks text-gm-green"></i> À lire aussi</h2>
+                    <h2 class="h4 mb-3"><i class="bi bi-bookmarks text-gm-green"></i> {{ 'blog.show.also_read'|trans }}</h2>
                     <div class="row g-4">
                         {% for r in related %}
                             {% set r_img = image_url(r, 'medium') %}
@@ -135,7 +135,7 @@
                                         <div class="blog-card-overlay">
                                             <h3 class="blog-card-title h6">{{ r.title }}</h3>
                                             <span class="proj-card-cta">
-                                                Lire <i class="bi bi-arrow-right"></i>
+                                                {{ 'blog.related.read'|trans }} <i class="bi bi-arrow-right"></i>
                                             </span>
                                         </div>
                                     </article>

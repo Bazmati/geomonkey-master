@@ -1,50 +1,43 @@
-i18n Lot 2a — Formulaires front (connexion, inscription, don)
-==============================================================
+# i18n Lot 3 : partials + pages de contenu restantes (front uniquement)
 
-PÉRIMÈTRE :
-- 12 templates convertis : security/{login,forgot_password,reset_password},
-  membership/{register,payment_required,success,check_email,wait_validation,cancel},
-  donation/{index,success,cancel}
-- Textes statiques + placeholders des inputs (les placeholders inline sont
-  traduits via clés ; les 3 templates à formulaire ont aussi leurs pitchs
-  "pourquoi rejoindre/donner" traduits)
-- Catalogues : 153 -> 278 clés symétriques (125 nouvelles : auth.*, register.*, donation.*,
-  + réut. form.email, legal.back_home)
+## Périmètre (12 templates)
+- templates/front/event/_sidebar.html.twig    (filtres, catégories, tags, prochains rendez-vous, souvenirs)
+- templates/front/event/show.html.twig       (badges, inscription, countdown, infos pratiques, .ics)
+- templates/front/blog/_list.html.twig       (carte à la une, vide, lecture, badge Bureau)
+- templates/front/blog/_sidebar.html.twig
+- templates/front/blog/_share_buttons.html.twig (partages + copier le lien)
+- templates/front/blog/category.html.twig
+- templates/front/blog/show.html.twig        (lecture, remerciement, partage, à lire aussi)
+- templates/front/presentation/index.html.twig
+- templates/front/presentation/show.html.twig
+- templates/front/profile/show.html.twig
+- templates/front/profile/edit.html.twig
+- templates/front/newsletter/unsubscribe.html.twig
 
-FRONTIÈRE (à connaître) :
-- Les LIBELLÉS des champs Symfony (form_label) viennent des FormType
-  (RegistrationType, DonationType...) : ils restent en FR pour l'instant.
-- Les messages de VALIDATION Symfony (contraintes) restent en FR.
-- Le CONTENU des flashs (addFlash dans les contrôleurs) reste en FR.
-  -> traités dans un Lot 2b ultérieur (FormType + flashs + validators).
-- Le message d'erreur de connexion est auto-adapté : error.messageKey|trans(...,'security')
-  suit la locale (domaine security de Symfony).
+Non couverts (volontairement) :
+- gallery_image/_picture.html.twig (shim déprécié, aucun texte)
+- tag.html.twig (fragment breadcrumb) — le helper breadcrumb() PHP reste FR pour l'instant
 
-Détail technique : les clés contenant du HTML (register.price_label,
-register.pay.secure, register.check.warn, register.wait.important,
-register.cancel.no_fee, auth.already_logged) sont rendues avec |raw
-(car Twig auto-escape la sortie de trans).
+## Catalogues
+- translations/messages.fr.php + messages.en.php : **360 clés** chacune
+  (278 du lot 2a + 82 nouvelles du lot 3), symétriques, sans doublon.
+- Remplacez vos fichiers du lot 2a par ceux-ci (fusion déjà faite).
+- Nouvelles familles : event.sidebar.*, event.show.*, event.status.past_event,
+  blog.* (list, sidebar, share, category, show, read_suffix), presentation.*,
+  profile.*, badge.visitor, newsletter.*.
+- Quelques messages contiennent du HTML (lien "rejoins l'assoc'", <strong>%email%</strong>)
+  rendus avec |raw dans les templates.
 
-Contenu du zip (extraire à la racine du projet) :
-  templates/front/security/login.html.twig
-  templates/front/security/forgot_password.html.twig
-  templates/front/security/reset_password.html.twig
-  templates/front/membership/register.html.twig
-  templates/front/membership/payment_required.html.twig
-  templates/front/membership/success.html.twig
-  templates/front/membership/check_email.html.twig
-  templates/front/membership/wait_validation.html.twig
-  templates/front/membership/cancel.html.twig
-  templates/front/donation/index.html.twig
-  templates/front/donation/success.html.twig
-  templates/front/donation/cancel.html.twig
-  translations/messages.fr.php  (278 clés, lots 0+1a+1b+1c+2a fusionnés)
-  translations/messages.en.php  (278 clés, symétrique)
-  tests/Controller/Front/FormTranslationTest.php  (2 tests)
+## Test
+- tests/Controller/Front/ContentTranslationTest.php (2 tests) :
+  sidebar événements + hero Présentation, en FR par défaut puis EN après /locale/en.
+  Aucune fixture requise (assertions sur textes toujours rendus).
 
-Tests :
-  php bin/phpunit --filter FormTranslationTest
-  php bin/phpunit
-
-Déploiement : commit + push, puis CT 202 : git pull, cache:clear --env=prod,
-reload php8.4-fpm (catalogues + templates passent par l'opcache).
+## Déploiement (rituel habituel)
+1. Extraire ce zip à la racine du projet (il écrase les 12 templates, les 2 catalogues, ajoute le test).
+2. php bin/phpunit
+3. git add/commit/push
+4. Serveur (CT 202) :
+   pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && php bin/console cache:clear --env=prod && systemctl reload php8.4-fpm'
+5. Vérifier sur geomonkey.fr : /evenements (sidebar), /presentation, /blog (catégorie),
+    et une fiche événement/article pour les badges et boutons i18n.

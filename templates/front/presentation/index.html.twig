@@ -1,7 +1,7 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Présentation - GéoMonkey{% endblock %}
-{% block meta_description %}Découvre GéoMonkey : notre mission, nos valeurs, notre histoire et notre équipe. Une association culturelle et conviviale ouverte à tous.{% endblock %}
+{% block title %}{{ 'nav.presentation'|trans }} - GéoMonkey{% endblock %}
+{% block meta_description %}{{ 'presentation.meta'|trans }}{% endblock %}
 
 {% block body %}
     {% include 'partials/_navbar.html.twig' %}
@@ -10,13 +10,11 @@
     <header class="pres-hero">
         <div class="container position-relative text-center">
             <span class="badge home-hero-badge mb-3">
-                <i class="bi bi-info-circle me-1"></i> Qui sommes-nous ?
+                <i class="bi bi-info-circle me-1"></i> {{ 'presentation.badge'|trans }}
             </span>
-            <h1 class="pres-hero-title">Présentation de GéoMonkey</h1>
+            <h1 class="pres-hero-title">{{ 'presentation.hero_title'|trans }}</h1>
             <p class="home-hero-sub mx-auto mb-0">
-                Une assoc' qui rassemble les jeunes et les moins jeunes autour
-                de projets culturels qui font vibrer. Découvre qui nous sommes,
-                ce qui nous anime, et ce qu'on t'a réservé.
+                {{ 'presentation.sub'|trans }}
             </p>
         </div>
     </header>
@@ -27,7 +25,7 @@
         {% if pages is empty %}
             <div class="alert alert-gm-info">
                 <i class="bi bi-info-circle me-2"></i>
-                La présentation arrive bientôt !
+                {{ 'presentation.empty'|trans }}
             </div>
         {% else %}
             <div class="pres-list">
@@ -46,7 +44,7 @@
                                         {{ page.content|slice(0, 180)|trim }}{% if page.content|length > 180 %}…{% endif %}
                                     </p>
                                     <span class="pres-card-cta">
-                                        Lire la page <i class="bi bi-arrow-right ms-1"></i>
+                                        {{ 'presentation.read'|trans }} <i class="bi bi-arrow-right ms-1"></i>
                                     </span>
                                 </div>
                             </div>

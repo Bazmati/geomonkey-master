@@ -3,7 +3,7 @@
    Image = fond plein cadre + dégradé + texte par-dessus #}
 {% if posts is empty %}
     <div class="alert alert-gm-info">
-        <i class="bi bi-info-circle me-2"></i> Aucun article publié pour le moment. Revenez bientôt !
+        <i class="bi bi-info-circle me-2"></i> {{ 'blog.list.empty'|trans }}
     </div>
 {% else %}
     {% set featured = posts|first %}
@@ -16,7 +16,7 @@
                  {% if featured_img %}style="background-image: url('{{ featured_img }}')"{% endif %}>
             <div class="blog-card-overlay">
                 <span class="badge bg-gm-yellow text-gm-bg mb-2">
-                    <i class="bi bi-star me-1"></i> À la une
+                    <i class="bi bi-star me-1"></i> {{ 'blog.list.featured'|trans }}
                     {% if featured.category %} · {{ featured.category.name }}{% endif %}
                 </span>
                 <h2 class="blog-card-title">{{ featured.title }}</h2>
@@ -25,12 +25,12 @@
                 </p>
                 <p class="blog-card-meta mb-2">
                     <i class="bi bi-person"></i>
-                    {{ featured.author ? (featured.author.firstName ~ ' ' ~ featured.author.lastName) : 'Bureau' }}
+                    {{ featured.author ? (featured.author.firstName ~ ' ' ~ featured.author.lastName) : 'Bureau'|trans }}
                     · <i class="bi bi-calendar"></i> {{ (featured.publishedAt ?? featured.createdAt)|date('d/m/Y') }}
-                    · {{ ((featured.content|striptags|split(' ')|length) / 200)|round(1, 'ceil') }} min de lecture
+                    · {{ ((featured.content|striptags|split(' ')|length) / 200)|round(1, 'ceil') }} {{ 'blog.read_suffix'|trans }}
                 </p>
                 <span class="proj-card-cta">
-                    Lire l'article <i class="bi bi-arrow-right"></i>
+                    {{ 'blog.list.read'|trans }} <i class="bi bi-arrow-right"></i>
                 </span>
             </div>
         </article>
@@ -54,12 +54,12 @@
                                 <h3 class="blog-card-title">{{ post.title }}</h3>
                                 <p class="blog-card-meta mb-2">
                                     <i class="bi bi-person"></i>
-                                    {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau' }}
+                                    {{ post.author ? (post.author.firstName ~ ' ' ~ post.author.lastName) : 'Bureau'|trans }}
                                     · {{ (post.publishedAt ?? post.createdAt)|date('d/m/Y') }}
                                     · {{ ((post.content|striptags|split(' ')|length) / 200)|round(1, 'ceil') }} min
                                 </p>
                                 <span class="proj-card-cta">
-                                    Lire l'article <i class="bi bi-arrow-right"></i>
+                                    {{ 'blog.list.read'|trans }} <i class="bi bi-arrow-right"></i>
                                 </span>
                             </div>
                         </article>

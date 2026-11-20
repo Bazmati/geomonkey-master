@@ -2,7 +2,7 @@
    Variables attendues : latest, categories, tags (+ currentTag / currentCategory en option). #}
 <aside class="blog-sidebar">
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> Derniers articles</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-clock-history text-gm-green me-1"></i> {{ 'blog.sidebar.latest'|trans }}</h2>
         {% for post in latest %}
             <a href="{{ path('app_blog_show', {'slug': post.slug}) }}" class="blog-latest-item">
                 {% set img = image_url(post, 'small') %}
@@ -20,7 +20,7 @@
     </div>
 
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> Catégories</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-folder2-open text-gm-yellow me-1"></i> {{ 'filter.categories'|trans }}</h2>
         <ul class="list-unstyled mb-0">
             {% for category in categories %}
                 <li>
@@ -35,7 +35,7 @@
     </div>
 
     <div class="blog-sidebar-block">
-        <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> Tags</h2>
+        <h2 class="blog-sidebar-title"><i class="bi bi-tags text-gm-green me-1"></i> {{ 'filter.tags'|trans }}</h2>
         <p class="mb-0">
             {% for tag in tags %}
                 <a href="{{ path('app_blog_tag', {'slug': tag.slug}) }}"
