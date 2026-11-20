@@ -1,0 +1,106 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Mon profil — GéoMonkey{% endblock %}
+{% block meta_description %}Consulte et modifie tes informations personnelles sur GéoMonkey.{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+
+                    <h1 class="text-warning fw-bold mb-4">
+                        <i class="bi bi-person-vcard me-2"></i>Mon profil
+                    </h1>
+
+                    {# ===== Identité ===== #}
+                    <div class="card bg-gm-surface border-warning mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h6 text-gm-muted text-uppercase mb-3">Mes informations</h2>
+
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Prénom</div>
+                                <div class="col-sm-8">{{ app.user.firstName ?? '—' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Nom</div>
+                                <div class="col-sm-8">{{ app.user.lastName ?? '—' }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Adresse email</div>
+                                <div class="col-sm-8">{{ app.user.email }}</div>
+                            </div>
+
+                            <p class="small text-gm-muted mb-0">
+                                <i class="bi bi-info-circle me-1"></i>
+                                Pour changer d'adresse email, contacte le bureau de l'asso.
+                            </p>
+                        </div>
+                    </div>
+
+                    {# ===== Statut ===== #}
+                    <div class="card bg-gm-surface border-warning mb-4">
+                        <div class="card-body p-4">
+                            <h2 class="h6 text-gm-muted text-uppercase mb-3">Mon statut</h2>
+
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Fonction</div>
+                                <div class="col-sm-8">
+                                    {% if app.user.officeFunctionLabel %}
+                                        <span class="badge bg-success">{{ app.user.officeFunctionLabel }}</span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Visiteur</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Adhésion</div>
+                                <div class="col-sm-8">
+                                    {% if app.user.hasActiveMembership() %}
+                                        <span class="badge bg-success">
+                                            Membre actif jusqu'au {{ app.user.membershipValidDate|date('d/m/Y') }}
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-secondary">Pas d'adhésion active</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Membre depuis</div>
+                                <div class="col-sm-8">{{ app.user.createdAt|date('d/m/Y') }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4 text-gm-muted">Droit à l'image</div>
+                                <div class="col-sm-8">
+                                    {% if app.user.imageConsent %}
+                                        <span class="text-success"><i class="bi bi-check-circle me-1"></i>Consenti</span>
+                                    {% else %}
+                                        <span class="text-gm-muted"><i class="bi bi-x-circle me-1"></i>Non consenti</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <p class="small text-gm-muted mb-0">
+                                <i class="bi bi-shield-check me-1"></i>
+                                Mot de passe oublié ? Utilise « Mot de passe oublié » depuis la
+                                <a href="{{ path('app_login') }}" class="link-warning">page de connexion</a>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="d-flex flex-wrap gap-2">
+                        <a href="{{ path('app_profile_edit') }}" class="btn btn-gm-yellow fw-semibold">
+                            <i class="bi bi-pencil me-2"></i>Modifier mes informations
+                        </a>
+                        <a href="{{ path('app_home') }}" class="btn btn-outline-gm-yellow">
+                            <i class="bi bi-house me-2"></i>Retour à l'accueil
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

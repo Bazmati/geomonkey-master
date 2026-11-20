@@ -1,0 +1,39 @@
+GEO MONKEY — PAGE « MON PROFIL » (FRONT) v1
+============================================
+
+CONTENU (a extraire a la racine du projet geomonkey-master) :
+- src/Controller/Front/ProfileController.php  (NOUVEAU)
+- src/Form/ProfileType.php                    (NOUVEAU)
+- templates/front/profile/show.html.twig       (NOUVEAU)
+- templates/front/profile/edit.html.twig       (NOUVEAU)
+- tests/Controller/Front/ProfileControllerTest.php (NOUVEAU)
+- templates/partials/_navbar.html.twig         (REMPLACE : ajout
+  de l'entree « Mon profil » dans le menu utilisateur deroulant)
+- LISEZMOI.txt (ce fichier, ne pas copier)
+
+FONCTIONNALITE :
+- GET  /profil          : consultation (identite, statut bureau,
+  adhesion active + date, membre depuis, droit a l'image)
+- GET/POST /profil/modifier : edition prenom / nom / consentement
+  photo. Horodatage RGPD automatique a l'activation, effacement au
+  retrait. CSRF natif Symfony.
+- Comportement v1 assume : email NON modifiable (contact bureau),
+  mot de passe via le flux « Mot de passe oublie » existant.
+
+RIQUE CONNU : la navbar fournie remplace le fichier existant a
+l'identique pres de l'entree « Mon profil ». Si tu as modifie ta
+navbar depuis ta derniere synchronisation, verifie le diff avant
+d'ecraser (git diff templates/partials/_navbar.html.twig).
+
+TESTS : php bin/phpunit --filter ProfileControllerTest
+(4 tests : redirection invite, affichage, edition + horodatage
+RGPD, rejet prenom vide)
+
+RIUEL : local -> tests verts -> commit -> push ->
+pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && \
+  php bin/console cache:clear --env=prod && \
+  chown -R www-data:www-data var && systemctl reload php8.4-fpm'
+
+VERIFICATION PROD : se connecter sur www.geomonkey.fr -> menu
+utilisateur -> « Mon profil » -> verifier les 2 cartes, editer le
+prenom, flash vert, la navbar affiche le nouveau prenom.

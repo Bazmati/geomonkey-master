@@ -1,0 +1,64 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier mon profil — GéoMonkey{% endblock %}
+
+{% block body %}
+    {% include 'partials/_navbar.html.twig' %}
+
+    <section class="py-5">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-6">
+
+                    <h1 class="text-warning fw-bold mb-4">
+                        <i class="bi bi-pencil me-2"></i>Modifier mon profil
+                    </h1>
+
+                    <div class="card bg-gm-surface border-warning">
+                        <div class="card-body p-4">
+                            {{ form_start(form) }}
+                            {{ form_errors(form) }}
+
+                            <div class="mb-3">
+                                {{ form_label(form.firstName) }}
+                                {{ form_widget(form.firstName) }}
+                                {{ form_errors(form.firstName) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.lastName) }}
+                                {{ form_widget(form.lastName) }}
+                                {{ form_errors(form.lastName) }}
+                            </div>
+
+                            <div class="form-check mb-4">
+                                {{ form_widget(form.imageConsent) }}
+                                {{ form_label(form.imageConsent, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                {{ form_errors(form.imageConsent) }}
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-2">
+                                <button type="submit" class="btn btn-gm-yellow fw-semibold">
+                                    <i class="bi bi-check-lg me-1"></i>Enregistrer
+                                </button>
+                                <a href="{{ path('app_profile') }}" class="btn btn-outline-gm-yellow">
+                                    Annuler
+                                </a>
+                            </div>
+
+                            {{ form_end(form) }}
+                        </div>
+                    </div>
+
+                    <p class="small text-gm-muted mt-3 mb-0">
+                        <i class="bi bi-shield-check me-1"></i>
+                        Protégé contre la falsification de requête (CSRF). Ton email et ton mot de passe
+                        ne se modifient pas ici : contacte le bureau pour l'email, utilise
+                        « Mot de passe oublié » pour le mot de passe.
+                    </p>
+
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
