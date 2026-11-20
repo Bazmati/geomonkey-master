@@ -7,9 +7,14 @@
     <div class="p-4">
         <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
             <h1 class="text-gm-green mb-0"><i class="bi bi-card-checklist"></i> Toutes les adhésions</h1>
-            <a href="{{ path('app_admin_membership_requests') }}" class="btn btn-gm-surface btn-sm">
-                <i class="bi bi-clock-history me-1"></i> Demandes en attente
-            </a>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{{ path('app_admin_membership_offline') }}" class="btn btn-gm-green btn-sm">
+                    <i class="bi bi-cash-coin me-1"></i> Encaisser hors-ligne
+                </a>
+                <a href="{{ path('app_admin_membership_requests') }}" class="btn btn-gm-surface btn-sm">
+                    <i class="bi bi-clock-history me-1"></i> Demandes en attente
+                </a>
+            </div>
         </div>
 
         {# ===== Chiffres clés ===== #}
@@ -94,7 +99,10 @@
                                             {% endif %}
                                         </td>
                                         <td data-label="Statut">
-                                            {% if not membership.isActive %}
+                                            {% if membership.stripePaymentId and membership.stripePaymentId starts with 'MANUEL-' %}
+                                                <span class="badge text-bg-success">payée</span>
+                                                <span class="badge text-bg-info">hors-ligne</span>
+                                            {% elseif not membership.isActive %}
                                                 <span class="badge text-bg-secondary">inactive</span>
                                             {% elseif membership.paymentStatus == 'paid' %}
                                                 <span class="badge text-bg-success">payée</span>

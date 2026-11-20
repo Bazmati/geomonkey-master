@@ -21,6 +21,9 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/admin/membership', name: 'app_admin_membership_')]
 class MembershipController extends AbstractController
 {
+    /** Moyens de paiement acceptés hors ligne (traçables dans stripe_payment_id) */
+    private const OFFLINE_METHODS = ['especes', 'cheque', 'virement'];
+
     public function __construct(
         private UserRepository $userRepo,
         private MembershipRepository $membershipRepository,
@@ -113,5 +116,131 @@ class MembershipController extends AbstractController
             'memberships' => $memberships,
             'stats' => $stats,
         ]);
+    }
+
+    /**
+     * Encaissement hors-ligne d'une cotisation (espèces, chèque, virement) :
+     * le bureau encaisse en main propre (AG, événement...) sans passer par Stripe.
+     *
+     * Réplique la logique post-paiement du webhook Stripe (createOrUpdateMembership) :
+     * - désactive les memberships existants du membre
+     * - crée une membership paid valable 1 an
+     * - passe le visiteur en membre_actif, confirme l'inscription
+     * - envoie le mail M4 de confirmation
+     *
+     * Traçabilité : stripe_payment_id = 'MANUEL-<moyen>-<date>' (pas de migration
+     * de schéma nécessaire, la colonne existe déjà).
+     */
+    #[Route('/hors-ligne', name: 'offline', methods: ['GET', 'POST'])]
+    public function offline(Request $request): Response
+    {
+        // Montant par défaut : le tarif courant si défini
+        $defaultAmount = 15.00;
+        try {
+            $defaultAmount = $this->feeService->getCurrentAmountInEuros();
+        } catch (\RuntimeException) {
+            // aucun tarif défini : fallback affiché, l'agent saisit le montant réel
+        }
+
+        if (!$request->isMethod('POST')) {
+            return $this->render('admin/membership/offline.html.twig', [
+                'users' => $this->userRepo->findBy([], ['lastName' => 'ASC', 'firstName' => 'ASC']),
+                'default_amount' => $defaultAmount,
+                'methods' => self::OFFLINE_METHODS,
+            ]);
+        }
+
+        // ----- Traitement du formulaire -----
+        if (!$this->isCsrfTokenValid('offline_payment', (string) $request->request->get('_token'))) {
+            $this->addFlash('error', 'Token CSRF invalide.');
+            return $this->redirectToRoute('app_admin_membership_offline');
+        }
+
+        /** @var User|null $member */
+        $member = $this->userRepo->find((int) $request->request->get('user_id'));
+        if ($member === null) {
+            $this->addFlash('error', 'Membre introuvable.');
+            return $this->redirectToRoute('app_admin_membership_offline');
+        }
+
+        $method = (string) $request->request->get('method');
+        if (!in_array($method, self::OFFLINE_METHODS, true)) {
+            $this->addFlash('error', 'Moyen de paiement invalide.');
+            return $this->redirectToRoute('app_admin_membership_offline');
+        }
+
+        // Montant saisi en euros (virgule ou point acceptés)
+        $amountCents = (int) round(((float) str_replace(',', '.', (string) $request->request->get('amount'))) * 100);
+        if ($amountCents <= 0) {
+            $this->addFlash('error', 'Merci de saisir un montant valide.');
+            return $this->redirectToRoute('app_admin_membership_offline');
+        }
+
+        // Désactiver les memberships existants du membre (même règle que le webhook)
+        foreach ($member->getMemberships() as $existing) {
+            $existing->setIsActive(false);
+        }
+
+        $nowImmutable = new \DateTimeImmutable();
+        $expiresAt = $nowImmutable->add(new \DateInterval('P1Y'));
+
+        $membership = new Membership();
+        $membership->setUser($member);
+        $membership->setAmount($amountCents);
+        $membership->setIsActive(true);
+        $membership->setStartedAt($nowImmutable);
+        $membership->setExpiresAt($expiresAt);
+        $membership->setStripePaymentId(sprintf(
+            'MANUEL-%s-%s',
+            $method,
+            $nowImmutable->format('Ymd-His')
+        ));
+        $membership->setPaymentStatus('paid');
+
+        $member->addMembership($membership);
+
+        // Si le membre était un simple visiteur -> membre actif (règle du webhook)
+        if ($member->getOfficeFunction() === \App\Enum\OfficeFunction::None) {
+            $member->setOfficeFunction(\App\Enum\OfficeFunction::ActiveMember);
+        }
+
+        $member->setIsRegistrationConfirmed(true);
+        $member->setRegistrationValidatedAt($nowImmutable);
+        $member->setMembershipValidUntil(\DateTime::createFromImmutable($expiresAt));
+
+        $this->em->persist($membership);
+        $this->em->flush();
+
+        // M4 : mail de confirmation (non bloquant, même principe que le webhook)
+        try {
+            $this->mailService->sendMembershipConfirmedEmail($member);
+        } catch (\Throwable) {
+            $this->addFlash('warning', sprintf(
+                'Cotisation de %s encaissée (%s), mais l\'email de confirmation n\'a pas pu être envoyé.',
+                $member->getEmail(),
+                $this->methodLabel($method)
+            ));
+            return $this->redirectToRoute('app_admin_membership_list');
+        }
+
+        $this->addFlash('success', sprintf(
+            'Cotisation de %s encaissée hors-ligne (%s) : adhésion valable jusqu\'au %s.',
+            $member->getEmail(),
+            $this->methodLabel($method),
+            $expiresAt->format('d/m/Y')
+        ));
+
+        return $this->redirectToRoute('app_admin_membership_list');
+    }
+
+    /** Libellé lisible du moyen de paiement hors-ligne */
+    private function methodLabel(string $method): string
+    {
+        return match ($method) {
+            'especes' => 'espèces',
+            'cheque' => 'chèque',
+            'virement' => 'virement',
+            default => $method,
+        };
     }
 }

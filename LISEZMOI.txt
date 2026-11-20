@@ -1,41 +1,48 @@
-# i18n Lot 2c : fil d'Ariane bilingue + derniers fragments (front)
+# Encaisser une cotisation hors-ligne
 
-## Périmètre
-- src/Twig/BreadcrumbExtension.php
-  TranslatorInterface injecté (3e argument du constructeur).
-  Les libellés des routes FRONT sont traduits via les clés nav.* du catalogue
-  (nav.home, nav.blog, nav.events, nav.gallery, nav.presentation, nav.join).
-  Les libellés du backoffice restent FR (hors périmètre tant que pas multi-assos).
-  Les libellés d'entités (titre d'un événement, nom d'un tag...) viennent de la
-  base et ne sont pas traduits (contenu DB, frontière i18n connue).
-- templates/front/tag.html.twig
-  Le fragment fil d'Ariane des pages tag utilise maintenant
-  'nav.home'|trans et 'nav.blog'|trans au lieu de « Accueil » / « Actualités ».
-- src/Controller/Front/MembershipController.php
-  Le flash « Aucun tarif d'adhésion défini en base de données » (quand aucun
-  MembershipFee n'existe) passe par la clé flash.register.no_fee au lieu de
-  $e->getMessage(). Le texte FR est IDENTIQUE à l'original (les tests
-  existants_ASSERT_FR passent inchangés).
+## Besoin
+Le bureau encaisse parfois des cotisations en main propre (espèces à l'AG,
+chèque, virement) sans passer par Stripe. Aucune trace n'existait dans l'app :
+il fallait créer l'adhésion « à la main » en base.
 
-## Catalogues
-- translations/messages.fr.php + messages.en.php : **421 clés** chacune
-  (420 du lot 2b + 1 nouvelle : flash.register.no_fee).
+## Fonctionnement
+Bouton « Encaisser hors-ligne » sur /admin/membership/list → page
+/admin/membership/hors-ligne (accès bureau : voter ENTITY_EDIT, comme le
+reste du module adhésions).
 
-## Test
-- tests/Controller/Front/BreadcrumbTranslationTest.php (2 tests) :
-  fil d'Ariane de /presentation et /evenements en FR par défaut puis EN.
+Formulaire : membre (tous les comptes), montant encaissé en € (défaut : le
+tarif courant), moyen de paiement (espèces / chèque / virement).
 
-## Piège connu
-BreadcrumbExtension a maintenant 3 arguments de constructeur
-(RequestStack, UrlGeneratorInterface, TranslatorInterface). Si un test
-l'instancie directement, il doit passer le translator (mock TranslatorInterface).
+À la validation, l'action réplique la logique post-paiement du webhook
+Stripe (createOrUpdateMembership) :
+- désactive les adhésions existantes du membre
+- crée une Membership paid, active, valable 1 an (startedAt/expiresAt)
+- trace le paiement dans stripe_payment_id : « MANUEL-<moyen>-<Ymd-His> »
+  (pas de migration de schéma, la colonne existait)
+- passe le simple visiteur en membre_actif (OfficeFunction::None → ActiveMember)
+- confirme l'inscription (isRegistrationConfirmed, registrationValidatedAt)
+- met à jour membershipValidUntil (paiement + 1 an)
+- envoie le mail M4 de confirmation (non bloquant comme dans le webhook)
+
+Pas de doublon Stripe : aucun appel à l'API, aucune session de paiement.
+
+## Fichiers
+- src/Controller/Admin/MembershipController.php (action « offline » ajoutée)
+- templates/admin/membership/offline.html.twig (nouveau)
+- templates/admin/membership/list.html.twig (bouton « Encaisser hors-ligne »
+  dans l'en-tête + badge « hors-ligne » sur les paiements MANUEL-*)
+- tests/Controller/Admin/MembershipOfflinePaymentTest.php (3 tests)
+
+## Tests
+php bin/phpunit tests/Controller/Admin/MembershipOfflinePaymentTest.php
+Le trésorier peut repérer les encaissements manuels dans la liste :
+badge « hors-ligne » à côté de « payée ».
 
 ## Déploiement (rituel habituel)
-1. Extraire à la racine du projet (5 fichiers écrasés + 1 nouveau test).
+1. Extraire à la racine du projet.
 2. php bin/phpunit
 3. git add/commit/push
 4. CT 202 : git pull + cache:clear --env=prod + reload php8.4-fpm
-5. Vérifier en EN : /evenements (Accueil > Événements devient Home > Events),
-   /presentation (About), une catégorie ou un tag de blog (fil du fragment tag),
-   et /inscription sans tarif en base (flash traduit — non testable en prod
-   puisqu'un tarif existe).
+5. Vérifier en prod : bouton sur /admin/membership/list, encaissement d'un
+   test en prod avec un vrai membre du bureau puis vérifier la liste et le
+   mail M4 reçus.

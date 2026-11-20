@@ -130,6 +130,6 @@
 </nav>
 
 {# Messages flash : juste sous la navbar, sur toutes les pages #}
-{% if app.flashes %}
-{% include 'partials/_flash.html.twig' %}
+{% if app.session and app.session.flashbag.peekAll|length > 0 %}
+    {% include 'partials/_flash.html.twig' %}
 {% endif %}
