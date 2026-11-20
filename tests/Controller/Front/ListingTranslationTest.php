@@ -23,15 +23,17 @@ class ListingTranslationTest extends WebTestCase
 
         $client->request('GET', $this->url('app_event_index'));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('La vie de l\'assoc\', jour après jour', $client->getResponse()->getContent());
+        // On assert sur le texte du Crawler (et non sur le HTML brut)
+        // car les apostrophes droites sont échappées en &#039; par Twig.
+        $this->assertSelectorTextContains('h1.pres-hero-title', "La vie de l'assoc', jour après jour");
 
         $client->request('GET', $this->url('app_project_index'));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Des idées qui prennent vie', $client->getResponse()->getContent());
+        $this->assertSelectorTextContains('h1.pres-hero-title', 'Des idées qui prennent vie');
 
         $client->request('GET', $this->url('app_gallery_index'));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Le patchwork des souvenirs', $client->getResponse()->getContent());
+        $this->assertSelectorTextContains('h1.pres-hero-title', 'Le patchwork des souvenirs');
     }
 
     public function testListingPagesAreEnglishAfterSwitch(): void
@@ -42,17 +44,16 @@ class ListingTranslationTest extends WebTestCase
 
         $client->request('GET', $this->url('app_event_index'));
         $this->assertResponseIsSuccessful();
-        $content = $client->getResponse()->getContent();
-        $this->assertStringContainsString('Asso life, day after day', $content);
-        $this->assertStringNotContainsString('event.hero.title', $content);
+        $this->assertSelectorTextContains('h1.pres-hero-title', 'Asso life, day after day');
+        $this->assertStringNotContainsString('event.hero.title', $client->getResponse()->getContent());
 
         $client->request('GET', $this->url('app_project_index'));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('Ideas coming to life', $client->getResponse()->getContent());
+        $this->assertSelectorTextContains('h1.pres-hero-title', 'Ideas coming to life');
 
         $client->request('GET', $this->url('app_gallery_index'));
         $this->assertResponseIsSuccessful();
-        $this->assertStringContainsString('A patchwork of memories', $client->getResponse()->getContent());
+        $this->assertSelectorTextContains('h1.pres-hero-title', 'A patchwork of memories');
         $this->assertStringNotContainsString('gallery.hero.title', $client->getResponse()->getContent());
     }
 }

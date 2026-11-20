@@ -53,7 +53,8 @@ class LoginControllerTest extends WebTestCase
         $this->client->followRedirect();
 
         // Ensure we do not reveal if the user exists or not.
-        self::assertSelectorTextContains('.alert-gm-danger', 'Invalid credentials.');
+        // Message custom affiché par le site (autrefois : 'Invalid credentials.' par défaut Symfony).
+        self::assertSelectorTextContains('.alert-gm-danger', 'Identifiants invalides');
 
         // Denied - Can't login with invalid password.
         $this->client->request('GET', '/login');
@@ -68,7 +69,7 @@ class LoginControllerTest extends WebTestCase
         $this->client->followRedirect();
 
         // Ensure we do not reveal the user exists but the password is wrong.
-        self::assertSelectorTextContains('.alert-gm-danger', 'Invalid credentials.');
+        self::assertSelectorTextContains('.alert-gm-danger', 'Identifiants invalides');
 
         // Success - Login with valid credentials is allowed.
         $this->client->submitForm('Se connecter', [

@@ -1,38 +1,15 @@
-GEO MONKEY — i18n LOT 1b : PAGES DE LISTING BILINGUES
-=====================================================
+Correctifs des tests après le lot 1b :
 
-PREALABLE : Lots 0 et 1a installes.
+1. ListingTranslationTest : assertions du hero FR passees par assertSelectorTextContains
+   (le HTML brut contient les apostrophes echappees &#039;, la comparaison de chaine brute echouait).
 
-CONTENU (a extraire a la racine du projet) :
-- templates/front/event/index.html.twig   (REMPLACE : hero, carte evenement
-  vedette, filtres, cartes mobiles en |trans)
-- templates/front/project/index.html.twig (REMPLACE : hero, sections
-  en cours/preparation/termines, cartes en |trans)
-- templates/front/blog/index.html.twig    (REMPLACE : hero + filtre par tag)
-- templates/front/gallery/index.html.twig (REMPLACE : hero, compteur, tip,
-  lightbox aria/titles en |trans)
-- translations/messages.fr.php (REMPLACE : Lots 0+1a + ~50 cles
-  event.*/project.*/blog.*/gallery.*/filter.*)
-- translations/messages.en.php (REMPLACE : idem EN)
-- tests/Controller/Front/ListingTranslationTest.php (NOUVEAU : 2 tests)
-- LISEZMOI.txt (ne pas copier)
+2. LoginControllerTest : attente alignee sur le message custom du site
+   "Erreur : Identifiants invalides." (ancien assertion Symfony "Invalid credentials." ;- message FR affiche depuis ton custom).
 
-DETAILS :
-- Le compteur du projet en cours utilise un parametre : '...|trans({'%count%': n})
-  FR '%count% chantier(s)...', EN '%count% project(s)...'.
-- Le data-attribute du countdown ("C'est maintenant !") est traduit.
-- Non traduits (contenu de la base ou sous-templates du prochain lot) :
-  titres/lieux d'evenements, descriptions de projets,
-  project.status.label (enum PHP), _sidebar et _list des evenements/blog,
-  noms de tags et categories.
+Remplacer dans le repo :
+  tests/Controller/Front/ListingTranslationTest.php
+  tests/LoginControllerTest.php
 
-TESTS : php bin/phpunit --filter ListingTranslationTest
-
-RIUEL : local -> tests verts -> commit -> push ->
-pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && \
-  php bin/console cache:clear --env=prod && \
-  chown -R www-data:www-data var && systemctl reload php8.4-fpm'
-
-VERIF PROD : bascule FR/EN puis visite /evenements, /projets, /galerie,
-/blog : les heroes et boutons changent de langue, les contenus (titres,
-descriptions) restent en francais : comportement voulu.
+Puis :
+  php bin/phpunit --filter "ListingTranslationTest|LoginControllerTest"
+  php bin/phpunit
