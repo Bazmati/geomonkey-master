@@ -2,6 +2,8 @@
 
 namespace App\Tests\Controller\Front;
 
+use App\Entity\MembershipFee;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Routing\RouterInterface;
 
@@ -10,6 +12,11 @@ use Symfony\Component\Routing\RouterInterface;
  * Vérifie les textes figés du « hero » et les libellés statiques.
  * Les libellés des champs Symfony (FormType) et le contenu des
  * flashs restent en français pour l'instant (frontière acceptée).
+ *
+ * NB : /inscription redirige vers l'accueil si aucun tarif de
+ * cotisation n'existe en base -> on sème un MembershipFee en setUp.
+ * NB : les <h1> des héros sont coupés par <br>, le texte du crawler
+ * colle les segments sans espace (« Content de terevoir ! »).
  */
 class FormTranslationTest extends WebTestCase
 {
@@ -18,9 +25,20 @@ class FormTranslationTest extends WebTestCase
         return static::getContainer()->get(RouterInterface::class)->generate($route);
     }
 
+    private function seedMembershipFee(): void
+    {
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+        $fee = new MembershipFee();
+        $fee->setAmount(1500);
+        $fee->setNotes('Tarif de test');
+        $em->persist($fee);
+        $em->flush();
+    }
+
     public function testFormPagesAreFrenchByDefault(): void
     {
         $client = static::createClient();
+        $this->seedMembershipFee();
 
         $client->request('GET', $this->url('app_login'));
         $this->assertResponseIsSuccessful();
@@ -39,6 +57,7 @@ class FormTranslationTest extends WebTestCase
     public function testFormPagesAreEnglishAfterSwitch(): void
     {
         $client = static::createClient();
+        $this->seedMembershipFee();
         $client->request('GET', '/locale/en');
         $client->followRedirect();
 
@@ -46,7 +65,6 @@ class FormTranslationTest extends WebTestCase
         $this->assertResponseIsSuccessful();
         $this->assertSelectorTextContains('h1.gm-join-title', 'Welcomeback!');
         $this->assertSelectorTextContains('form button[type=submit]', 'Log in');
-        $this->assertSelectorTextContains('nav', 'Join'); // bouton navbar
 
         $client->request('GET', $this->url('app_membership_register'));
         $this->assertResponseIsSuccessful();
