@@ -1,39 +1,51 @@
-GEO MONKEY — PAGE « MON PROFIL » (FRONT) v1
-============================================
+GEO MONKEY — i18n LOT 0 : INFRASTRUCTURE + NAVBAR + FOOTER
+==========================================================
 
-CONTENU (a extraire a la racine du projet geomonkey-master) :
-- src/Controller/Front/ProfileController.php  (NOUVEAU)
-- src/Form/ProfileType.php                    (NOUVEAU)
-- templates/front/profile/show.html.twig       (NOUVEAU)
-- templates/front/profile/edit.html.twig       (NOUVEAU)
-- tests/Controller/Front/ProfileControllerTest.php (NOUVEAU)
-- templates/partials/_navbar.html.twig         (REMPLACE : ajout
-  de l'entree « Mon profil » dans le menu utilisateur deroulant)
-- LISEZMOI.txt (ce fichier, ne pas copier)
+CONTENU (a extraire a la racine du projet) :
+- config/packages/translation.yaml     (NOUVEAU : translator active,
+  default_locale fr, fallback fr)
+- src/EventSubscriber/LocaleSubscriber.php (NOUVEAU : relit la locale
+  session > cookie sur chaque requete, priorite 16)
+- src/Controller/Front/LocaleController.php (NOUVEAU : route
+  /locale/{fr|en}, session + cookie 1 an, referer meme hote uniquement)
+- translations/messages.fr.php         (NOUVEAU : catalogue FR)
+- translations/messages.en.php         (NOUVEAU : catalogue EN)
+- templates/partials/_navbar.html.twig (REMPLACE : liens trans + menu
+  utilisateur trans + selecteur de langue FR/EN)
+- templates/front/base.html.twig       (REMPLACE : <html lang> dynamique,
+  footer trans ; SEO fige en FR volontairement)
+- tests/Controller/Front/LocaleControllerTest.php (NOUVEAU : 3 tests)
+- LISEZMOI.txt (ne pas copier)
 
-FONCTIONNALITE :
-- GET  /profil          : consultation (identite, statut bureau,
-  adhesion active + date, membre depuis, droit a l'image)
-- GET/POST /profil/modifier : edition prenom / nom / consentement
-  photo. Horodatage RGPD automatique a l'activation, effacement au
-  retrait. CSRF natif Symfony.
-- Comportement v1 assume : email NON modifiable (contact bureau),
-  mot de passe via le flux « Mot de passe oublie » existant.
+COMportement :
+- Defaut : francais (sans session ni cookie).
+- Bouton FR/EN dans la navbar (icone bi-translate + code locale).
+- La langue survit a la session via cookie gm_locale (1 an, secure,
+  httpOnly, samesite lax). Referer du meme hote seulement (anti
+  open-redirect).
+- URLs STRICTEMENT identiques dans les deux langues : SEO FR preserve.
+- Le contenu de la base (articles, evenements...) reste en francais :
+  l'i18n ne traduit que l'interface.
 
-RIQUE CONNU : la navbar fournie remplace le fichier existant a
-l'identique pres de l'entree « Mon profil ». Si tu as modifie ta
-navbar depuis ta derniere synchronisation, verifie le diff avant
-d'ecraser (git diff templates/partials/_navbar.html.twig).
+IMPORTANT :
+- Pas de composer install necessaire (symfony/translation 8.0 deja
+  present dans composer.json).
+- ATTENTION : la navbar fournie remplace la tienne (elle est la
+  version a jour du repo + i18n). Verifie git diff avant d'ecraser.
+- Lot 0 volontairement limite : les PAGES (home, legal, evenements...)
+  sont encore en francais natural dans leurs templates. Lots suivants :
+  pages publiques, formulaires/flashs/validation, backoffice plus tard.
 
-TESTS : php bin/phpunit --filter ProfileControllerTest
-(4 tests : redirection invite, affichage, edition + horodatage
-RGPD, rejet prenom vide)
+TESTS : php bin/phpunit --filter LocaleControllerTest
+(3 tests : interface FR par defaut, bascule EN + cookie + <html lang>,
+locale non supportee = 404)
 
 RIUEL : local -> tests verts -> commit -> push ->
 pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && \
   php bin/console cache:clear --env=prod && \
   chown -R www-data:www-data var && systemctl reload php8.4-fpm'
 
-VERIFICATION PROD : se connecter sur www.geomonkey.fr -> menu
-utilisateur -> « Mon profil » -> verifier les 2 cartes, editer le
-prenom, flash vert, la navbar affiche le nouveau prenom.
+VERIF PROD : www.geomonkey.fr -> bouton FR/EN dans la navbar ->
+interface bascule, recharger la page : la langue est conservee
+(session + cookie), basculer entre les onglets du site : tout reste
+en anglais jusqu'a ce que tu reviennes a FR.

@@ -1,5 +1,8 @@
+# i18n GéoMonkey : interface bilingue FR/EN.
+# La locale vit en session/cookie (LocaleSubscriber), jamais dans les URLs :
+# URLs uniques, SEO français préservé.
 framework:
-    default_locale: en
+    default_locale: fr
     translator:
         default_path: '%kernel.project_dir%/translations'
-        providers:
+        fallbacks: ['fr']
