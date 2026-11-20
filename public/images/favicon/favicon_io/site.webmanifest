@@ -1,0 +1,17 @@
+{
+    "id": "/",
+    "name": "GéoMonkey",
+    "short_name": "GéoMonkey",
+    "description": "Association culturelle et conviviale : événements, ateliers et rencontres. Rejoins-nous !",
+    "lang": "fr",
+    "start_url": "/",
+    "scope": "/",
+    "icons": [
+        { "src": "/images/favicon/favicon_io/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+        { "src": "/images/favicon/favicon_io/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+        { "src": "/images/favicon/favicon_io/android-chrome-maskable-512x512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    ],
+    "theme_color": "#1C1C1A",
+    "background_color": "#1C1C1A",
+    "display": "standalone"
+}

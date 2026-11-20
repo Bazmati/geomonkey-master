@@ -1,0 +1,32 @@
+GEO MONKEY — PACK PWA (icônes refaites depuis le logo officiel)
+================================================================
+
+PROBLEME CORRIGE : tous les PNG de favicon_io faisaient 150 octets
+(coquilles vides), et android-chrome-512x512.png etait absent alors
+que le manifest le declarait : Chrome ne pouvait pas installer l'app.
+
+CONTENU : a extraire DANS public/images/favicon/favicon_io/
+(ecrasez les anciens fichiers) :
+- android-chrome-192x192.png      (icone any 192)
+- android-chrome-512x512.png      (icone any 512, celle qui manquait)
+- android-chrome-maskable-512x512.png (icone maskable, logo a 80% dans
+  la zone de securite : Android peut la rogner en cercle/squircle)
+- apple-touch-icon.png            (180x180, iOS)
+- favicon-32x32.png / favicon-16x16.png
+- favicon.ico                     (multi-tailles 16/32/48)
+- site.webmanifest                (ajoute l'icone maskable + id stable)
+
+ATTENTION : public/images/ est dans .gitignore -> ces fichiers ne
+passent PAS par git. Deux deploiements :
+1. LOCAL : extraire dans public/images/favicon/favicon_io/
+2. SERVEUR (CT 202) : depuis le PVE :
+   pct push 202 ./favicon_io/mon-fichier.png /var/www/geomonkey/public/images/favicon/favicon_io/mon-fichier.png
+   (repeter pour chaque fichier, puis:)
+   pct exec 202 -- chown www-data:www-data /var/www/geomonkey/public/images/favicon/favicon_io/*
+
+VERIFICATION : https://www.geomonkey.fr/images/favicon/favicon_io/android-chrome-512x512.png
+doit renvoyer une vraie image (~57 Ko).
+
+INSTALLATION SUR TELEPHONE (Android/Chrome) : ouvrir www.geomonkey.fr
+-> menu :> -> "Installer l'application" (ou "Ajouter a l'ecran d'accueil").
+iOS/Safari : Partager -> "Sur l'ecran d'accueil".
