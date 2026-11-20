@@ -1,51 +1,37 @@
-GEO MONKEY — i18n LOT 0 : INFRASTRUCTURE + NAVBAR + FOOTER
-==========================================================
+GEO MONKEY — i18n LOT 1a : PAGE D'ACCUEIL BILINGUE
+==================================================
+
+PREALABLE : le Lot 0 doit etre installe (translation.yaml,
+LocaleSubscriber, LocaleController, catalogs) et le bouton FR/EN
+operationnel.
 
 CONTENU (a extraire a la racine du projet) :
-- config/packages/translation.yaml     (NOUVEAU : translator active,
-  default_locale fr, fallback fr)
-- src/EventSubscriber/LocaleSubscriber.php (NOUVEAU : relit la locale
-  session > cookie sur chaque requete, priorite 16)
-- src/Controller/Front/LocaleController.php (NOUVEAU : route
-  /locale/{fr|en}, session + cookie 1 an, referer meme hote uniquement)
-- translations/messages.fr.php         (NOUVEAU : catalogue FR)
-- translations/messages.en.php         (NOUVEAU : catalogue EN)
-- templates/partials/_navbar.html.twig (REMPLACE : liens trans + menu
-  utilisateur trans + selecteur de langue FR/EN)
-- templates/front/base.html.twig       (REMPLACE : <html lang> dynamique,
-  footer trans ; SEO fige en FR volontairement)
-- tests/Controller/Front/LocaleControllerTest.php (NOUVEAU : 3 tests)
+- templates/front/home/index.html.twig (REMPLACE : tous les textes
+  figes passent en |trans, structures identiques)
+- translations/messages.fr.php (REMPLACE : Lot 0 + cles home.*)
+- translations/messages.en.php (REMPLACE : idem en anglais)
+- tests/Controller/Front/HomeTranslationTest.php (NOUVEAU : 2 tests)
 - LISEZMOI.txt (ne pas copier)
 
-COMportement :
-- Defaut : francais (sans session ni cookie).
-- Bouton FR/EN dans la navbar (icone bi-translate + code locale).
-- La langue survit a la session via cookie gm_locale (1 an, secure,
-  httpOnly, samesite lax). Referer du meme hote seulement (anti
-  open-redirect).
-- URLs STRICTEMENT identiques dans les deux langues : SEO FR preserve.
-- Le contenu de la base (articles, evenements...) reste en francais :
-  l'i18n ne traduit que l'interface.
+SCOPE ASSUME :
+- Tous les textes figures de la home sont traduits (hero, piliers,
+  stats, sections evenements/projets/actus/galerie, CTA, newsletter).
+- Le CONTENU de la base reste en francais : titres d'evenements,
+  statuts de projets (project.status.label/publicTeaser), noms de
+  categories, extraits d'articles, alt d'images, nawet author names.
+- SEO (title, meta description) figure en francais volontairement.
+- Les dates gardent le format d/m/Y (mois courts EN dans le chip
+  date : detail cosmetique acceptable en v1).
 
-IMPORTANT :
-- Pas de composer install necessaire (symfony/translation 8.0 deja
-  present dans composer.json).
-- ATTENTION : la navbar fournie remplace la tienne (elle est la
-  version a jour du repo + i18n). Verifie git diff avant d'ecraser.
-- Lot 0 volontairement limite : les PAGES (home, legal, evenements...)
-  sont encore en francais natural dans leurs templates. Lots suivants :
-  pages publiques, formulaires/flashs/validation, backoffice plus tard.
-
-TESTS : php bin/phpunit --filter LocaleControllerTest
-(3 tests : interface FR par defaut, bascule EN + cookie + <html lang>,
-locale non supportee = 404)
+TESTS : php bin/phpunit --filter HomeTranslationTest
+(2 tests : home FR par defaut sans cle brute qui fuit, home EN
+apres bascule)
 
 RIUEL : local -> tests verts -> commit -> push ->
 pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && \
   php bin/console cache:clear --env=prod && \
   chown -R www-data:www-data var && systemctl reload php8.4-fpm'
 
-VERIF PROD : www.geomonkey.fr -> bouton FR/EN dans la navbar ->
-interface bascule, recharger la page : la langue est conservee
-(session + cookie), basculer entre les onglets du site : tout reste
-en anglais jusqu'a ce que tu reviennes a FR.
+VERIF PROD : www.geomonkey.fr bascule FR/EN -> toute la home change
+de langue (hero, sections, CTA), les contenus de la base (evenements,
+articles...) restent en francais : comportement voulu.
