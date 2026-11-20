@@ -464,4 +464,6 @@ return [
     'flash.newsletter.invalid_email' => 'Invalid email address: check your input.',
     'flash.newsletter.already' => 'You are already subscribed to the newsletter, thanks!',
     'flash.newsletter.subscribed' => 'Subscription confirmed! 🐒 Check your inbox for the welcome message.',
+
+    'flash.register.no_fee' => 'No membership fee defined in the database. Sign-ups are currently closed.',
 ];

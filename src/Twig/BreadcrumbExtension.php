@@ -4,6 +4,7 @@ namespace App\Twig;
 
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use Twig\Extension\AbstractExtension;
 use Twig\TwigFunction;
 
@@ -12,6 +13,11 @@ use Twig\TwigFunction;
  * dans PARENTS (route enfant => route parent). Le template appelle juste
  * {{ breadcrumb() }} sans argument ; l'extension lit la route courante et
  * remonte la chaîne. Une nouvelle page = une ligne dans PARENTS.
+ *
+ * i18n Lot 2c : les libellés des routes FRONT sont traduits via le catalogue
+ * (clés nav.*). Les libellés du backoffice restent en français (hors périmètre
+ * tant que l'app n'est pas multi-assos). Les libellés d'entités (titre d'un
+ * événement, nom d'un tag...) viennent de la base et ne sont pas traduits.
  */
 class BreadcrumbExtension extends AbstractExtension
 {
@@ -49,7 +55,7 @@ class BreadcrumbExtension extends AbstractExtension
         // Admin — galerie
         'app_admin_gallery_image_index' => 'app_admin_dashboard',
         'app_admin_gallery_image_new'   => 'app_admin_gallery_image_index',
-        'app_admin_gallery_image_edit'  => 'app_admin_gallery_image_index',
+        'app_admin_gallery_image_edit' => 'app_admin_gallery_image_index',
         // Admin — adhésions
         'app_admin_membership_requests' => 'app_admin_dashboard',
         'app_admin_membership_list'      => 'app_admin_dashboard',
@@ -67,13 +73,10 @@ class BreadcrumbExtension extends AbstractExtension
         'app_admin_social_index' => 'app_admin_dashboard',
     ];
 
+    /**
+     * Libellés statiques FR (backoffice et routes sans clé i18n).
+     */
     private const LABELS = [
-        'app_home'                => 'Accueil',
-        'app_blog_index'          => 'Actualités',
-        'app_event_index'         => 'Événements',
-        'app_gallery_index'       => 'Galerie',
-        'app_presentation_index'  => 'Présentation',
-        'app_membership_register' => 'Rejoindre',
         'app_admin_dashboard'     => 'Backoffice',
         // Admin — blog
         'app_admin_blog_index'      => 'Articles',
@@ -92,7 +95,7 @@ class BreadcrumbExtension extends AbstractExtension
         // Admin — galerie
         'app_admin_gallery_image_index' => 'Galerie',
         'app_admin_gallery_image_new'   => 'Créer',
-        'app_admin_gallery_image_edit'  => 'Modifier',
+        'app_admin_gallery_image_edit' => 'Modifier',
         // Admin — adhésions
         'app_admin_membership_requests' => 'Demandes d\'adhésion',
         'app_admin_membership_list'      => 'Adhésions',
@@ -110,12 +113,25 @@ class BreadcrumbExtension extends AbstractExtension
         'app_admin_social_index' => 'Réseaux sociaux',
     ];
 
+    /**
+     * Libellés des routes FRONT : traduits via le catalogue (clés nav.*).
+     */
+    private const FRONT_LABEL_KEYS = [
+        'app_home'                => 'nav.home',
+        'app_blog_index'          => 'nav.blog',
+        'app_event_index'         => 'nav.events',
+        'app_gallery_index'       => 'nav.gallery',
+        'app_presentation_index'  => 'nav.presentation',
+        'app_membership_register' => 'nav.join',
+    ];
+
     public function __construct(
         private RequestStack $requestStack,
         private UrlGeneratorInterface $urlGenerator,
+        private TranslatorInterface $translator,
     ) {}
 
-        /**
+    /**
      * Racine du fil : Accueil pour le front, Backoffice pour l'admin.
      */
     private function rootRoute(string $route): string
@@ -133,6 +149,18 @@ class BreadcrumbExtension extends AbstractExtension
                 'is_safe' => ['html'],
             ]),
         ];
+    }
+
+    /**
+     * Libellé d'une route : traduit pour le front, statique FR pour l'admin.
+     */
+    private function labelFor(string $route): string
+    {
+        if (isset(self::FRONT_LABEL_KEYS[$route])) {
+            return $this->translator->trans(self::FRONT_LABEL_KEYS[$route]);
+        }
+
+        return self::LABELS[$route] ?? $route;
     }
 
     /**
@@ -176,8 +204,7 @@ class BreadcrumbExtension extends AbstractExtension
                 // override passé au template > entité dans les attributs > libellé statique.
                 $label = $override['label']
                     ?? $this->entityLabel($request)
-                    ?? self::LABELS[$r]
-                    ?? $r;
+                    ?? $this->labelFor($r);
                 $items[] = ['label' => $label, 'url' => null];
                 continue;
             }
@@ -189,7 +216,7 @@ class BreadcrumbExtension extends AbstractExtension
             } catch (\Throwable) {
                 $url = null;
             }
-            $items[] = ['label' => self::LABELS[$r] ?? $r, 'url' => $url];
+            $items[] = ['label' => $this->labelFor($r), 'url' => $url];
         }
 
         return $twig->render('partials/_breadcrumb.html.twig', ['items' => $items]);

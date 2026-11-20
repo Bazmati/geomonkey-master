@@ -36,8 +36,9 @@ class MembershipController extends AbstractController
         try {
             $membershipFee = $this->feeService->getCurrentAmountInEuros();
         } catch (\RuntimeException $e) {
-            // Message du service (frontière acceptée : le service reste FR)
-            $this->addFlash('error', $e->getMessage());
+            // Lot 2c : le message d'origine du service/repository est remplacé
+            // par une clé du catalogue (i18n front).
+            $this->addFlash('error', $this->translator->trans('flash.register.no_fee'));
             return $this->redirectToRoute('app_home');
         }
 

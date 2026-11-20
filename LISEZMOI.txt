@@ -1,52 +1,41 @@
-# i18n Lot 2b : libellés FormType, validation et flashs contrôleurs (front)
+# i18n Lot 2c : fil d'Ariane bilingue + derniers fragments (front)
 
 ## Périmètre
-
-### FormTypes (labels + messages de validation traduits via TranslatorInterface)
-- src/Form/DonationType.php
-- src/Form/ProfileType.php
-- src/Form/RegistrationFormType.php
-
-Principe : les FormTypes sont des services Symfony (autoconfigure/autowire),
-le TranslatorInterface est injecté en constructeur et les libellés/messages
-sont traduits à la construction du formulaire (domaine `messages`).
-Les placeholders de validation ({{ limit }}, {{ min }}, {{ max }}) sont
-conservés par trans() puis remplacés par le validator.
-
-### Contrôleurs front (flashs + messages 404 traduits)
-- src/Controller/Front/DonationController.php   (erreur paiement Stripe)
-- src/Controller/Front/MembershipController.php (emails, vérification email, mot de passe oublié/réinitialisé)
-- src/Controller/Front/ProfileController.php    (profil mis à jour)
-- src/Controller/Front/EventController.php      (inscription/désinscription événement, CSRF, 404)
-- src/Controller/Front/NewsletterController.php (inscription newsletter)
-
-Frontières volontairement laissées FR :
-- MembershipFeeService->getCurrentAmountInEuros() : le message d'erreur du service
-  (flash sur /inscription quand aucun tarif n'existe) reste FR.
-- MembershipFeeType : formulaire back-office, hors périmètre.
-- Emails transactionnels (déjà traités à part, non concernés ici).
+- src/Twig/BreadcrumbExtension.php
+  TranslatorInterface injecté (3e argument du constructeur).
+  Les libellés des routes FRONT sont traduits via les clés nav.* du catalogue
+  (nav.home, nav.blog, nav.events, nav.gallery, nav.presentation, nav.join).
+  Les libellés du backoffice restent FR (hors périmètre tant que pas multi-assos).
+  Les libellés d'entités (titre d'un événement, nom d'un tag...) viennent de la
+  base et ne sont pas traduits (contenu DB, frontière i18n connue).
+- templates/front/tag.html.twig
+  Le fragment fil d'Ariane des pages tag utilise maintenant
+  'nav.home'|trans et 'nav.blog'|trans au lieu de « Accueil » / « Actualités ».
+- src/Controller/Front/MembershipController.php
+  Le flash « Aucun tarif d'adhésion défini en base de données » (quand aucun
+  MembershipFee n'existe) passe par la clé flash.register.no_fee au lieu de
+  $e->getMessage(). Le texte FR est IDENTIQUE à l'original (les tests
+  existants_ASSERT_FR passent inchangés).
 
 ## Catalogues
-- translations/messages.fr.php + messages.en.php : **420 clés** chacune
-  (360 du lot 3 + 60 nouvelles : form.*, event.error.*, flash.*).
-- Remplacez vos fichiers du lot 3 par ceux-ci (fusion déjà faite).
+- translations/messages.fr.php + messages.en.php : **421 clés** chacune
+  (420 du lot 2b + 1 nouvelle : flash.register.no_fee).
 
-## Tests
-- tests/Controller/Front/FormTypeTranslationTest.php (nouveau, 4 tests) :
-  labels FR/EN du formulaire de don + messages de validation en POST,
-  labels FR/EN du formulaire d'inscription (seed MembershipFee en base).
-- tests/Controller/Front/FormTranslationTest.php : commentaire mis à jour
-  (seul changement, l'ancienne frontière "libellés FormType" est levée).
+## Test
+- tests/Controller/Front/BreadcrumbTranslationTest.php (2 tests) :
+  fil d'Ariane de /presentation et /evenements en FR par défaut puis EN.
+
+## Piège connu
+BreadcrumbExtension a maintenant 3 arguments de constructeur
+(RequestStack, UrlGeneratorInterface, TranslatorInterface). Si un test
+l'instancie directement, il doit passer le translator (mock TranslatorInterface).
 
 ## Déploiement (rituel habituel)
-1. Extraire ce zip à la racine du projet. Il écrase :
-   3 FormTypes, 5 contrôleurs, les 2 catalogues, 2 fichiers de test.
-2. `php bin/phpunit tests/Controller/Front/`
-   (si un FormType n'est pas reconnu comme service, vérifier que
-   services.yaml autoconfigure bien App\\ — c'est la config standard du repo)
+1. Extraire à la racine du projet (5 fichiers écrasés + 1 nouveau test).
+2. php bin/phpunit
 3. git add/commit/push
-4. Serveur (CT 202) :
-   pct exec 202 -- bash -c 'cd /var/www/geomonkey && git pull && php bin/console cache:clear --env=prod && systemctl reload php8.4-fpm'
-5. Vérifier sur geomonkey.fr en EN : /don (libellés + soumission vide),
-   /inscription (labels, radios, CGA cliquables), inscription/désinscription
-   à un événement (flash), inscription newsletter depuis l'accueil (flash).
+4. CT 202 : git pull + cache:clear --env=prod + reload php8.4-fpm
+5. Vérifier en EN : /evenements (Accueil > Événements devient Home > Events),
+   /presentation (About), une catégorie ou un tag de blog (fil du fragment tag),
+   et /inscription sans tarif en base (flash traduit — non testable en prod
+   puisqu'un tarif existe).

@@ -464,4 +464,6 @@ return [
     'flash.newsletter.invalid_email' => 'Adresse email invalide : vérifie ta saisie.',
     'flash.newsletter.already' => 'Tu es déjà inscrit·e à la newsletter, merci !',
     'flash.newsletter.subscribed' => 'Inscription confirmée ! 🐒 Vérifie ta boîte mail pour le message de bienvenue.',
+
+    'flash.register.no_fee' => 'Aucun tarif d\'adhésion défini en base de données.',
 ];

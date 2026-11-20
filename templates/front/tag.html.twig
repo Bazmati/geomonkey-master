@@ -1,8 +1,8 @@
 {% block title %}#{{ tag.name }} — {{ parent() }}{% endblock %}
 ...
         {{ breadcrumb_macros.breadcrumb([
-            ('Accueil', path('app_home')),
-            ('Actualités', path('app_blog_index')),
+            ('nav.home'|trans, path('app_home')),
+            ('nav.blog'|trans, path('app_blog_index')),
             ('#' ~ tag.name, null),
         ]) }}
 
