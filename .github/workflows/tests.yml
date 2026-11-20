@@ -74,7 +74,8 @@ jobs:
       # il est gitignore, donc on en crée un factice. Les valeurs réelles
       # viennent des variables d'environnement du job définies plus haut.
       - name: Fichier .env factice
-        run: echo "# CI: valeurs réelles dans les vars d'environnement du job" > .env
+        run: |
+          printf '# CI : valeurs reelles dans les vars environnement du job\n' > .env
 
       - name: Base de test (création + schéma)
         run: |
