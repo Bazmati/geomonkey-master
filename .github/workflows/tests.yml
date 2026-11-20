@@ -1,0 +1,75 @@
+name: Tests
+
+# Suite PHPUnit à chaque push sur main et à chaque pull request.
+# But : détecter un push raté AVANT que le CT 202 tire la prod.
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  phpunit:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: geomonkey
+          POSTGRES_PASSWORD: geomonkey
+          POSTGRES_DB: geomonkey
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U geomonkey"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      # Env test : la vraie base est geomonkey + suffixe _test (doctrine.yaml when@test)
+      APP_SECRET: ci-valeur-factice-non-secrète
+      APP_DEBUG: '0'
+      DATABASE_URL: postgresql://geomonkey:geomonkey@127.0.0.1:5432/geomonkey?serverVersion=15&charset=utf8
+      MAILER_DSN: null://default
+      # Placeholders : ces services sont instanciés par les contrôleurs pendant
+      # les tests kernel, il faut que les vars existent (valeurs jamais utilisées).
+      STRIPE_SECRET_KEY: sk_test_ci
+      STRIPE_SUCCESS_URL: http://localhost/inscription/success
+      STRIPE_CANCEL_URL: http://localhost/inscription/cancel
+      STRIPE_DONATION_SUCCESS_URL: http://localhost/don/success
+      STRIPE_DONATION_CANCEL_URL: http://localhost/don/cancel
+      STRIPE_WEBHOOK_SECRET: whsec_ci
+      CONTACT_EMAIL: ci@local.fr
+      WHATSAPP_GROUP_LINK: https://example.invalid
+      MAIL_FROM_ADDRESS: noreply@local.fr
+      MAILBOX_ENCRYPTION: ssl
+      # MAILBOX_HOST/PORT/USER/PASSWORD sont forcés vides par phpunit.dist.xml
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: PHP 8.4
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: pdo_pgsql, mbstring, xml, ctype, iconv, intl, curl, zip, dom, simplexml, gd
+          coverage: none
+
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/composer
+          key: composer-${{ hashFiles('composer.lock') }}
+
+      - name: Composer install
+        run: composer install --no-interaction --no-progress
+
+      - name: Base de test (création + schéma)
+        run: |
+          php bin/console doctrine:database:create --if-not-exists --env=test
+          php bin/console doctrine:schema:update --force --env=test
+
+      - name: PHPUnit
+        run: php bin/phpunit -c phpunit.dist.xml
