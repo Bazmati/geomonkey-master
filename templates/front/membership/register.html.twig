@@ -58,10 +58,45 @@
                     </li>
                 </ul>
 
+                {# ===== Timeline : comment ça marche ===== #}
+                <div class="gm-join-steps mt-4">
+                    <p class="small text-uppercase fw-semibold text-gm-muted mb-2">
+                        <i class="bi bi-signpost-split me-1"></i>{{ 'register.steps_title'|trans }}
+                    </p>
+                    <ol class="list-unstyled gm-join-benefits m-0">
+                        <li>
+                            <i class="bi bi-1-circle-fill"></i>
+                            <div><strong>{{ 'register.step1t'|trans }}</strong><br>
+                            <span class="small">{{ 'register.step1s'|trans }}</span></div>
+                        </li>
+                        <li>
+                            <i class="bi bi-2-circle-fill"></i>
+                            <div><strong>{{ 'register.step2t'|trans }}</strong><br>
+                            <span class="small">{{ 'register.step2s'|trans }}</span></div>
+                        </li>
+                        <li>
+                            <i class="bi bi-3-circle-fill"></i>
+                            <div><strong>{{ 'register.step3t'|trans }}</strong><br>
+                            <span class="small">{{ 'register.step3s'|trans }}</span></div>
+                        </li>
+                        <li>
+                            <i class="bi bi-4-circle-fill"></i>
+                            <div><strong>{{ 'register.step4t'|trans }}</strong><br>
+                            <span class="small">{{ 'register.step4s'|trans }}</span></div>
+                        </li>
+                    </ol>
+                </div>
+
                 <div class="gm-join-price mt-4">
                     <span class="gm-join-price-value">{{ "%.2f"|format(membershipFee) }}&nbsp;€</span>
                     <span class="gm-join-price-label">{{ 'register.price_label'|trans|raw }}</span>
                 </div>
+
+                <p class="text-gm-muted small mt-2 mb-0">
+                    <i class="bi bi-cash-coin me-1"></i>
+                    {{ 'register.offline_note'|trans }}
+                    <a href="mailto:contact@geomonkey.fr" class="text-gm-warning">{{ 'register.offline_contact'|trans }}</a>.
+                </p>
             </div>
 
             {# ===== Colonne formulaire : carte verre dépoli ===== #}

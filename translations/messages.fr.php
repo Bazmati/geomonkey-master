@@ -466,4 +466,19 @@ return [
     'flash.newsletter.subscribed' => 'Inscription confirmée ! 🐒 Vérifie ta boîte mail pour le message de bienvenue.',
 
     'flash.register.no_fee' => 'Aucun tarif d\'adhésion défini en base de données.',
+
+    // ===== Adhésion : timeline + paiement hors-ligne (23 nov. 2026) =====
+    'register.steps_title' => 'Comment ça marche',
+    'register.step1t' => '1. Remplis le formulaire',
+    'register.step1s' => 'Deux minutes : prénom, email et mot de passe.',
+    'register.step2t' => '2. Paie ta cotisation en ligne',
+    'register.step2s' => 'Paiement sécurisé par carte bancaire (Stripe).',
+    'register.step3t' => '3. Ton compte est activé',
+    'register.step3s' => 'Accès immédiat à l\'espace membre.',
+    'register.step4t' => '4. Profite pendant un an',
+    'register.step4s' => 'Confirmation par email : événements, galerie et projets.',
+    'register.offline_note' => 'Pas de carte bancaire ? Cotisation possible par chèque ou en espèces :',
+    'register.offline_contact' => 'écris-nous',
+    'donation.offline_note' => 'Tu préfères un don par chèque ou en espèces ?',
+    'donation.offline_contact' => 'écris-nous',
 ];

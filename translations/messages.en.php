@@ -466,4 +466,19 @@ return [
     'flash.newsletter.subscribed' => 'Subscription confirmed! 🐒 Check your inbox for the welcome message.',
 
     'flash.register.no_fee' => 'No membership fee defined in the database. Sign-ups are currently closed.',
+
+    // ===== Membership: timeline + offline payment (Nov 23, 2026) =====
+    'register.steps_title' => 'How it works',
+    'register.step1t' => '1. Fill in the form',
+    'register.step1s' => 'Two minutes: first name, email and password.',
+    'register.step2t' => '2. Pay your membership online',
+    'register.step2s' => 'Secure card payment via Stripe.',
+    'register.step3t' => '3. Your account is activated',
+    'register.step3s' => 'Immediate access to the member area.',
+    'register.step4t' => '4. Enjoy a full year',
+    'register.step4s' => 'Email confirmation: events, gallery and projects.',
+    'register.offline_note' => 'No credit card? You can pay by cheque or in cash:',
+    'register.offline_contact' => 'write to us',
+    'donation.offline_note' => 'You would rather donate by cheque or in cash?',
+    'donation.offline_contact' => 'write to us',
 ];
