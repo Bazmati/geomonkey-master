@@ -2,7 +2,7 @@
 
 **Géomonkey** est une application web complète destinée aux associations : site vitrine public + espace de gestion des adhérents, des événements et des contenus. Développée avec **Symfony 8 / PHP 8.4**, elle a été imaginée pour une association réelle — ce qui en fait un projet de démonstration concret, avec de vraies contraintes (RGPD, paiements, formulaires sécurisés).
 
-> 🌐 **Avancement du projet :** [www.geomonkey.fr](https://www.geomonkey.fr) — mise en production prévue fin novembre 2026, hébergée sur un serveur Proxmox (conteneur LXC).
+> 🌐 **En production :** [www.geomonkey.fr](https://www.geomonkey.fr) — en ligne depuis novembre 2026, hébergée sur un serveur Proxmox (conteneur LXC), administrée de bout en bout (déploiement, sauvegardes, rotation des secrets).
 
 ## 👥 À qui s'adresse ce projet ?
 
@@ -12,15 +12,15 @@
 - **Les recruteurs** qui veulent évaluer un niveau réel sur Symfony/PHP : code structuré, commits réguliers, projet en production.
 - **Les responsables associatifs** (clubs, collectifs, zines) qui veulent s'inspirer d'un fonctionnement éprouvé.
 
-## ✨ Fonctionnalités (V1)
+## ✨ Fonctionnalités
 
 ### ✅ Terminées
 
 
 | Module               | Détail                                                          |
-| ------------------   | --------------------------------------------------------------- |
+| ------------------   | ----------------------------------------------------------------- |
 | 👥 Utilisateurs      | CRUD complet, rôles et permissions, inscription                 |
-| 📅 Événements        | CRUD des événements, gestion des participants                   |
+| 📅 Événements        | CRUD, participants, calendrier **FullCalendar**, pages publiques |
 | 🖼️ Galerie photos    | CRUD galerie, import d'images en 3 tailles, conversion **WebP** |
 | 🔐 Sécurité          | Formulaires sécurisés, validation des données, contrôle d'accès |
 | ⚖️ RGPD              | Consentement, données personnelles maîtrisées                   |
@@ -28,19 +28,18 @@
 | 📰 Blog              | CRUD BlogPost + pages publiques                                 |
 | 📝 Présentation      | CRUD Présentation (entité PresentationPage)                     |
 | 💳 Adhésion en ligne | Paiement **Stripe** avec webhook signé                          |
-
+| ❤️ Dons en ligne      | Paiement Stripe, webhook dédié, page de don                     |
+| 🧾 Encaissements hors-ligne | Cotisations et dons en espèces/chèque, réservés au trésorier et au président (Voters Symfony) |
+| ✉️ Messagerie        | Intégration de la boîte mail de l'asso (IMAP/GMX), synchronisation cron, lecture des messages dans l'admin |
+| 🛡️ Gouvernance      | Rôles président / trésorier / secrétaire, droits fins par entité |
+| 🌍 Internationalisation | Interface bilingue français / anglais                       |
+| 📱 Responsive & PWA  | Navigation mobile, manifeste et icônes PWA                       |
+| 📈 SEO               | Métadonnées, sitemap, balisage                                  |
 
 ### 🚧 En cours
 
-- 🎨 Refonte du style des pages
 - 🗂️ **CRUD Projets** avec relation événement ↔ article
-
-### 📋 À faire (V1)
-
-- 📈 SEO : métadonnées, sitemap, balisage
-- 📱 Style responsive
-- 📆 FullCalendar pour l'affichage des événements
-- ❤️ Dons en ligne : le paiement Stripe étant opérationnel pour les adhésions, c'est une extension naturelle
+- 🤖 **CI GitHub Actions** : suite PHPUnit (430+ tests) exécutée à chaque push
 
 ## 🔮 Feuille de route
 
@@ -48,7 +47,7 @@
 
 - 🛍️ **Boutique de goodies**
 - 🎟️ **Billeterie** pour les événements
-- 💰 **Gestionnaire de comptabilité** pour les associations loi 1901 (suivi des cotisations — l'entité `MembershipFee` est déjà en place — et exports)
+- 💰 **Gestionnaire de comptabilité** pour les associations loi 1901 (l'entité `MembershipFee` et les encaissements hors-ligne sont déjà en place, exports à venir)
 
 ### V3
 
@@ -61,13 +60,15 @@
 - **Frontend** : Twig, Bootstrap 5.3, Stimulus, Turbo (Symfony UX)
 - **Base de données** : PostgreSQL
 - **Images** : Intervention Image (redimensionnement + conversion WebP)
-- **Paiements** : Stripe (adhésions en ligne, webhook dédié)
-- **Tests** : PHPUnit
+- **Paiements** : Stripe (adhésions et dons en ligne, webhooks dédiés)
+- **Messagerie** : IMAP (boîte GMX de l'association), envoi SMTP
+- **Tests** : PHPUnit (430+ tests), intégration continue GitHub Actions
 - **Hébergement** : production sur serveur Proxmox (conteneur LXC) — Docker Compose fourni pour le développement local 
 
 ## 🧠 Choix techniques
 
 - **Stripe pour les paiements** : bundle officiel Symfony, sécurité et conformité PCI DSS prises en charge par Stripe, et aucune donnée de carte stockée par l'application — ce qui allège considérablement le dossier RGPD de l'association.
+- **Voters plutôt que des rôles à rallonge** : chaque action sensible passe par un Voter (`EntityVoter`) avec des attributs dédiés (`ENTITY_EDIT`, `ENTITY_TREASURY`, `ENTITY_CASH`) — la gouvernance de l'asso est dans le code, pas dans un tableur.
 - **Pas de bundle pour les images** : le traitement (redimensionnement, WebP) est un composant cœur de l'application — le garder en code maîtrisé évite de dépendre du calendrier de mise à jour d'un tiers et de ses éventuelles failles. Un bundle quand il protège, du code maîtrisé quand c'est le produit.
 - **Assistance IA** : le projet a été développé seul à un rythme soutenu avec l'assistance de l'IA — chaque choix tranché après compréhension, chaque ligne relue et validée avant commit.
 
@@ -98,7 +99,7 @@ git clone https://github.com/Bazmati/geomonkey-master.git
 cd geomonkey-master
 composer install
 npm install && npm run build
-cp .env.local.example .env.local   # puis configurer DATABASE_URL
+cp .env.local.example .env.local   # puis configurer DATABASE_URL (le .env versionné fournit les valeurs par défaut)
 php bin/console doctrine:migrations:migrate
 symfony serve
 ```
@@ -107,8 +108,9 @@ L'application est alors accessible sur `https://localhost:8000`.
 
 ## 🌐 Mise en production
 
-- La mise en production est prévue **fin novembre 2026** sur [**www.geomonkey.fr**](https://www.geomonkey.fr), sur un serveur Proxmox en conteneur LXC.
-- `.env.local.example` liste les variables à définir (base de données, SMTP, Stripe…).
+- **En production** sur [**www.geomonkey.fr**](https://www.geomonkey.fr), hébergée sur un serveur Proxmox en conteneur LXC.
+- Le fichier **`MAINTENEUR.md`** documente la reprise en main : stack, déploiement, gouvernance (EntityVoter), rotation des secrets et pièges connus.
+- `.env` (versionné) fournit les valeurs par défaut ; `.env.local` (gitignore) porte les valeurs réelles de chaque machine (base de données, SMTP, Stripe…).
 - Paiement : renseigner les clés Stripe et configurer le webhook (voir `StripeWebhookController`).
 
 ## 🧪 Tests
@@ -116,6 +118,8 @@ L'application est alors accessible sur `https://localhost:8000`.
 ```bash
 php bin/phpunit
 ```
+
+430+ tests (PHPUnit), exécutés automatiquement à chaque push par GitHub Actions.
 
 ## 🤝 Contribuer
 
