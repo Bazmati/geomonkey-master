@@ -212,6 +212,7 @@ return [
     'auth.error_prefix' => 'Error:',
     'auth.field_email' => 'Email',
     'auth.field_password' => 'Password',
+    'auth.show_password' => 'Show or hide password',
     'auth.ph_email' => 'you@email.com',
     'auth.remember_me' => 'Remember me',
     'auth.submit' => 'Log in',

@@ -212,6 +212,7 @@ return [
     'auth.error_prefix' => 'Erreur :',
     'auth.field_email' => 'Email',
     'auth.field_password' => 'Mot de passe',
+    'auth.show_password' => 'Afficher ou masquer le mot de passe',
     'auth.ph_email' => 'votre@email.com',
     'auth.remember_me' => 'Se souvenir de moi',
     'auth.submit' => 'Se connecter',

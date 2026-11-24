@@ -147,9 +147,14 @@
 
                             <div class="col-12 mb-3">
                                 {{ form_label(form.plainPassword, null, {'label_attr': {'class': 'form-label fw-semibold'}}) }}
-                                <div class="input-group">
+                                <div class="input-group" data-controller="password-toggle">
                                     <span class="input-group-text bg-gm-light"><i class="bi bi-lock text-gm-text"></i></span>
-                                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'register.ph_password'|trans}}) }}
+                                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control form-control-lg', 'placeholder': 'register.ph_password'|trans, 'data-password-toggle-target': 'input'}}) }}
+                                    <button class="btn btn-outline-secondary" type="button"
+                                        data-action="password-toggle#toggle"
+                                        aria-label="{{ 'auth.show_password'|trans }}">
+                                        <i class="bi bi-eye" data-password-toggle-target="icon"></i>
+                                    </button>
                                 </div>
                                 <div class="form-text">{{ 'register.pw_hint'|trans }}</div>
                                 <div class="text-gm-danger">{{ form_errors(form.plainPassword) }}</div>

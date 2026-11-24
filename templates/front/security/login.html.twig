@@ -109,13 +109,19 @@
                         {# Champ Mot de passe #}
                         <div class="mb-4">
                             <label for="inputPassword" class="form-label fw-semibold">{{ 'auth.field_password'|trans }}</label>
-                            <div class="input-group">
+                            <div class="input-group" data-controller="password-toggle">
                                 <span class="input-group-text bg-gm-light text-gm-text border-0">
                                     <i class="bi bi-lock"></i>
                                 </span>
                                 <input type="password" id="inputPassword" name="_password"
                                     class="form-control form-control-lg"
-                                    autocomplete="current-password" placeholder="••••••••" required>
+                                    autocomplete="current-password" placeholder="••••••••" required
+                                    data-password-toggle-target="input">
+                                <button class="btn btn-outline-secondary" type="button"
+                                    data-action="password-toggle#toggle"
+                                    aria-label="{{ 'auth.show_password'|trans }}">
+                                    <i class="bi bi-eye" data-password-toggle-target="icon"></i>
+                                </button>
                             </div>
                         </div>
 
