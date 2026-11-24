@@ -75,13 +75,6 @@ jobs:
       - name: Composer install
         run: composer install --no-interaction --no-progress --no-scripts
 
-      # Dotenv exige que le fichier .env existe (PathException sinon) :
-      # il est gitignore, donc on en crée un factice. Les valeurs réelles
-      # viennent des variables d'environnement du job définies plus haut.
-      - name: Fichier .env factice
-        run: |
-          printf '# CI : valeurs reelles dans les vars environnement du job\n' > .env
-
       - name: Base de test (création + schéma)
         run: |
           php bin/console doctrine:database:create --if-not-exists --env=test
