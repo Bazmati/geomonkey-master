@@ -1,4 +1,5 @@
 # 🐒 Géomonkey — Plateforme web pour associations
+![Tests](https://github.com/Bazmati/geomonkey-master/actions/workflows/tests.yml/badge.svg)
 
 **Géomonkey** est une application web complète destinée aux associations : site vitrine public + espace de gestion des adhérents, des événements et des contenus. Développée avec **Symfony 8 / PHP 8.4**, elle a été imaginée pour une association réelle — ce qui en fait un projet de démonstration concret, avec de vraies contraintes (RGPD, paiements, formulaires sécurisés).
 
