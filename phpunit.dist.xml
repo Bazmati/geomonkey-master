@@ -14,12 +14,13 @@
         <env name="KERNEL_CLASS" value="App\Kernel" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
+    <server name="CLOUDFLARE_TURNSTILE_SITEKEY" value="1x00000000000000000000AA"/>
+    <server name="CLOUDFLARE_TURNSTILE_SECRET_KEY" value="1x0000000000000000000000000000000AA"/>
         <server name="DEFAULT_URI" value="http://localhost" force="true" />
         <server name="MESSENGER_TRANSPORT_DSN" value="sync://" force="true" />
 
         <!-- TA base locale : le suffixe _test est ajouté automatiquement
              par doctrine.yaml when@test (tests → geomonkey_test). -->
-        <server name="DATABASE_URL" value="postgresql://UTILISATEUR:MOTDEPASSE@127.0.0.1:5432/geomonkey?serverVersion=15&amp;charset=utf8" force="true" />
 
         <server name="MAILBOX_HOST" value="" force="true"/>
         <server name="MAILBOX_PORT" value="0" force="true"/>
