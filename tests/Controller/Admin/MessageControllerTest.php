@@ -37,7 +37,7 @@ final class MessageControllerTest extends WebTestCase
         $membership->setAmount(1500);
         $membership->setStartedAt((new \DateTimeImmutable())->sub(new \DateInterval('P1M')));
         $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P11M')));
-        $membership->setUser($user);
+        $user->addMembership($membership);
 
         $em->persist($membership);
         $em->persist($user);

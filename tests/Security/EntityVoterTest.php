@@ -34,7 +34,7 @@ class EntityVoterTest extends TestCase
         $membership->setIsActive(true);
         $membership->setStartedAt((new \DateTimeImmutable())->sub(new \DateInterval('P1M')));
         $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P11M')));
-        $membership->setUser($user);
+        $user->addMembership($membership);
         
         // Ajouter l'adhésion à l'utilisateur
         $reflection = new \ReflectionClass($user);

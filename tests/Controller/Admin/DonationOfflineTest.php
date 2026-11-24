@@ -41,7 +41,7 @@ final class DonationOfflineTest extends WebTestCase
         $membership->setAmount(1500);
         $membership->setStartedAt(new \DateTimeImmutable());
         $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P1Y')));
-        $membership->setUser($user);
+        $user->addMembership($membership);
         $membership->setPaymentStatus('paid');
         $em->persist($membership);
 

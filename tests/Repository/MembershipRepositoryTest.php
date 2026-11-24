@@ -46,7 +46,7 @@ class MembershipRepositoryTest extends KernelTestCase
     private function createMembership(User $user, bool $isActive, \DateTimeImmutable $startedAt, \DateTimeImmutable $expiresAt, ?\DateTimeImmutable $reminderSentAt = null): Membership
     {
         $membership = new Membership();
-        $membership->setUser($user);
+        $user->addMembership($membership);
         $membership->setIsActive($isActive);
         $membership->setStartedAt($startedAt);
         $membership->setExpiresAt($expiresAt);

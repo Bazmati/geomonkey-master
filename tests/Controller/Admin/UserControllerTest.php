@@ -35,7 +35,7 @@ final class UserControllerTest extends WebTestCase
         $membership->setAmount(1500);
         $membership->setStartedAt((new \DateTimeImmutable())->sub(new \DateInterval('P1M')));
         $membership->setExpiresAt((new \DateTimeImmutable())->add(new \DateInterval('P11M')));
-        $membership->setUser($admin);
+        $admin->addMembership($membership);
         $em->persist($membership);
 
         $em->persist($admin);
