@@ -68,12 +68,17 @@ jobs:
           path: ~/.cache/composer
           key: composer-${{ hashFiles('composer.lock') }}
 
-      # --no-scripts : les auto-scripts (cache:clear, assets:install,
-      # importmap:install) crashent en 255 sans .env local et sont inutiles
-      # pour les tests — le kernel de test construit son propre cache et
-      # l'AssetMapper sert les sources directement en env test.
+      # --no-scripts : les auto-scripts (cache:clear, assets:install) crashent
+      # en 255 sans .env local — le kernel de test construit son propre cache.
       - name: Composer install
         run: composer install --no-interaction --no-progress --no-scripts
+
+      # assets/vendor/ est gitignore (paquets JS téléchargés). Sans eux,
+      # ImportMapGenerator explose à chaque rendu Twig : « Circular reference
+      # detected for "app.js" » causé par « Unable to find asset
+      # "./vendor/bootstrap/js/bootstrap.bundle.min.js" ».
+      - name: Assets vendor (importmap:download)
+        run: php bin/console importmap:download --env=test
 
       - name: Base de test (création + schéma)
         run: |
