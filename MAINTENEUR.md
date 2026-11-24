@@ -25,9 +25,24 @@ développeur habituel n'est pas disponible. À garder à jour avec le code.
 Les autres CT équipent le serveur (200, 203) : ne jamais rien installer
 dans le CT 202 hors des besoins de l'app.
 
-## 3. Variables d'environnement (`.env.local`)
+## 3. Variables d'environnement
 
-Fichier exemple : `.env.local.example`. Les indispensables :
+Trois fichiers, des rôles bien séparés :
+
+- **`.env` (versionné)** : défauts non secrets uniquement (`APP_ENV=dev`,
+  placeholder `DATABASE_URL`, Messenger `sync://`, Mailer `null://`).
+  Ne jamais y mettre de vraie valeur. Avant tout commit :
+  `git diff .env*` pour vérifier qu'aucun secret ne part en dépôt.
+- **`.env.local` (gitignoré)** : vraies valeurs de chaque machine.
+  **Sur le CT 202 il doit contenir `APP_ENV=prod` + `APP_DEBUG=0`**
+  (le `.env` versionné dit dev) et tous les secrets.
+  Fichier exemple : `.env.local.example`.
+- **`.env.test` (gitignoré)** : config de test locale (typiquement la
+  `DATABASE_URL` locale ; le suffixe `_test` est ajouté par `doctrine.yaml`).
+  Obligatoire pour les tests : **Symfony ignore les `.local` en env test**,
+  on ne peut donc pas s'appuyer sur `.env.local`.
+
+Indispensables en `.env.local` :
 
 - `APP_SECRET`, `DATABASE_URL`
 - `MAILER_DSN` (SMTP GMX ; encoder `#` → `%23`, `%` → `%25` dans le mot de passe — piège déjà rencontré)
@@ -35,9 +50,11 @@ Fichier exemple : `.env.local.example`. Les indispensables :
 - `CONTACT_EMAIL`, `WHATSAPP_GROUP_LINK`, `MAIL_FROM_ADDRESS`
 - Boîte mail asso : `MAILBOX_HOST/PORT/ENCRYPTION/USER/PASSWORD` (+ `MAILBOX_SENT_FOLDER` optionnel, défaut `INBOX.Sent`)
 
-**En test** (`phpunit.dist.xml`) : `MAILBOX_HOST/PORT/USER/PASSWORD` sont
-forcés vides et le mailer est `null://null`. Le captcha Turnstile est
-désactivé (`config/packages/test/zmkr_cloudflare_turnstile.yaml`).
+**En test** (`phpunit.dist.xml`, version commitée) : `MAILBOX_*` forcés
+vides, mailer `null`, `DEFAULT_URI=http://localhost`, Messenger `sync://`,
+et les **clés Turnstile de test Cloudflare** (« always passes », non
+secrètes par nature) en `<server>`. Le dist ne contient JAMAIS de vraie
+valeur, surtout pas de `DATABASE_URL` en `force="true"` (piège section 8).
 
 ## 4. Lancer les tests
 
@@ -53,7 +70,9 @@ php bin/phpunit -c phpunit.dist.xml   # version commitée de la config
 
 La CI GitHub (`.github/workflows/tests.yml`) joue la suite entière sur un
 PostgreSQL 15 de service à chaque push sur `main` — si elle est rouge,
-ne pas déployer le CT 202.
+ne pas déployer le CT 202. Elle télécharge les paquets JS gérés par
+importmap (`php bin/console importmap:install --env=test`) et s'appuie sur
+les assets auto-hébergés versionnés dans `assets/vendor/` (section 8).
 
 DAMA DoctrineTestBundle isole chaque test dans une transaction : les
 entités sont détachées après la requête, re-fetcher l'entité pour
@@ -133,6 +152,23 @@ mode test avant de redéployer.
 - **Webhook Stripe** : vérifier que la valeur du secret ne contient pas
   un préfixe `whsec_` dupliqué ; symptôme : tous les webhooks en 400 et
   les dons restés `pending`.
+- **Config PHPUnit** : toute valeur mystère en test (user
+  `UTILISATEUR`, DSN inconnu) se grepe d'abord dans `phpunit.dist.xml` :
+  un `<server … force="true">` y écrase tout, y compris `.env.test`,
+  avant même le bootstrap. Une ligne `DATABASE_URL` copiée depuis
+  `.env.local.example` y a déjà coûté une demi-journée de debug.
+- **Assets vendor** : `assets/vendor/` est gitignoré **sauf**
+  `bootstrap/` et `fullcalendar/` (auto-hébergés volontairement,
+  requis par `app.js` et `base.html.twig`). `@hotwired/*` et consorts
+  sont téléchargés par `importmap:install`. Symptôme s'ils manquent
+  (typiquement en CI) : 40 erreurs « Circular reference detected for
+  "app.js" » causées par « Unable to find asset
+  ./vendor/bootstrap/js/bootstrap.bundle.min.js » — le message
+  « circular reference » est un leurre, c'est un import introuvable.
+- **Extensions PHP CLI** : vérifier curl et GD présents
+  (`php -m | grep -iE 'curl|gd'`) — `curl_version()` (Stripe) et
+  `imagewebp()` (ImageManager) étaient absents du PHP local et donnaient
+  des failures trompeuses.
 - **Base de données** : PostgreSQL sur le CT 202, rôle `postgres`
   (`su - postgres -c 'psql geomonkey ...'`). Tables notables :
   `membership_fees` (avec un s), `memberships`, `donations` (avec un s),
