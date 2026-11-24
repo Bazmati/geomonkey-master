@@ -20,7 +20,9 @@
 
 ###> symfony/asset-mapper ###
 /public/assets/
-/assets/vendor/
+/assets/vendor/*
+!/assets/vendor/bootstrap/
+!/assets/vendor/fullcalendar/
 ###< symfony/asset-mapper ###
 
 ###> ide ###
