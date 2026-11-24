@@ -77,8 +77,8 @@ jobs:
       # ImportMapGenerator explose à chaque rendu Twig : « Circular reference
       # detected for "app.js" » causé par « Unable to find asset
       # "./vendor/bootstrap/js/bootstrap.bundle.min.js" ».
-      - name: Assets vendor (importmap:download)
-        run: php bin/console importmap:download --env=test
+      - name: Assets vendor (importmap:install)
+        run: php bin/console importmap:install --env=test
 
       - name: Base de test (création + schéma)
         run: |
